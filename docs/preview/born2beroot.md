@@ -1,608 +1,522 @@
-# Born2beroot
+orn2beroot
 
-## Overview
+From a computer to a Linux server.
 
-Born2beroot는 **가상 머신(Virtual Machine)에 Linux 서버를 구축하고 관리하는 프로젝트**입니다.
+Born2beroot는 Virtual Machine 위에 Linux Server를 구축하고 직접 관리하면서 서버와 System Administration의 기본 개념을 학습하는 프로젝트입니다.
 
-이 프로젝트를 통해 가상화의 기본 개념부터 Linux 시스템의 사용자와 권한, 원격 접속, 네트워크 보안, 서비스 관리와 모니터링까지 서버 관리의 기초를 경험합니다.
+이 문서에서는 명령어부터 시작하지 않습니다. 서버란 무엇인가? → 왜 VM이 필요한가? → OS/Linux는 무슨 일을 하는가? → 서버를 어떻게 안전하게 운영하는가?라는 흐름으로 각 기술이 등장한 이유를 먼저 이해합니다.
 
-이후 Inception과 Inception of Things에서 Docker와 Kubernetes를 학습하기 위한 가장 기본적인 인프라 계층에 해당합니다.
+1. Server
 
----
+서버가 필요한 이유
 
-## 1. Virtual Machine
+우리가 사용하는 많은 프로그램은 혼자서 모든 일을 처리하지 않습니다. 예를 들어 Browser는 인터넷의 모든 Web Page를 가지고 있지 않습니다. 사용자가 페이지를 요청하면 어딘가의 시스템이 요청을 받아 데이터를 돌려줘야 합니다.
 
-Virtual Machine(VM)은 물리 컴퓨터의 CPU, 메모리, 저장공간 등의 자원을 **가상화하여 독립된 컴퓨터처럼 사용할 수 있도록 만든 환경**입니다.
+Browser (Client)
+      │ Request
+      ▼
+    Server
+      │ Response
+      ▼
+Browser
 
-```text
-Physical Machine
-       │
-       ▼
-   Hypervisor
-       │
-       ▼
- Virtual Machine
-       │
-       ▼
-     Debian
-```
+요청하는 쪽을 Client, 요청을 받아 기능이나 데이터를 제공하는 쪽을 Server라고 합니다.
 
-VM은 자신만의 Guest OS와 Kernel을 가질 수 있습니다.
+Server란?
 
-이를 통해 하나의 물리 컴퓨터에서 서로 다른 운영체제를 실행하거나, Host 시스템과 격리된 환경에서 서버를 구축하고 테스트할 수 있습니다.
+Server는 다른 프로그램이나 컴퓨터의 요청을 받아 Service를 제공하는 컴퓨터 또는 프로그램입니다.
 
----
+Web Server       → Web Page 제공
+Database Server  → Data 저장 / 조회
+File Server      → File 제공
+SSH Server       → Remote Shell 제공
 
-## 2. Linux와 Debian
+Server는 반드시 특별한 종류의 거대한 컴퓨터를 뜻하지 않습니다. 일반 Computer도 필요한 프로그램을 실행하고 Network를 통해 Service를 제공하도록 구성하면 Server 역할을 할 수 있습니다.
 
-Linux는 엄밀히 말하면 운영체제 전체가 아니라 **Kernel**입니다.
+Server를 운영한다는 것은 단순히 컴퓨터를 켜두는 것이 아닙니다. User와 Permission, Network 접근, Software, Storage, Service 상태 등을 지속적으로 관리해야 합니다. 이러한 작업을 System Administration이라고 합니다.
 
-Kernel은 애플리케이션과 하드웨어 사이에서 CPU, 메모리, 디스크, 네트워크 등의 시스템 자원을 관리합니다.
+2. 서버를 어떻게 연습할까?
 
-```text
-Application
+Linux Server를 공부하려면 직접 관리할 Server 환경이 필요합니다. 별도의 물리 Computer를 준비할 수도 있지만 학습할 때마다 Hardware를 준비하는 것은 비효율적이고, OS나 Network 설정을 실험하다 Host 환경을 망가뜨릴 수도 있습니다.
+
+우리가 원하는 것은 다음과 같습니다.
+
+내 실제 Computer
+      │
+      ├── 기존 환경 유지
+      │
+      └── 독립적인 Linux Server 실습 환경
+
+이 문제를 해결할 수 있는 대표적인 방법이 Virtualization입니다.
+
+3. Virtualization
+
+독립적인 System마다 Physical Machine을 하나씩 사용하면 격리는 쉽지만 Hardware가 계속 필요하고, 각 Machine에서 사용하지 않는 CPU와 RAM도 생깁니다.
+
+Physical Machine A → System A
+Physical Machine B → System B
+Physical Machine C → System C
+
+그래서 이런 질문이 생깁니다.
+
+하나의 물리 Computer를 여러 개의 독립적인 Computer처럼 사용할 수 없을까?
+
+Virtualization은 물리 Computing Resource를 추상화하여 하나의 물리 System 위에 여러 독립적인 실행 환경을 만들 수 있게 합니다.
+
+             Physical Machine
+          CPU / RAM / Disk / Network
+                     │
+                     ▼
+               Virtualization
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+        VM 1       VM 2       VM 3
+
+Hypervisor
+
+물리 Hardware를 Virtual Machine에 나누어 제공하고 VM을 관리하는 Software 계층을 Hypervisor라고 합니다.
+
+       VM 1          VM 2
+        │             │
+        └──────┬──────┘
+               ▼
+          Hypervisor
+               │
+               ▼
+     Physical Hardware
+
+Born2beroot에서 사용하는 VirtualBox도 이러한 Virtualization 환경을 제공합니다.
+
+4. Virtual Machine
+
+**Virtual Machine(VM)**은 Virtualization을 통해 만들어진 가상의 Computer 환경입니다.
+
+Virtual Machine
+├── Virtual CPU
+├── Virtual RAM
+├── Virtual Disk
+├── Virtual Network Interface
+└── Operating System
+
+각 VM은 독립적인 Operating System을 실행할 수 있습니다.
+
+Physical Computer
+        │
+        ▼
+    Hypervisor
+        │
+   ┌────┴────┐
+   ▼         ▼
+ VM 1       VM 2
+   │         │
+Debian     Ubuntu
+
+VM은 Isolation, 물리 Resource의 효율적인 사용, 서로 다른 OS 환경 구성, 안전한 Test Environment라는 장점을 줍니다. 반면 각 VM이 Guest OS 전체를 실행하므로 Container에 비해 일반적으로 더 많은 Resource를 사용합니다.
+
+Born2beroot에서는 왜 VM을 사용할까?
+
+Born2beroot의 목적은 Linux Server를 직접 구축하고 관리하는 것입니다.
+
+My Computer
+    ↓
+VirtualBox
+    ↓
+Virtual Machine
+    ↓
+Linux
+    ↓
+Server Administration
+
+VM 덕분에 Host Computer를 크게 변경하지 않고 독립적인 Linux Server를 만들 수 있습니다.
+
+그런데 Computer만 있다고 Program이 저절로 실행되는 것은 아닙니다. Hardware와 Application 사이에서 System 전체를 관리할 무언가가 필요합니다.
+
+5. Operating System
+
+여러 Program이 CPU, Memory, Disk, Network Device를 동시에 사용하려고 합니다. 각각이 Hardware를 직접 제어한다면 자원 충돌과 보안 문제가 생깁니다.
+
+Applications
      │
      ▼
+Operating System
+     │
+     ▼
+Hardware
+
+**Operating System(OS)**은 Hardware Resource를 관리하고 Application이 Computer를 사용할 수 있는 환경과 Interface를 제공합니다.
+
+CPU     → Process 실행 관리
+Memory  → Memory 할당과 보호
+Disk    → File과 Storage 관리
+Device  → Hardware Device 관리
+User    → 사용자와 권한 관리
+Network → Network Resource 관리
+
+6. Linux와 Debian
+
+엄밀히 말하면 Linux는 Kernel입니다. Kernel은 OS의 핵심 부분으로 CPU, Process, Memory, Device 등 Hardware Resource를 관리합니다.
+
+Applications
+     ↓
+System Tools / Libraries
+     ↓
 Linux Kernel
-     │
-     ▼
-  Hardware
-```
+     ↓
+Hardware
 
-Debian은 Linux Kernel에 Shell, 시스템 도구, 라이브러리, 패키지 관리자 등을 결합하여 실제 운영체제로 사용할 수 있도록 만든 **Linux Distribution(배포판)**입니다.
+Linux Kernel에 System Tool, Library, Package Manager 등을 묶어 실제 사용할 수 있는 OS 형태로 제공하는 것을 Linux Distribution이라고 합니다.
 
----
+Linux
+├── Debian
+├── Ubuntu
+├── Rocky Linux
+└── ...
 
-## 3. User, Group과 Permission
+Born2beroot에서는 Linux Distribution을 설치하고 직접 Server 환경으로 구성합니다.
 
-Linux는 여러 사용자가 하나의 시스템을 사용할 수 있는 **Multi-user System**입니다.
+이제 Server와 OS가 준비되었습니다. 다음 문제는 **여러 사용자가 같은 System을 사용한다면 누가 무엇을 할 수 있는가?**입니다.
 
-파일과 디렉터리의 접근 권한은 기본적으로 다음 세 범주로 구분됩니다.
+7. User, Group, Permission
 
-```text
-Owner
-Group
-Others
-```
+모든 사용자가 모든 File과 System 설정을 자유롭게 수정할 수 있다면 Server를 안전하게 운영할 수 없습니다.
 
-### 기본 명령어
+Linux는 User라는 Identity로 사용자를 구분하고, 여러 User를 Group으로 묶어 관리할 수 있습니다.
 
-현재 사용자 확인:
+File에는 대표적으로 다음 Permission이 있습니다.
 
-```bash
-whoami
-```
+r → read
+w → write
+x → execute
 
-사용자의 UID, GID와 Group 확인:
+권한의 대상은 user / group / others로 나뉩니다.
 
-```bash
+-rwxr-x---
+
+이를 통해 누가 어떤 Resource를 읽고, 수정하고, 실행할 수 있는가를 통제합니다.
+
+확인:
+
 id
-```
-
-시스템의 사용자 목록 확인:
-
-```bash
-cat /etc/passwd
-```
-
-특정 사용자가 속한 Group 확인:
-
-```bash
-groups username
-```
-
-사용자 생성:
-
-```bash
-sudo adduser username
-```
-
-Group 생성:
-
-```bash
-sudo groupadd groupname
-```
-
-사용자를 Group에 추가:
-
-```bash
-sudo usermod -aG groupname username
-```
-
-파일 권한 확인:
-
-```bash
+groups
 ls -l
-```
 
-파일 권한 변경:
+8. root와 sudo
 
-```bash
-chmod 755 file
-```
+System File 수정, Package 설치, User 관리, Network 설정 같은 작업은 System 전체에 영향을 줄 수 있습니다.
 
-핵심 원칙은 **필요한 사용자에게 필요한 권한만 부여하는 것**입니다.
+Linux의 강력한 관리자 계정이 root입니다. 하지만 모든 작업을 root로 하면 작은 실수도 System 전체에 영향을 줄 수 있습니다.
 
----
-
-## 4. root와 sudo
-
-`root`는 Linux 시스템에서 매우 강력한 관리 권한을 가진 특별한 사용자입니다.
-
-일반 사용자는 평소에는 제한된 권한으로 작업하고, 관리 권한이 필요한 경우 `sudo`를 사용합니다.
-
-```text
 Normal User
      │
-     │ sudo
+     │ 필요한 순간에만
+     ▼
+    sudo
+     │
      ▼
 Privileged Command
-```
 
-예를 들어 일반 사용자는 패키지를 설치할 권한이 없을 수 있습니다.
+sudo는 허가된 User가 필요한 Command에 대해 관리자 권한을 사용하도록 해줍니다.
 
-```bash
-apt install nginx
-```
+즉 Born2beroot의 sudo 설정은 단순한 명령어 학습이 아니라 관리자 권한을 어떻게 제한하고 위임할 것인가를 배우는 과정입니다.
 
-이때 허용된 사용자는:
+9. Authentication과 Password Policy
 
-```bash
-sudo apt install nginx
-```
+Permission이 잘 설정되어 있어도 다른 사람이 User의 계정으로 쉽게 로그인할 수 있다면 의미가 없습니다.
 
-처럼 관리자 권한으로 해당 명령만 실행할 수 있습니다.
+Authorization
+"이 User는 무엇을 할 수 있는가?"
 
-sudo 권한 확인:
+Authentication
+"지금 접속한 사람이 정말 그 User인가?"
 
-```bash
-sudo -l
-```
+Password는 Authentication 방법 중 하나입니다. Password Policy는 길이, 복잡성, 변경 주기 등의 규칙을 적용하여 너무 약한 인증 정보를 사용하는 위험을 줄입니다.
 
-`sudo`는 사용자가 아니라 **허용된 사용자가 특정 명령을 다른 사용자, 일반적으로 root의 권한으로 실행할 수 있도록 하는 도구**입니다.
+Born2beroot에서는 개별 Password뿐 아니라 System 차원의 인증 정책을 다룹니다.
 
----
+10. Remote Administration과 SSH
 
-## 5. SSH
+실제 Server는 관리자 바로 옆에 있지 않을 수 있습니다. Data Center나 다른 장소에 있는 Server를 관리하려면 Network를 통해 명령을 실행할 방법이 필요합니다.
 
-SSH(Secure Shell)는 **네트워크를 통해 다른 컴퓨터의 Shell에 안전하게 접속하기 위한 프로토콜**입니다.
+**SSH(Secure Shell)**는 Network를 통해 다른 Computer에 안전하게 접속하고 명령을 실행하기 위한 Protocol입니다.
 
-```text
-Local Computer
-      │
-      │ SSH
-      ▼
- Linux Server
-```
+Administrator
+     │
+     │ SSH
+     ▼
+  Network
+     │
+     ▼
+Linux Server
+     │
+     ▼
+   Shell
 
-### SSH 접속
+SSH는 원격 관리뿐 아니라 통신 내용을 암호화한다는 점도 중요합니다.
 
-기본 형태:
+Born2beroot에서는 VM에서 SSH Server를 실행하고 Host에서 VM으로 접속합니다.
 
-```bash
-ssh username@server_ip
-```
+ssh -p 4242 user@host
+systemctl status ssh
+
+11. IP Address와 Port
+
+Network에서 Server에 접속하려면 먼저 어느 Host인지 알아야 합니다. 이를 식별하는 데 IP Address가 사용됩니다.
+
+하지만 하나의 Server에서는 여러 Network Service가 동시에 실행될 수 있습니다.
+
+One Server
+├── SSH
+├── Web Server
+└── Database
+
+그래서 하나의 Host 안에서 Service를 구분하기 위해 Port를 사용합니다.
+
+IP Address
+    │
+    ├── Port 22  → SSH의 일반적인 Port
+    ├── Port 80  → HTTP
+    └── Port 443 → HTTPS
+
+즉 간단히 보면:
+
+IP Address → 어느 Computer?
+Port       → 그 Computer의 어느 Network Service?
+
+Born2beroot에서 SSH Port를 설정하면서 이 관계를 직접 확인합니다.
+
+12. Firewall
+
+Server가 Network에 연결되면 외부에서 들어오는 Connection도 생깁니다. 모든 접근을 허용할 필요는 없습니다.
+
+Firewall은 Network Traffic에 규칙을 적용하여 어떤 접근을 허용하고 차단할지 결정합니다.
+
+Network
+   │
+   ▼
+Firewall
+   │
+   ├── Allowed → Server
+   └── Denied  → Block
+
+Born2beroot에서는 필요한 Port만 허용하여 Service는 제공하면서 불필요한 Network 노출은 줄이는 것을 연습합니다.
+
+Debian에서 UFW를 사용한다면 상태를 다음처럼 확인할 수 있습니다.
+
+sudo ufw status
+
+13. Storage, Partition, LVM
+
+Server는 OS, Application, Log, User Data 등을 Disk에 저장합니다.
+
+Storage를 목적에 따라 분리할 수 있지만 고정된 Partition만으로 관리하면 나중에 공간을 조정하기 불편할 수 있습니다.
+
+**LVM(Logical Volume Manager)**은 Physical Storage와 실제 사용하는 Volume 사이에 논리적인 관리 계층을 둡니다.
+
+Physical Disk
+     ↓
+Physical Volume
+     ↓
+Volume Group
+     │
+     ├── Logical Volume A
+     ├── Logical Volume B
+     └── Logical Volume C
+
+이 구조를 통해 Storage를 더 유연하게 구성하고 확장할 수 있습니다.
+
+확인:
+
+lsblk
+sudo pvs
+sudo vgs
+sudo lvs
+
+Born2beroot에서 LVM을 사용하는 목적은 Partition 이름을 외우는 것이 아니라 Server Storage가 어떻게 구조화되고 관리되는지 이해하는 데 있습니다.
+
+14. Package Manager
+
+Server를 운영하면서 새로운 Software를 설치하고 Update해야 합니다.
+
+Program을 인터넷에서 하나씩 직접 찾아 설치한다면 Version, Dependency, Update, 삭제를 모두 직접 관리해야 합니다.
+
+Package Repository
+        ↓
+Package Manager
+        │
+        ├── Install
+        ├── Update
+        ├── Upgrade
+        └── Remove
+
+Debian 계열에서는 APT를 사용합니다.
+
+sudo apt update
+sudo apt install <package>
+
+apt update는 설치된 Package를 모두 새 Version으로 바꾸는 명령이 아니라 Repository의 Package 목록 정보를 갱신하는 명령입니다.
+
+15. Process, Daemon, Service, systemd
+
+Program을 실행하면 OS는 실행 중인 작업을 Process로 관리합니다.
+
+Program
+   │ execute
+   ▼
+Process
+
+하지만 SSH Server 같은 Program은 사용자가 Terminal을 열어둔 동안만 실행되어서는 안 됩니다. Background에서 계속 요청을 기다려야 합니다.
+
+Unix/Linux 환경에서 이런 형태로 Background에서 지속적으로 동작하는 Program을 흔히 Daemon이라고 합니다.
+
+그리고 Service를 시작하고 중지하고, Boot 시 자동 실행하고, 상태를 확인하는 관리 체계가 필요합니다. 많은 Linux Distribution에서는 systemd가 이 역할을 담당합니다.
+
+systemd
+├── start
+├── stop
+├── restart
+├── enable
+└── status
 
 예:
 
-```bash
-ssh daeun@192.168.1.10
-```
-
-SSH의 기본 Port는 `22`입니다.
-
-다른 Port를 사용한다면 `-p` 옵션을 사용합니다.
-
-```bash
-ssh -p 4242 daeun@192.168.1.10
-```
-
-Born2beroot에서는 SSH를 기본 Port 22가 아닌 **4242 Port**에서 실행하도록 설정합니다.
-
-### SSH 서비스 확인
-
-서버에서 SSH 서비스 상태 확인:
-
-```bash
-sudo systemctl status ssh
-```
-
-시작:
-
-```bash
-sudo systemctl start ssh
-```
-
-재시작:
-
-```bash
+systemctl status ssh
 sudo systemctl restart ssh
-```
 
-### SSH 설정
+16. Automation과 cron
 
-SSH 서버의 주요 설정 파일은:
+Server Administration에는 반복 작업이 많습니다.
 
-```text
-/etc/ssh/sshd_config
-```
+Backup
+Status Check
+Maintenance
+Script 실행
 
-입니다.
+사람이 정해진 시간마다 직접 실행하면 비효율적이고 실수하기 쉽습니다.
 
-예를 들어 설정 파일에서 SSH Port를 지정할 수 있습니다.
+cron은 정해진 시간이나 주기에 Command 또는 Script를 자동 실행할 수 있게 합니다.
 
-```text
-Port 4242
-```
+Schedule
+   ↓
+ cron
+   ↓
+Command / Script
 
-설정을 변경했다면 SSH 서비스를 재시작해야 적용됩니다.
+Born2beroot에서는 Monitoring Script를 주기적으로 실행하면서 기본적인 System Automation을 경험합니다.
 
-```bash
-sudo systemctl restart ssh
-```
+17. Monitoring
 
-### 연결 구조
+Server가 켜져 있다는 것과 Server가 정상적으로 동작한다는 것은 다릅니다.
 
-```text
-My Computer
-     │
-     │ ssh -p 4242 user@IP
-     │
-     ▼
-   Port 4242
-     │
-     ▼
- SSH Server (sshd)
-     │
-     ▼
- Linux Shell
-```
-
-즉 SSH는 단순히 "다른 컴퓨터에 접속한다"가 아니라, **Client가 네트워크를 통해 서버에서 실행 중인 SSH Service에 연결하는 것**입니다.
-
----
-
-## 6. Port
-
-하나의 서버에서는 여러 네트워크 서비스가 동시에 실행될 수 있습니다.
-
-Port는 **하나의 컴퓨터 안에서 어떤 네트워크 서비스와 통신할 것인지 구분하기 위한 번호**입니다.
-
-```text
-Server
-│
-├── 22   → SSH (default)
-├── 80   → HTTP
-├── 443  → HTTPS
-└── 4242 → Born2beroot SSH
-```
-
-현재 열려 있거나 Listening 중인 Port를 확인할 때는 다음과 같은 명령을 사용할 수 있습니다.
-
-```bash
-ss -tuln
-```
-
-프로세스 정보까지 함께 확인하려면:
-
-```bash
-sudo ss -tulpn
-```
-
----
-
-## 7. Firewall
-
-Firewall은 **네트워크 트래픽을 규칙에 따라 허용하거나 차단하는 시스템**입니다.
-
-Born2beroot에서는 UFW(Uncomplicated Firewall)를 사용합니다.
-
-```text
-Network
-   │
-   ▼
-  UFW
-   │
-   ├── Port 4242 → ALLOW
-   │
-   └── Others    → BLOCK
-   │
-   ▼
-Server
-```
-
-### Firewall 상태 확인
-
-```bash
-sudo ufw status
-```
-
-좀 더 자세히 확인:
-
-```bash
-sudo ufw status verbose
-```
-
-### Firewall 활성화
-
-```bash
-sudo ufw enable
-```
-
-비활성화:
-
-```bash
-sudo ufw disable
-```
-
-### Port 허용
-
-예를 들어 SSH가 사용하는 4242 Port를 허용하려면:
-
-```bash
-sudo ufw allow 4242
-```
-
-TCP만 명시적으로 허용하려면:
-
-```bash
-sudo ufw allow 4242/tcp
-```
-
-규칙 목록을 번호와 함께 확인:
-
-```bash
-sudo ufw status numbered
-```
-
-특정 규칙 삭제:
-
-```bash
-sudo ufw delete <rule-number>
-```
-
-### SSH와 Firewall의 관계
-
-SSH 서버가 4242에서 정상적으로 실행되고 있어도 Firewall이 해당 Port를 막고 있다면 외부에서 접속할 수 없습니다.
-
-```text
-SSH Server
-Listening :4242
-       ▲
-       │
-     Firewall
-       │
-       X
-     Client
-```
-
-따라서 서버를 외부에서 사용하려면 두 조건이 모두 필요합니다.
-
-```text
-Service가 Port에서 실행 중
-            +
-Firewall이 해당 Port 허용
-            ↓
-       접속 가능
-```
-
-이 관계는 이후 Inception에서 Docker의 Port와 Network를 공부할 때도 계속 등장합니다.
-
----
-
-## 8. LVM
-
-LVM(Logical Volume Manager)은 물리적인 저장장치와 실제로 사용하는 저장공간 사이에 **논리적인 관리 계층**을 추가합니다.
-
-```text
-Physical Disk
-      │
-      ▼
-Physical Volume
-      │
-      ▼
-Volume Group
-      │
-      ├── Logical Volume
-      └── Logical Volume
-```
-
-LVM 상태를 간단히 확인할 수 있는 명령어:
-
-```bash
-lsblk
-```
-
-Physical Volume:
-
-```bash
-sudo pvs
-```
-
-Volume Group:
-
-```bash
-sudo vgs
-```
-
-Logical Volume:
-
-```bash
-sudo lvs
-```
-
----
-
-## 9. Package Manager
-
-Debian에서는 `apt`를 이용해 패키지를 관리합니다.
-
-패키지 목록 업데이트:
-
-```bash
-sudo apt update
-```
-
-패키지 설치:
-
-```bash
-sudo apt install <package>
-```
-
-설치된 패키지 업데이트:
-
-```bash
-sudo apt upgrade
-```
-
-패키지 삭제:
-
-```bash
-sudo apt remove <package>
-```
-
----
-
-## 10. Service와 Daemon
-
-서버에는 백그라운드에서 지속적으로 실행되는 프로그램들이 있습니다.
-
-Debian에서는 `systemd`가 많은 시스템 서비스를 관리합니다.
-
-```text
-systemd
-   │
-   ├── ssh.service
-   ├── cron.service
-   └── ...
-```
-
-서비스 상태 확인:
-
-```bash
-systemctl status <service>
-```
-
-시작:
-
-```bash
-sudo systemctl start <service>
-```
-
-중지:
-
-```bash
-sudo systemctl stop <service>
-```
-
-재시작:
-
-```bash
-sudo systemctl restart <service>
-```
-
-부팅할 때 자동으로 시작하도록 설정:
-
-```bash
-sudo systemctl enable <service>
-```
-
----
-
-## 11. cron과 Monitoring
-
-`cron`은 특정 명령이나 스크립트를 **정해진 시간 또는 주기에 자동으로 실행**할 수 있도록 해주는 도구입니다.
-
-현재 사용자의 cron 설정:
-
-```bash
-crontab -l
-```
-
-cron 설정 수정:
-
-```bash
-crontab -e
-```
-
-root의 crontab을 수정하려면:
-
-```bash
-sudo crontab -e
-```
-
-예를 들어 일정 주기로 monitoring script를 실행하는 구조입니다.
-
-```text
-cron
- │
- │ 일정 주기
- ▼
-monitoring.sh
- │
- ▼
-System Information
-```
-
-Monitoring의 핵심은 특정 명령어를 암기하는 것이 아니라 **서버가 정상적으로 동작하고 있는지 지속적으로 관찰하는 것**입니다.
-
----
-
-## What I Learned
-
-Born2beroot에서는 **하나의 Linux 서버를 구축하고 관리하는 기본 방법**을 학습합니다.
-
-```text
-Virtual Machine
-      │
-      ▼
-    Linux
-      │
-      ├── User / Permission
-      ├── Service
-      ├── SSH
-      ├── Port
-      ├── Firewall
-      ├── Storage
-      └── Monitoring
-```
-
-특히 중요한 연결 관계는 다음과 같습니다.
-
-```text
-User
- ↓
-Permission
- ↓
-sudo / root
-
-
-Client
- ↓
-Network
- ↓
-Firewall
- ↓
-Port
- ↓
-Service
-
+관리자는 CPU, Memory, Disk, Process, User, Network 등 System 상태를 파악할 수 있어야 합니다.
 
 Server
- ↓
-Monitoring
-```
+├── CPU
+├── Memory
+├── Disk
+├── Process
+├── Network
+└── Users
+     │
+     ▼
+ Monitoring
+     │
+     ▼
+Administrator
 
-다음 프로젝트인 Inception에서는 하나의 서버 위에 여러 서비스를 직접 설치하는 대신, **각 서비스를 Container라는 독립적인 실행 환경으로 분리하여 관리하는 방법**을 학습합니다.
+Born2beroot에서는 monitoring.sh 같은 Script로 여러 System 정보를 수집하고 주기적으로 출력하면서 Monitoring + Shell Script + Automation이 어떻게 연결되는지 경험합니다.
 
-```text
+18. Born2beroot의 전체 그림
+
+각 기술은 서로 떨어져 있는 것이 아닙니다.
+
+Service를 제공하는 Computer가 필요하다
+                ↓
+              Server
+                ↓
+독립적인 실습 환경이 필요하다
+                ↓
+       Virtualization / VM
+                ↓
+Hardware와 Program을 관리해야 한다
+                ↓
+       Operating System
+                ↓
+          Linux / Debian
+                ↓
+사용자와 Resource 접근을 구분해야 한다
+                ↓
+    User / Group / Permission
+                ↓
+관리자 권한을 통제해야 한다
+                ↓
+          root / sudo
+                ↓
+사용자의 신원을 확인해야 한다
+                ↓
+        Password Policy
+                ↓
+원격으로 Server를 관리해야 한다
+                ↓
+               SSH
+                ↓
+Network에서 Host와 Service를 찾아야 한다
+                ↓
+        IP Address / Port
+                ↓
+Network 접근을 통제해야 한다
+                ↓
+            Firewall
+                ↓
+Storage를 유연하게 관리해야 한다
+                ↓
+         Partition / LVM
+                ↓
+Software를 체계적으로 관리해야 한다
+                ↓
+        Package Manager
+                ↓
+Server Program을 지속적으로 운영해야 한다
+                ↓
+   Process / Service / systemd
+                ↓
+반복 작업을 자동화해야 한다
+                ↓
+              cron
+                ↓
+Server 상태를 파악해야 한다
+                ↓
+           Monitoring
+
+결국 Born2beroot가 던지는 큰 질문은 하나입니다.
+
+Linux Server 한 대를 안전하고 지속적으로 운영하려면 무엇이 필요한가?
+
+19. 다음 단계: Inception
+
+Born2beroot에서는 Linux Server 한 대를 구성하고 관리하는 기본을 배웠습니다.
+
+그런데 하나의 Server에 여러 Application을 직접 설치하기 시작하면 새로운 문제가 생깁니다.
+
+Linux Server
+├── Web Server
+├── WordPress
+├── Database
+└── Other Applications
+
+각 Application은 서로 다른 Version, Library, Configuration을 요구할 수 있고 서로의 환경에 영향을 줄 수 있습니다.
+
+그래서 다음 질문으로 이어집니다.
+
+여러 Application을 하나의 Server에서 서로 분리된 환경으로 실행할 수 없을까?
+
 Born2beroot
-     │
-     │ Linux / VM
-     ▼
- Inception
-     │
-     │ Docker / Container
-     ▼
-Inception of Things
-```
+Linux Server Administration
+        ↓
+"Application 환경을 어떻게 분리하지?"
+        ↓
+Inception
+        ↓
+Docker / Container
+
+이 질문이 다음 프로젝트인 Inception으로 이어집니다.
