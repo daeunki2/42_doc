@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Project Guide - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Project Guide";
+        var mkdocs_page_input_path = "iot/subject.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Preview</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../preview/born2beroot/">Born2beroot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../preview/inception/">Inception</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inception of Things</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Project Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1">1. 이 과제는 무엇을 배우는 과제인가?</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../part1/">Part 1 — K3s & Vagrant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../part2/">Part 2 — K3s & Applications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../part3/">Part 3 — K3d & Argo CD</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bonus/">Bonus — GitLab</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Review</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../review/">Review</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Inception of Things</li>
+      <li class="breadcrumb-item active">Project Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="_1">과제 파악하기</h1>
+<h2 id="1">1. 이 과제는 무엇을 배우는 과제인가?</h2>
+<p>Inception of Things는 <strong>Kubernetes를 처음 경험하기 위한 System Administration 프로젝트</strong>입니다.</p>
+<p>과제는 Vagrant를 이용한 Virtual Machine 구성에서 시작하여 K3s를 이용한 Kubernetes Cluster 구성, Application 배포, 그리고 K3d와 Argo CD를 이용한 자동 배포까지 단계적으로 진행됩니다.</p>
+<p>원본 과제는 이 프로젝트를 <strong>Kubernetes에 대한 최소한의 입문(minimal introduction)</strong>이라고 설명합니다.</p>
+<p>따라서 이 과제의 목표는 Kubernetes의 모든 기능을 배우는 것이 아닙니다.</p>
+<p>전체적인 학습 흐름을 먼저 이해하는 것이 중요합니다.</p>
+<pre><code class="language-text">Virtual Machine
+      │
+      ▼
+   Vagrant
+      │
+      ▼
+     K3s
+      │
+      ▼
+ Kubernetes
+      │
+      ▼
+Application Deployment
+      │
+      ▼
+     K3d
+      │
+      ▼
+   Argo CD
+      │
+      ▼
+    GitOps
+</code></pre>
+<p>과제는 크게 세 단계로 구성됩니다.</p>
+<pre><code class="language-text">Part 1
+K3s + Vagrant
+→ Kubernetes Cluster 만들기
+
+Part 2
+K3s + Applications
+→ Kubernetes에 Application 배포하기
+
+Part 3
+K3d + Argo CD
+→ Git을 기준으로 Application 배포 자동화하기
+
+Bonus
+GitLab
+→ Git 저장소까지 Local Infrastructure에 포함하기
+</code></pre>
+<hr />
+<h1 id="2">2. 먼저 알아야 할 것</h1>
+<p>이 프로젝트를 시작하기 전에 모든 개념을 완벽하게 공부할 필요는 없습니다.</p>
+<p>다만 다음 흐름은 알고 시작하는 것이 좋습니다.</p>
+<h2 id="_2">우리가 이미 배운 것</h2>
+<p>Born2beroot와 Inception에서 배운 개념들이 그대로 이어집니다.</p>
+<pre><code class="language-text">Born2beroot
+
+Virtual Machine
+Linux
+IP / Port
+SSH
+Service
+Network
+      │
+      ▼
+Inception
+
+Docker
+Image
+Container
+Network
+Volume
+Docker Compose
+      │
+      ▼
+Inception of Things
+
+Vagrant
+Kubernetes
+K3s / K3d
+Pod
+Deployment
+Service
+Ingress
+Namespace
+Argo CD
+GitOps
+</code></pre>
+<p>즉 완전히 새로운 내용을 처음부터 배우는 것이 아니라,</p>
+<blockquote>
+<p><strong>VM과 Container에 대한 지식을 바탕으로 여러 Container를 관리하는 방법을 배우는 과정</strong></p>
+</blockquote>
+<p>이라고 생각할 수 있습니다.</p>
+<hr />
+<h1 id="3-kubernetes">3. Kubernetes는 왜 필요한가?</h1>
+<p>Inception에서는 Docker Compose를 이용하여 여러 Container를 구성했습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Docker Compose
+
+├── NGINX
+├── WordPress
+└── MariaDB
+</code></pre>
+<p>작은 환경에서는 이런 방식으로도 충분합니다.</p>
+<p>하지만 Container와 Server가 많아지면 새로운 문제가 발생합니다.</p>
+<pre><code class="language-text">Container가 죽으면?
+
+Container를 3개 실행하고 싶다면?
+
+3개 중 하나가 죽으면?
+
+여러 Server가 있다면
+어느 Server에 Container를 실행해야 할까?
+
+Application을 업데이트하려면?
+
+Container의 IP가 계속 바뀐다면
+다른 Application은 어떻게 찾을까?
+</code></pre>
+<p>이러한 문제를 관리하는 시스템을 <strong>Container Orchestrator</strong>라고 합니다.</p>
+<p>Kubernetes가 대표적인 Container Orchestrator입니다.</p>
+<p>이 과제에서는 Kubernetes가 이러한 문제를 어떻게 해결하는지 아주 작은 환경에서 직접 경험하게 됩니다.</p>
+<hr />
+<h1 id="4">4. 이 과제에서 가장 중요한 생각</h1>
+<p>Kubernetes를 공부할 때 가장 먼저 이해해야 할 개념 중 하나는 <strong>Desired State</strong>입니다.</p>
+<p>Docker를 직접 사용할 때는 보통 명령을 내립니다.</p>
+<pre><code class="language-text">이 Container를 실행해.
+</code></pre>
+<p>Kubernetes에서는 조금 다르게 생각합니다.</p>
+<pre><code class="language-text">이 Application의 Pod가
+항상 3개 존재해야 한다.
+</code></pre>
+<p>우리는 원하는 상태를 선언하고 Kubernetes는 실제 상태를 그 상태에 맞추려고 합니다.</p>
+<pre><code class="language-text">Desired State
+
+Pod = 3
+      │
+      ▼
+Kubernetes
+      │
+      ▼
+Actual State
+
+Pod
+Pod
+Pod
+</code></pre>
+<p>만약 하나가 죽으면:</p>
+<pre><code class="language-text">Desired: 3
+
+Actual: 2
+
+      ↓
+
+Kubernetes
+
+      ↓
+
+새로운 Pod 생성
+
+      ↓
+
+Actual: 3
+</code></pre>
+<p>이 <strong>"원하는 상태를 선언하고 시스템이 그 상태를 유지한다"</strong>는 생각은 이후 Argo CD와 GitOps를 이해하는 데도 중요합니다.</p>
+<hr />
+<h1 id="5-part-1-k3s-and-vagrant">5. Part 1 — K3s and Vagrant</h1>
+<h2 id="_3">목표</h2>
+<p>Part 1에서는 <strong>두 개의 Virtual Machine을 만들고 K3s Cluster를 구성합니다.</strong></p>
+<pre><code class="language-text">              Kubernetes Cluster
+
+        ┌────────────────────┐
+        │                    │
+        ▼                    ▼
+
+   VM 1                    VM 2
+192.168.56.110          192.168.56.111
+
+ K3s Server              K3s Agent
+ Controller               Worker
+</code></pre>
+<p>VM은 직접 하나씩 만드는 것이 아니라 <strong>Vagrant</strong>를 이용하여 생성합니다.</p>
+<hr />
+<h2 id="_4">과제가 요구하는 것</h2>
+<p>VM 두 대가 필요합니다.</p>
+<p>첫 번째:</p>
+<pre><code class="language-text">hostname
+→ &lt;login&gt;S
+
+IP
+→ 192.168.56.110
+
+K3s
+→ Server / Controller
+</code></pre>
+<p>두 번째:</p>
+<pre><code class="language-text">hostname
+→ &lt;login&gt;SW
+
+IP
+→ 192.168.56.111
+
+K3s
+→ Agent / Worker
+</code></pre>
+<p>두 머신 모두 password 없이 SSH 접속할 수 있어야 합니다.</p>
+<p>또한 <code>kubectl</code>을 사용할 수 있어야 합니다.</p>
+<hr />
+<h2 id="_5">여기서 배워야 할 개념</h2>
+<h3 id="vagrant">Vagrant</h3>
+<p>Virtual Machine 환경을 <strong>코드로 정의하고 자동으로 생성하기 위한 도구</strong>입니다.</p>
+<p>Born2beroot에서는 VM을 직접 만들었다면:</p>
+<pre><code class="language-text">Born2beroot
+
+VM 설정
+→ OS 설치
+→ Network 설정
+→ 직접 관리
+</code></pre>
+<p>Vagrant에서는:</p>
+<pre><code class="language-text">Vagrantfile
+      │
+      ▼
+vagrant up
+      │
+      ▼
+VM 생성
+      │
+      ├── CPU
+      ├── RAM
+      ├── Network
+      ├── Hostname
+      └── Provisioning
+</code></pre>
+<p>이라는 방식으로 VM 환경을 재현할 수 있습니다.</p>
+<h3 id="provisioning">Provisioning</h3>
+<p>VM을 만든 뒤 필요한 프로그램 설치와 설정까지 자동으로 수행하는 과정입니다.</p>
+<pre><code class="language-text">VM 생성
+   │
+   ▼
+Provisioning Script
+   │
+   ├── K3s 설치
+   ├── 설정
+   └── Cluster 연결
+</code></pre>
+<h3 id="kubernetes-cluster">Kubernetes Cluster</h3>
+<p>여러 머신을 하나의 Kubernetes 환경으로 묶은 것입니다.</p>
+<h3 id="node">Node</h3>
+<p>Kubernetes Cluster에 참여하는 하나의 Machine입니다.</p>
+<p>이 과제에서는:</p>
+<pre><code class="language-text">Cluster
+│
+├── Server Node
+│
+└── Agent Node
+</code></pre>
+<p>형태가 됩니다.</p>
+<h3 id="k3s">K3s</h3>
+<p>K3s는 Kubernetes를 가볍게 구성할 수 있도록 만든 Kubernetes Distribution입니다.</p>
+<p>Part 1에서는 K3s를 이용하여 작은 Kubernetes Cluster를 직접 구성합니다.</p>
+<h3 id="kubectl">kubectl</h3>
+<p>Kubernetes Cluster에 명령을 보내고 상태를 확인하기 위한 CLI입니다.</p>
+<p>예:</p>
+<pre><code class="language-bash">kubectl get nodes
+</code></pre>
+<pre><code class="language-bash">kubectl get pods
+</code></pre>
+<hr />
+<h2 id="part-1">Part 1에서 스스로 답할 수 있어야 하는 질문</h2>
+<p>Part 1이 끝났다면 최소한 다음 질문에 답할 수 있어야 합니다.</p>
+<pre><code class="language-text">Vagrant는 왜 사용하는가?
+
+Vagrantfile은 무엇인가?
+
+Provisioning은 무엇인가?
+
+Kubernetes Cluster란 무엇인가?
+
+Node란 무엇인가?
+
+Server와 Agent의 차이는 무엇인가?
+
+K3s는 Kubernetes와 어떤 관계인가?
+
+두 VM은 어떻게 하나의 Cluster가 되는가?
+
+kubectl은 누구에게 명령을 보내는가?
+</code></pre>
+<hr />
+<h1 id="6-part-2-k3s-and-applications">6. Part 2 — K3s and Applications</h1>
+<p>Part 1에서는 Kubernetes가 실행될 <strong>환경</strong>을 만들었습니다.</p>
+<p>Part 2에서는 처음으로 그 Kubernetes 위에 <strong>Application을 배포합니다.</strong></p>
+<h2 id="_6">목표</h2>
+<p>이번에는 VM 하나만 사용합니다.</p>
+<pre><code class="language-text">VM
+│
+│ K3s Server
+│
+└── Kubernetes
+      │
+      ├── App 1
+      ├── App 2 × 3
+      └── App 3
+</code></pre>
+<p>세 개의 Web Application을 실행해야 합니다.</p>
+<p>요청의 <code>HOST</code>에 따라 서로 다른 Application이 보여야 합니다.</p>
+<pre><code class="language-text">                  192.168.56.110
+                         │
+                      Ingress
+                         │
+          ┌──────────────┼──────────────┐
+          │              │              │
+       app1.com        app2.com       default
+          │              │              │
+          ▼              ▼              ▼
+        App 1           App 2          App 3
+                        × 3
+</code></pre>
+<p>특히 <strong>App 2는 3개의 Replica</strong>를 가져야 합니다.</p>
+<hr />
+<h1 id="7-kubernetes">7. 여기서 Kubernetes의 핵심 개념을 배운다</h1>
+<p>Part 2가 이 과제에서 Kubernetes 자체를 이해하는 가장 중요한 부분입니다.</p>
+<h2 id="pod">Pod</h2>
+<p>Container가 Kubernetes에서 실행되는 기본 단위입니다.</p>
+<p>처음에는 다음 정도로 이해하면 충분합니다.</p>
+<pre><code class="language-text">Docker
+
+Container
+
+    ↓ Kubernetes
+
+Pod
+└── Container
+</code></pre>
+<p>Pod 안에는 하나 이상의 Container가 들어갈 수 있습니다.</p>
+<hr />
+<h2 id="deployment">Deployment</h2>
+<p>Application의 Pod를 어떻게 실행하고 유지할지 선언합니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">App2
+
+replicas: 3
+</code></pre>
+<p>라고 선언하면:</p>
+<pre><code class="language-text">Deployment
+    │
+    ├── Pod
+    ├── Pod
+    └── Pod
+</code></pre>
+<p>형태로 유지됩니다.</p>
+<hr />
+<h2 id="replica">Replica</h2>
+<p>같은 Application의 Pod를 여러 개 실행하는 것입니다.</p>
+<p>Part 2의 App2가 바로 이를 경험하기 위한 요구사항입니다.</p>
+<pre><code class="language-text">App2
+
+├── Pod
+├── Pod
+└── Pod
+</code></pre>
+<hr />
+<h2 id="service">Service</h2>
+<p>Pod는 생성되고 삭제될 수 있습니다.</p>
+<p>따라서 다른 시스템이 특정 Pod 하나의 IP에 직접 의존하면 관리하기 어렵습니다.</p>
+<p>Service는 여러 Pod 앞에 <strong>안정적인 접근 지점</strong>을 제공합니다.</p>
+<pre><code class="language-text">Service
+   │
+   ├── Pod
+   ├── Pod
+   └── Pod
+</code></pre>
+<hr />
+<h2 id="ingress">Ingress</h2>
+<p>외부에서 들어온 HTTP 요청을 규칙에 따라 적절한 Service로 전달합니다.</p>
+<p>이 과제에서는 <code>HOST</code>를 이용합니다.</p>
+<pre><code class="language-text">app1.com
+    │
+    ▼
+Ingress
+    │
+    ▼
+App1 Service
+</code></pre>
+<pre><code class="language-text">app2.com
+    │
+    ▼
+Ingress
+    │
+    ▼
+App2 Service
+</code></pre>
+<p>그 외 요청은 App3로 보내야 합니다.</p>
+<hr />
+<h2 id="kubernetes-yaml">Kubernetes YAML</h2>
+<p>Kubernetes에서는 원하는 리소스 상태를 YAML 파일로 선언하는 방식을 많이 사용합니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-yaml">kind: Deployment
+
+spec:
+  replicas: 3
+</code></pre>
+<p>처럼:</p>
+<blockquote>
+<p>"Pod를 세 개 만들어라"</p>
+</blockquote>
+<p>라고 명령을 반복해서 내리는 것이 아니라,</p>
+<blockquote>
+<p>"이 Application은 Pod가 세 개 존재하는 상태여야 한다"</p>
+</blockquote>
+<p>라고 원하는 상태를 선언합니다.</p>
+<hr />
+<h2 id="part-2">Part 2에서 반드시 연결해야 하는 구조</h2>
+<p>각 개념을 따로 외우기보다 다음 흐름을 이해하는 것이 중요합니다.</p>
+<pre><code class="language-text">External Request
+       │
+       ▼
+    Ingress
+       │
+       ▼
+    Service
+       │
+       ▼
+  Deployment
+       │
+       ▼
+      Pod
+       │
+       ▼
+   Container
+</code></pre>
+<hr />
+<h2 id="part-2_1">Part 2가 끝났을 때 답할 수 있어야 하는 질문</h2>
+<pre><code class="language-text">Pod와 Container의 관계는?
+
+Deployment는 왜 필요한가?
+
+Replica는 왜 만드는가?
+
+Pod 하나가 죽으면 어떻게 되는가?
+
+Service는 왜 필요한가?
+
+Ingress와 Service는 무엇이 다른가?
+
+HOST에 따라 다른 Application을
+어떻게 보여주는가?
+
+왜 App2를 3개 실행하도록 했을까?
+</code></pre>
+<hr />
+<h1 id="8-part-3-k3d-and-argo-cd">8. Part 3 — K3d and Argo CD</h1>
+<p>Part 2까지는 우리가 직접 Kubernetes에 Application을 배포했습니다.</p>
+<p>Part 3에서는 여기서 한 단계 더 나아갑니다.</p>
+<h2 id="_7">목표</h2>
+<p>이번에는 Vagrant를 사용하지 않습니다.</p>
+<p>VM 안에 Docker와 K3d 등을 설치하고 Kubernetes 환경을 구성합니다.</p>
+<p>그리고 Argo CD를 이용합니다.</p>
+<p>전체 구조는 다음과 같습니다.</p>
+<pre><code class="language-text">Developer
+    │
+    │ git push
+    ▼
+Public GitHub Repository
+    │
+    │ Desired State
+    ▼
+  Argo CD
+    │
+    │ Sync
+    ▼
+ Kubernetes
+    │
+    ▼
+Application
+</code></pre>
+<hr />
+<h1 id="9-k3s-k3d">9. K3s와 K3d</h1>
+<p>과제에서는 <strong>K3s와 K3d의 차이를 이해해야 한다고 명시적으로 요구합니다.</strong></p>
+<p>Part 1과 Part 2에서는 K3s를 사용했습니다.</p>
+<p>Part 3에서는 K3d를 사용합니다.</p>
+<p>학습할 때 다음 질문을 중심으로 비교해야 합니다.</p>
+<pre><code class="language-text">K3s란 무엇인가?
+
+K3d란 무엇인가?
+
+왜 K3d를 사용하려면 Docker가 필요한가?
+
+Part 1에서는 왜 VM 안에 K3s를 설치했는가?
+
+Part 3에서는 Cluster가 어디에서 실행되는가?
+</code></pre>
+<hr />
+<h1 id="10-namespace">10. Namespace</h1>
+<p>Part 3에서는 두 개의 Namespace를 만들어야 합니다.</p>
+<pre><code class="language-text">Kubernetes Cluster
+│
+├── namespace: argocd
+│      │
+│      └── Argo CD
+│
+└── namespace: dev
+       │
+       └── Application
+</code></pre>
+<p>Namespace는 하나의 Kubernetes Cluster 안에서 리소스를 논리적으로 구분하는 방법입니다.</p>
+<hr />
+<h1 id="11-argo-cd">11. Argo CD</h1>
+<p>Argo CD는 Git Repository에 선언된 Kubernetes 설정을 기준으로 Cluster의 상태를 관리합니다.</p>
+<p>예를 들어 GitHub에:</p>
+<pre><code class="language-text">deployment.yaml
+
+image: playground:v1
+</code></pre>
+<p>이 있다고 가정합니다.</p>
+<p>Cluster도:</p>
+<pre><code class="language-text">playground:v1
+</code></pre>
+<p>을 실행하고 있습니다.</p>
+<p>이 상태는 서로 일치합니다.</p>
+<pre><code class="language-text">Git        Cluster
+
+v1    ==    v1
+
+      Synced
+</code></pre>
+<p>Git을:</p>
+<pre><code class="language-text">v1 → v2
+</code></pre>
+<p>로 변경하면:</p>
+<pre><code class="language-text">Git        Cluster
+
+v2    !=    v1
+</code></pre>
+<p>차이가 발생합니다.</p>
+<p>Argo CD가 이를 동기화하면:</p>
+<pre><code class="language-text">Git        Cluster
+
+v2    ==    v2
+
+      Synced
+</code></pre>
+<p>가 됩니다.</p>
+<p>과제에서는 실제로 Git Repository에서 Application 버전을 변경하고 Application이 업데이트되는 것을 확인해야 합니다.</p>
+<hr />
+<h1 id="12-gitops">12. GitOps</h1>
+<p>Part 3에서 배우게 되는 중요한 운영 방식입니다.</p>
+<p>GitOps에서는 Git Repository를 시스템의 원하는 상태를 기록하는 <strong>Source of Truth</strong>로 사용합니다.</p>
+<p>기존 방식:</p>
+<pre><code class="language-text">Developer
+    │
+kubectl 명령
+    │
+    ▼
+Kubernetes
+</code></pre>
+<p>GitOps:</p>
+<pre><code class="language-text">Developer
+    │
+ git push
+    ▼
+   Git
+    │
+    ▼
+ Argo CD
+    │
+    ▼
+Kubernetes
+</code></pre>
+<p>따라서:</p>
+<pre><code class="language-text">Git에 기록된 상태
+        =
+우리가 원하는 상태
+</code></pre>
+<p>가 됩니다.</p>
+<p>이 개념은 앞에서 배운 Kubernetes의 <strong>Desired State</strong>와 연결됩니다.</p>
+<hr />
+<h1 id="13-part-3">13. Part 3에서 배워야 할 개념</h1>
+<pre><code class="language-text">K3d
+│
+├── K3s와의 차이
+├── Docker와의 관계
+└── Cluster 생성
+
+Namespace
+│
+└── Resource 분리
+
+Argo CD
+│
+├── Git Repository 감시
+├── Desired State 비교
+└── Synchronization
+
+GitOps
+│
+├── Git = Source of Truth
+└── Declarative Deployment
+
+Image Tag
+│
+├── v1
+└── v2
+</code></pre>
+<hr />
+<h1 id="14-part-3">14. Part 3이 끝났을 때 답할 수 있어야 하는 질문</h1>
+<pre><code class="language-text">K3s와 K3d의 차이는?
+
+왜 K3d에 Docker가 필요한가?
+
+Namespace는 왜 사용하는가?
+
+Argo CD는 무엇을 하는가?
+
+Argo CD는 무엇과 무엇을 비교하는가?
+
+Git이 Source of Truth라는 것은 무슨 뜻인가?
+
+Git에서 v1 → v2로 변경하면
+어떤 과정을 거쳐 Application이 바뀌는가?
+
+GitOps와 직접 kubectl을 사용하는 방식은
+무엇이 다른가?
+</code></pre>
+<hr />
+<h1 id="15-bonus-gitlab">15. Bonus — GitLab</h1>
+<p>Bonus에서는 Part 3에서 사용했던 GitHub를 <strong>Local GitLab</strong>으로 대체합니다.</p>
+<p>Part 3:</p>
+<pre><code class="language-text">GitHub
+   │
+   ▼
+Argo CD
+   │
+   ▼
+Kubernetes
+</code></pre>
+<p>Bonus:</p>
+<pre><code class="language-text">Local GitLab
+      │
+      ▼
+   Argo CD
+      │
+      ▼
+ Kubernetes
+</code></pre>
+<p>GitLab 자체도 Local에서 실행되어야 하며:</p>
+<pre><code class="language-text">namespace: gitlab
+</code></pre>
+<p>이라는 전용 Namespace를 만들어야 합니다.</p>
+<p>Part 3에서 구현했던 모든 기능이 Local GitLab을 이용해서도 동작해야 합니다.</p>
+<p>Bonus에서는 필요하다면 Helm 등의 도구를 사용할 수 있습니다.</p>
+<blockquote>
+<p>Bonus는 Mandatory가 완벽하게 동작하는 경우에만 평가됩니다.</p>
+</blockquote>
+<hr />
+<h1 id="16">16. 과제 전체에서 배워야 할 개념 지도</h1>
+<p>처음부터 모든 것을 공부하려고 하면 Kubernetes 용어가 한꺼번에 등장하기 때문에 혼란스러울 수 있습니다.</p>
+<p>다음 순서로 공부하는 것이 좋습니다.</p>
+<pre><code class="language-text">[이미 알고 있어야 할 것]
+
+Linux
+ │
+ ├── Process
+ ├── Service
+ ├── IP / Port
+ ├── SSH
+ └── Network
+       │
+       ▼
+Docker
+ │
+ ├── Image
+ ├── Container
+ └── Network
+
+────────────────────────────
+
+[Part 1]
+
+Virtual Machine
+       │
+       ▼
+    Vagrant
+       │
+       ▼
+  Provisioning
+       │
+       ▼
+      K3s
+       │
+       ▼
+Kubernetes Cluster
+       │
+       ├── Server
+       └── Agent
+       │
+       ▼
+     kubectl
+
+────────────────────────────
+
+[Part 2]
+
+    Container
+        │
+        ▼
+       Pod
+        │
+        ▼
+   Deployment
+        │
+        ▼
+     Replica
+        │
+        ▼
+     Service
+        │
+        ▼
+     Ingress
+
+────────────────────────────
+
+[Part 3]
+
+      Docker
+        │
+        ▼
+       K3d
+        │
+        ▼
+ Kubernetes Cluster
+        │
+        ├── Namespace
+        │
+        ▼
+     Argo CD
+        │
+        ▼
+       Git
+        │
+        ▼
+      GitOps
+
+────────────────────────────
+
+[Bonus]
+
+     GitLab
+        │
+        ▼
+Local Git Repository
+        │
+        ▼
+     Argo CD
+        │
+        ▼
+    Kubernetes
+</code></pre>
+<hr />
+<h1 id="17">17. 과제의 진짜 학습 흐름</h1>
+<p>이 프로젝트를 단순히:</p>
+<pre><code class="language-text">Vagrant 설치
+K3s 설치
+YAML 작성
+Argo CD 설치
+</code></pre>
+<p>라는 설치 과제로 접근하면 각각의 기술이 왜 필요한지 이해하기 어렵습니다.</p>
+<p>대신 각 Part가 <strong>하나의 질문에 답하는 과정</strong>이라고 생각하는 것이 좋습니다.</p>
+<h3 id="part-1_1">Part 1</h3>
+<blockquote>
+<p>Kubernetes가 동작할 환경은 어떻게 만드는가?</p>
+</blockquote>
+<pre><code class="language-text">Vagrant
+→ VM
+→ K3s
+→ Cluster
+</code></pre>
+<h3 id="part-2_2">Part 2</h3>
+<blockquote>
+<p>Kubernetes는 Application을 어떻게 실행하고 외부에 제공하는가?</p>
+</blockquote>
+<pre><code class="language-text">Deployment
+→ Pod
+→ Service
+→ Ingress
+</code></pre>
+<h3 id="part-3">Part 3</h3>
+<blockquote>
+<p>Application의 배포 상태를 Git을 기준으로 자동 관리할 수 있는가?</p>
+</blockquote>
+<pre><code class="language-text">Git
+→ Argo CD
+→ Kubernetes
+</code></pre>
+<h3 id="bonus">Bonus</h3>
+<blockquote>
+<p>Git Repository까지 직접 운영한다면?</p>
+</blockquote>
+<pre><code class="language-text">GitLab
+→ Argo CD
+→ Kubernetes
+</code></pre>
+<hr />
+<h1 id="18">18. 구현 전에 세울 학습 목표</h1>
+<p>이 프로젝트를 완료했을 때 다음 문장을 자신의 말로 설명할 수 있다면 과제의 핵심을 이해했다고 볼 수 있습니다.</p>
+<h3 id="infrastructure">Infrastructure</h3>
+<blockquote>
+<p>Virtual Machine과 Container의 차이를 설명할 수 있다.</p>
+<p>Vagrant가 VM 환경을 어떻게 재현하는지 설명할 수 있다.</p>
+</blockquote>
+<h3 id="kubernetes">Kubernetes</h3>
+<blockquote>
+<p>Kubernetes가 왜 필요한지 설명할 수 있다.</p>
+<p>Cluster와 Node의 관계를 설명할 수 있다.</p>
+<p>Pod, Deployment, Service, Ingress의 역할과 연결 관계를 설명할 수 있다.</p>
+</blockquote>
+<h3 id="deployment_1">Deployment</h3>
+<blockquote>
+<p>Kubernetes의 Desired State 개념을 설명할 수 있다.</p>
+<p>Replica를 선언했을 때 Kubernetes가 무엇을 하는지 설명할 수 있다.</p>
+</blockquote>
+<h3 id="gitops">GitOps</h3>
+<blockquote>
+<p>K3s와 K3d의 차이를 설명할 수 있다.</p>
+<p>Argo CD가 무엇을 비교하고 동기화하는지 설명할 수 있다.</p>
+<p>Git을 Source of Truth로 사용한다는 의미를 설명할 수 있다.</p>
+<p>Git에서 Application의 Image Tag를 변경했을 때 실제 Application이 업데이트되는 흐름을 설명할 수 있다.</p>
+</blockquote>
+<hr />
+<h1 id="19">19. 추천 학습 순서</h1>
+<p>처음부터 Kubernetes 전체를 공부할 필요는 없습니다.</p>
+<p>과제의 진행 순서에 맞춰 필요한 만큼 공부합니다.</p>
+<pre><code class="language-text">1. 과제 전체 구조 파악
+
+        ↓
+
+2. Vagrant 이해
+
+        ↓
+
+3. Part 1 구현
+   VM → K3s Cluster
+
+        ↓
+
+4. Kubernetes 기본 구조 이해
+   Cluster / Node / Pod
+
+        ↓
+
+5. Part 2 개념
+   Deployment / Service / Ingress
+
+        ↓
+
+6. Part 2 구현
+
+        ↓
+
+7. K3s vs K3d
+
+        ↓
+
+8. Argo CD / GitOps 이해
+
+        ↓
+
+9. Part 3 구현
+
+        ↓
+
+10. 전체 구조 다시 연결
+
+        ↓
+
+11. Mandatory 완성
+
+        ↓
+
+12. Bonus GitLab
+</code></pre>
+<p>즉,</p>
+<blockquote>
+<p><strong>필요한 개념을 먼저 이해하고 → 바로 구현하고 → 실제 동작을 확인하고 → 다시 개념과 연결한다.</strong></p>
+</blockquote>
+<p>이 과정을 반복합니다.</p>
+<hr />
+<h1 id="20">20. 최종적으로 만들어지는 것</h1>
+<p>Mandatory를 모두 완료하면 전체적으로 다음과 같은 경험을 하게 됩니다.</p>
+<pre><code class="language-text">Part 1
+
+Vagrant
+   │
+   ├── VM : Server
+   └── VM : Worker
+          │
+          ▼
+     K3s Cluster
+
+
+Part 2
+
+Client
+   │
+   ▼
+Ingress
+   │
+   ▼
+Service
+   │
+   ▼
+Deployment
+   │
+   ▼
+Pods
+
+
+Part 3
+
+Developer
+   │
+git push
+   ▼
+GitHub
+   │
+   ▼
+Argo CD
+   │
+   ▼
+K3d / Kubernetes
+   │
+   ▼
+Application
+
+
+Bonus
+
+Developer
+   │
+git push
+   ▼
+Local GitLab
+   │
+   ▼
+Argo CD
+   │
+   ▼
+Kubernetes
+   │
+   ▼
+Application
+</code></pre>
+<hr />
+<h1 id="21">21. 제출 구조</h1>
+<p>Mandatory는 Repository Root에 다음 세 폴더로 제출합니다.</p>
+<pre><code class="language-text">.
+├── p1/
+├── p2/
+└── p3/
+</code></pre>
+<p>Bonus를 진행한다면:</p>
+<pre><code class="language-text">.
+├── p1/
+├── p2/
+├── p3/
+└── bonus/
+</code></pre>
+<p>형태가 됩니다.</p>
+<p>필요한 Script는 <code>scripts</code> 폴더에, Configuration File은 <code>confs</code> 폴더에 위치해야 합니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">p1/
+├── Vagrantfile
+├── scripts/
+└── confs/
+
+p2/
+├── Vagrantfile
+├── scripts/
+└── confs/
+
+p3/
+├── scripts/
+└── confs/
+
+bonus/
+├── ...
+├── scripts/
+└── confs/
+</code></pre>
+<p>평가는 <strong>평가받는 팀의 컴퓨터에서 진행</strong>되며, Repository 안에 제출된 내용만 평가 대상이 됩니다.</p>
+<hr />
+<h1 id="_8">정리</h1>
+<p>Inception of Things의 핵심은 단순히 Kubernetes 명령어를 배우는 것이 아닙니다.</p>
+<p>이 프로젝트는 지금까지 배운 인프라 개념을 다음 단계로 연결합니다.</p>
+<pre><code class="language-text">Born2beroot
+│
+│ &quot;Server를 어떻게 관리하는가?&quot;
+│
+▼
+Linux / VM
+
+        ↓
+
+Inception
+│
+│ &quot;Application을 어떻게 격리하는가?&quot;
+│
+▼
+Docker / Container
+
+        ↓
+
+Inception of Things — Part 1
+│
+│ &quot;Container를 운영할 Cluster를 어떻게 만드는가?&quot;
+│
+▼
+Vagrant / K3s / Kubernetes
+
+        ↓
+
+Part 2
+│
+│ &quot;Kubernetes가 Application을 어떻게 관리하는가?&quot;
+│
+▼
+Pod / Deployment / Service / Ingress
+
+        ↓
+
+Part 3
+│
+│ &quot;배포 상태를 어떻게 자동으로 관리하는가?&quot;
+│
+▼
+K3d / Argo CD / GitOps
+
+        ↓
+
+Bonus
+│
+│ &quot;Git Infrastructure까지 직접 운영한다면?&quot;
+│
+▼
+GitLab
+</code></pre>
+<p>따라서 이 과제의 학습 방향은 <strong>VM → Container → Orchestration → GitOps</strong>라는 인프라 기술의 발전 흐름을 이해하는 것입니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../part1/" class="btn btn-neutral float-right" title="Part 1 — K3s & Vagrant">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../part1/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Born2beroot - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Born2beroot";
+        var mkdocs_page_input_path = "preview/born2beroot.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Preview</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Born2beroot</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-virtual-machine">1. Virtual Machine</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-linux-debian">2. Linux와 Debian</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-user-group-permission">3. User, Group과 Permission</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_1">기본 명령어</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-root-sudo">4. root와 sudo</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-ssh">5. SSH</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ssh">SSH 접속</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ssh_1">SSH 서비스 확인</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ssh_2">SSH 설정</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_2">연결 구조</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-port">6. Port</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-firewall">7. Firewall</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#firewall">Firewall 상태 확인</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#firewall_1">Firewall 활성화</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#port">Port 허용</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ssh-firewall">SSH와 Firewall의 관계</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-lvm">8. LVM</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-package-manager">9. Package Manager</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#10-service-daemon">10. Service와 Daemon</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#11-cron-monitoring">11. cron과 Monitoring</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-i-learned">What I Learned</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inception/">Inception</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inception of Things</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/subject/">Project Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part1/">Part 1 — K3s & Vagrant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part2/">Part 2 — K3s & Applications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part3/">Part 3 — K3d & Argo CD</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/bonus/">Bonus — GitLab</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Review</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../review/">Review</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Preview</li>
+      <li class="breadcrumb-item active">Born2beroot</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="born2beroot">Born2beroot</h1>
+<h2 id="overview">Overview</h2>
+<p>Born2beroot는 <strong>가상 머신(Virtual Machine)에 Linux 서버를 구축하고 관리하는 프로젝트</strong>입니다.</p>
+<p>이 프로젝트를 통해 가상화의 기본 개념부터 Linux 시스템의 사용자와 권한, 원격 접속, 네트워크 보안, 서비스 관리와 모니터링까지 서버 관리의 기초를 경험합니다.</p>
+<p>이후 Inception과 Inception of Things에서 Docker와 Kubernetes를 학습하기 위한 가장 기본적인 인프라 계층에 해당합니다.</p>
+<hr />
+<h2 id="1-virtual-machine">1. Virtual Machine</h2>
+<p>Virtual Machine(VM)은 물리 컴퓨터의 CPU, 메모리, 저장공간 등의 자원을 <strong>가상화하여 독립된 컴퓨터처럼 사용할 수 있도록 만든 환경</strong>입니다.</p>
+<pre><code class="language-text">Physical Machine
+       │
+       ▼
+   Hypervisor
+       │
+       ▼
+ Virtual Machine
+       │
+       ▼
+     Debian
+</code></pre>
+<p>VM은 자신만의 Guest OS와 Kernel을 가질 수 있습니다.</p>
+<p>이를 통해 하나의 물리 컴퓨터에서 서로 다른 운영체제를 실행하거나, Host 시스템과 격리된 환경에서 서버를 구축하고 테스트할 수 있습니다.</p>
+<hr />
+<h2 id="2-linux-debian">2. Linux와 Debian</h2>
+<p>Linux는 엄밀히 말하면 운영체제 전체가 아니라 <strong>Kernel</strong>입니다.</p>
+<p>Kernel은 애플리케이션과 하드웨어 사이에서 CPU, 메모리, 디스크, 네트워크 등의 시스템 자원을 관리합니다.</p>
+<pre><code class="language-text">Application
+     │
+     ▼
+Linux Kernel
+     │
+     ▼
+  Hardware
+</code></pre>
+<p>Debian은 Linux Kernel에 Shell, 시스템 도구, 라이브러리, 패키지 관리자 등을 결합하여 실제 운영체제로 사용할 수 있도록 만든 <strong>Linux Distribution(배포판)</strong>입니다.</p>
+<hr />
+<h2 id="3-user-group-permission">3. User, Group과 Permission</h2>
+<p>Linux는 여러 사용자가 하나의 시스템을 사용할 수 있는 <strong>Multi-user System</strong>입니다.</p>
+<p>파일과 디렉터리의 접근 권한은 기본적으로 다음 세 범주로 구분됩니다.</p>
+<pre><code class="language-text">Owner
+Group
+Others
+</code></pre>
+<h3 id="_1">기본 명령어</h3>
+<p>현재 사용자 확인:</p>
+<pre><code class="language-bash">whoami
+</code></pre>
+<p>사용자의 UID, GID와 Group 확인:</p>
+<pre><code class="language-bash">id
+</code></pre>
+<p>시스템의 사용자 목록 확인:</p>
+<pre><code class="language-bash">cat /etc/passwd
+</code></pre>
+<p>특정 사용자가 속한 Group 확인:</p>
+<pre><code class="language-bash">groups username
+</code></pre>
+<p>사용자 생성:</p>
+<pre><code class="language-bash">sudo adduser username
+</code></pre>
+<p>Group 생성:</p>
+<pre><code class="language-bash">sudo groupadd groupname
+</code></pre>
+<p>사용자를 Group에 추가:</p>
+<pre><code class="language-bash">sudo usermod -aG groupname username
+</code></pre>
+<p>파일 권한 확인:</p>
+<pre><code class="language-bash">ls -l
+</code></pre>
+<p>파일 권한 변경:</p>
+<pre><code class="language-bash">chmod 755 file
+</code></pre>
+<p>핵심 원칙은 <strong>필요한 사용자에게 필요한 권한만 부여하는 것</strong>입니다.</p>
+<hr />
+<h2 id="4-root-sudo">4. root와 sudo</h2>
+<p><code>root</code>는 Linux 시스템에서 매우 강력한 관리 권한을 가진 특별한 사용자입니다.</p>
+<p>일반 사용자는 평소에는 제한된 권한으로 작업하고, 관리 권한이 필요한 경우 <code>sudo</code>를 사용합니다.</p>
+<pre><code class="language-text">Normal User
+     │
+     │ sudo
+     ▼
+Privileged Command
+</code></pre>
+<p>예를 들어 일반 사용자는 패키지를 설치할 권한이 없을 수 있습니다.</p>
+<pre><code class="language-bash">apt install nginx
+</code></pre>
+<p>이때 허용된 사용자는:</p>
+<pre><code class="language-bash">sudo apt install nginx
+</code></pre>
+<p>처럼 관리자 권한으로 해당 명령만 실행할 수 있습니다.</p>
+<p>sudo 권한 확인:</p>
+<pre><code class="language-bash">sudo -l
+</code></pre>
+<p><code>sudo</code>는 사용자가 아니라 <strong>허용된 사용자가 특정 명령을 다른 사용자, 일반적으로 root의 권한으로 실행할 수 있도록 하는 도구</strong>입니다.</p>
+<hr />
+<h2 id="5-ssh">5. SSH</h2>
+<p>SSH(Secure Shell)는 <strong>네트워크를 통해 다른 컴퓨터의 Shell에 안전하게 접속하기 위한 프로토콜</strong>입니다.</p>
+<pre><code class="language-text">Local Computer
+      │
+      │ SSH
+      ▼
+ Linux Server
+</code></pre>
+<h3 id="ssh">SSH 접속</h3>
+<p>기본 형태:</p>
+<pre><code class="language-bash">ssh username@server_ip
+</code></pre>
+<p>예:</p>
+<pre><code class="language-bash">ssh daeun@192.168.1.10
+</code></pre>
+<p>SSH의 기본 Port는 <code>22</code>입니다.</p>
+<p>다른 Port를 사용한다면 <code>-p</code> 옵션을 사용합니다.</p>
+<pre><code class="language-bash">ssh -p 4242 daeun@192.168.1.10
+</code></pre>
+<p>Born2beroot에서는 SSH를 기본 Port 22가 아닌 <strong>4242 Port</strong>에서 실행하도록 설정합니다.</p>
+<h3 id="ssh_1">SSH 서비스 확인</h3>
+<p>서버에서 SSH 서비스 상태 확인:</p>
+<pre><code class="language-bash">sudo systemctl status ssh
+</code></pre>
+<p>시작:</p>
+<pre><code class="language-bash">sudo systemctl start ssh
+</code></pre>
+<p>재시작:</p>
+<pre><code class="language-bash">sudo systemctl restart ssh
+</code></pre>
+<h3 id="ssh_2">SSH 설정</h3>
+<p>SSH 서버의 주요 설정 파일은:</p>
+<pre><code class="language-text">/etc/ssh/sshd_config
+</code></pre>
+<p>입니다.</p>
+<p>예를 들어 설정 파일에서 SSH Port를 지정할 수 있습니다.</p>
+<pre><code class="language-text">Port 4242
+</code></pre>
+<p>설정을 변경했다면 SSH 서비스를 재시작해야 적용됩니다.</p>
+<pre><code class="language-bash">sudo systemctl restart ssh
+</code></pre>
+<h3 id="_2">연결 구조</h3>
+<pre><code class="language-text">My Computer
+     │
+     │ ssh -p 4242 user@IP
+     │
+     ▼
+   Port 4242
+     │
+     ▼
+ SSH Server (sshd)
+     │
+     ▼
+ Linux Shell
+</code></pre>
+<p>즉 SSH는 단순히 "다른 컴퓨터에 접속한다"가 아니라, <strong>Client가 네트워크를 통해 서버에서 실행 중인 SSH Service에 연결하는 것</strong>입니다.</p>
+<hr />
+<h2 id="6-port">6. Port</h2>
+<p>하나의 서버에서는 여러 네트워크 서비스가 동시에 실행될 수 있습니다.</p>
+<p>Port는 <strong>하나의 컴퓨터 안에서 어떤 네트워크 서비스와 통신할 것인지 구분하기 위한 번호</strong>입니다.</p>
+<pre><code class="language-text">Server
+│
+├── 22   → SSH (default)
+├── 80   → HTTP
+├── 443  → HTTPS
+└── 4242 → Born2beroot SSH
+</code></pre>
+<p>현재 열려 있거나 Listening 중인 Port를 확인할 때는 다음과 같은 명령을 사용할 수 있습니다.</p>
+<pre><code class="language-bash">ss -tuln
+</code></pre>
+<p>프로세스 정보까지 함께 확인하려면:</p>
+<pre><code class="language-bash">sudo ss -tulpn
+</code></pre>
+<hr />
+<h2 id="7-firewall">7. Firewall</h2>
+<p>Firewall은 <strong>네트워크 트래픽을 규칙에 따라 허용하거나 차단하는 시스템</strong>입니다.</p>
+<p>Born2beroot에서는 UFW(Uncomplicated Firewall)를 사용합니다.</p>
+<pre><code class="language-text">Network
+   │
+   ▼
+  UFW
+   │
+   ├── Port 4242 → ALLOW
+   │
+   └── Others    → BLOCK
+   │
+   ▼
+Server
+</code></pre>
+<h3 id="firewall">Firewall 상태 확인</h3>
+<pre><code class="language-bash">sudo ufw status
+</code></pre>
+<p>좀 더 자세히 확인:</p>
+<pre><code class="language-bash">sudo ufw status verbose
+</code></pre>
+<h3 id="firewall_1">Firewall 활성화</h3>
+<pre><code class="language-bash">sudo ufw enable
+</code></pre>
+<p>비활성화:</p>
+<pre><code class="language-bash">sudo ufw disable
+</code></pre>
+<h3 id="port">Port 허용</h3>
+<p>예를 들어 SSH가 사용하는 4242 Port를 허용하려면:</p>
+<pre><code class="language-bash">sudo ufw allow 4242
+</code></pre>
+<p>TCP만 명시적으로 허용하려면:</p>
+<pre><code class="language-bash">sudo ufw allow 4242/tcp
+</code></pre>
+<p>규칙 목록을 번호와 함께 확인:</p>
+<pre><code class="language-bash">sudo ufw status numbered
+</code></pre>
+<p>특정 규칙 삭제:</p>
+<pre><code class="language-bash">sudo ufw delete &lt;rule-number&gt;
+</code></pre>
+<h3 id="ssh-firewall">SSH와 Firewall의 관계</h3>
+<p>SSH 서버가 4242에서 정상적으로 실행되고 있어도 Firewall이 해당 Port를 막고 있다면 외부에서 접속할 수 없습니다.</p>
+<pre><code class="language-text">SSH Server
+Listening :4242
+       ▲
+       │
+     Firewall
+       │
+       X
+     Client
+</code></pre>
+<p>따라서 서버를 외부에서 사용하려면 두 조건이 모두 필요합니다.</p>
+<pre><code class="language-text">Service가 Port에서 실행 중
+            +
+Firewall이 해당 Port 허용
+            ↓
+       접속 가능
+</code></pre>
+<p>이 관계는 이후 Inception에서 Docker의 Port와 Network를 공부할 때도 계속 등장합니다.</p>
+<hr />
+<h2 id="8-lvm">8. LVM</h2>
+<p>LVM(Logical Volume Manager)은 물리적인 저장장치와 실제로 사용하는 저장공간 사이에 <strong>논리적인 관리 계층</strong>을 추가합니다.</p>
+<pre><code class="language-text">Physical Disk
+      │
+      ▼
+Physical Volume
+      │
+      ▼
+Volume Group
+      │
+      ├── Logical Volume
+      └── Logical Volume
+</code></pre>
+<p>LVM 상태를 간단히 확인할 수 있는 명령어:</p>
+<pre><code class="language-bash">lsblk
+</code></pre>
+<p>Physical Volume:</p>
+<pre><code class="language-bash">sudo pvs
+</code></pre>
+<p>Volume Group:</p>
+<pre><code class="language-bash">sudo vgs
+</code></pre>
+<p>Logical Volume:</p>
+<pre><code class="language-bash">sudo lvs
+</code></pre>
+<hr />
+<h2 id="9-package-manager">9. Package Manager</h2>
+<p>Debian에서는 <code>apt</code>를 이용해 패키지를 관리합니다.</p>
+<p>패키지 목록 업데이트:</p>
+<pre><code class="language-bash">sudo apt update
+</code></pre>
+<p>패키지 설치:</p>
+<pre><code class="language-bash">sudo apt install &lt;package&gt;
+</code></pre>
+<p>설치된 패키지 업데이트:</p>
+<pre><code class="language-bash">sudo apt upgrade
+</code></pre>
+<p>패키지 삭제:</p>
+<pre><code class="language-bash">sudo apt remove &lt;package&gt;
+</code></pre>
+<hr />
+<h2 id="10-service-daemon">10. Service와 Daemon</h2>
+<p>서버에는 백그라운드에서 지속적으로 실행되는 프로그램들이 있습니다.</p>
+<p>Debian에서는 <code>systemd</code>가 많은 시스템 서비스를 관리합니다.</p>
+<pre><code class="language-text">systemd
+   │
+   ├── ssh.service
+   ├── cron.service
+   └── ...
+</code></pre>
+<p>서비스 상태 확인:</p>
+<pre><code class="language-bash">systemctl status &lt;service&gt;
+</code></pre>
+<p>시작:</p>
+<pre><code class="language-bash">sudo systemctl start &lt;service&gt;
+</code></pre>
+<p>중지:</p>
+<pre><code class="language-bash">sudo systemctl stop &lt;service&gt;
+</code></pre>
+<p>재시작:</p>
+<pre><code class="language-bash">sudo systemctl restart &lt;service&gt;
+</code></pre>
+<p>부팅할 때 자동으로 시작하도록 설정:</p>
+<pre><code class="language-bash">sudo systemctl enable &lt;service&gt;
+</code></pre>
+<hr />
+<h2 id="11-cron-monitoring">11. cron과 Monitoring</h2>
+<p><code>cron</code>은 특정 명령이나 스크립트를 <strong>정해진 시간 또는 주기에 자동으로 실행</strong>할 수 있도록 해주는 도구입니다.</p>
+<p>현재 사용자의 cron 설정:</p>
+<pre><code class="language-bash">crontab -l
+</code></pre>
+<p>cron 설정 수정:</p>
+<pre><code class="language-bash">crontab -e
+</code></pre>
+<p>root의 crontab을 수정하려면:</p>
+<pre><code class="language-bash">sudo crontab -e
+</code></pre>
+<p>예를 들어 일정 주기로 monitoring script를 실행하는 구조입니다.</p>
+<pre><code class="language-text">cron
+ │
+ │ 일정 주기
+ ▼
+monitoring.sh
+ │
+ ▼
+System Information
+</code></pre>
+<p>Monitoring의 핵심은 특정 명령어를 암기하는 것이 아니라 <strong>서버가 정상적으로 동작하고 있는지 지속적으로 관찰하는 것</strong>입니다.</p>
+<hr />
+<h2 id="what-i-learned">What I Learned</h2>
+<p>Born2beroot에서는 <strong>하나의 Linux 서버를 구축하고 관리하는 기본 방법</strong>을 학습합니다.</p>
+<pre><code class="language-text">Virtual Machine
+      │
+      ▼
+    Linux
+      │
+      ├── User / Permission
+      ├── Service
+      ├── SSH
+      ├── Port
+      ├── Firewall
+      ├── Storage
+      └── Monitoring
+</code></pre>
+<p>특히 중요한 연결 관계는 다음과 같습니다.</p>
+<pre><code class="language-text">User
+ ↓
+Permission
+ ↓
+sudo / root
+
+
+Client
+ ↓
+Network
+ ↓
+Firewall
+ ↓
+Port
+ ↓
+Service
+
+
+Server
+ ↓
+Monitoring
+</code></pre>
+<p>다음 프로젝트인 Inception에서는 하나의 서버 위에 여러 서비스를 직접 설치하는 대신, <strong>각 서비스를 Container라는 독립적인 실행 환경으로 분리하여 관리하는 방법</strong>을 학습합니다.</p>
+<pre><code class="language-text">Born2beroot
+     │
+     │ Linux / VM
+     ▼
+ Inception
+     │
+     │ Docker / Container
+     ▼
+Inception of Things
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../inception/" class="btn btn-neutral float-right" title="Inception">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../inception/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

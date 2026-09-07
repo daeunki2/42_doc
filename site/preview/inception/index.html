@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Inception - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Inception";
+        var mkdocs_page_input_path = "preview/inception.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Preview</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../born2beroot/">Born2beroot</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Inception</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-vm-vs-container">1. VM vs Container</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-docker">2. Docker</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-image-container">3. Image와 Container</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#image">Image</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#container">Container</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-dockerfile">4. Dockerfile</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#from">FROM</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#run">RUN</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#copy">COPY</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cmd">CMD</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-container">5. Container 내부 확인</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-log">6. Log</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-docker-network">7. Docker Network</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#container_1">Container 이름을 이용한 통신</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-port">8. Port</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-volume">9. Volume</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#10-nginx">10. NGINX</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#11-tls-https">11. TLS / HTTPS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#12-wordpress-php-fpm">12. WordPress와 PHP-FPM</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#13-mariadb">13. MariaDB</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#14-docker-compose">14. Docker Compose</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#15-docker-compose">15. Docker Compose 기본 명령어</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_1">매우 자주 쓰는 흐름</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#16-environment-variables">16. Environment Variables</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#17-container-lifecycle">17. Container Lifecycle</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#18-inception">18. Inception 전체 구조</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#19-docker">19. 자주 사용하는 Docker 명령어</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#what-i-learned">What I Learned</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inception of Things</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/subject/">Project Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part1/">Part 1 — K3s & Vagrant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part2/">Part 2 — K3s & Applications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part3/">Part 3 — K3d & Argo CD</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/bonus/">Bonus — GitLab</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Review</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../review/">Review</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Preview</li>
+      <li class="breadcrumb-item active">Inception</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="inception">Inception</h1>
+<h2 id="overview">Overview</h2>
+<p>Inception은 <strong>Docker를 이용하여 여러 서비스를 독립적인 Container로 분리하고 하나의 애플리케이션으로 구성하는 프로젝트</strong>입니다.</p>
+<p>Born2beroot에서는 하나의 Linux 서버 자체를 구축하고 관리했다면, Inception에서는 그 서버 위에서 실행되는 애플리케이션들을 Container라는 단위로 분리하여 관리합니다.</p>
+<p>Inception의 기본 구성은 다음과 같습니다.</p>
+<pre><code class="language-text">                        Client
+                          │
+                        HTTPS
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │    NGINX    │
+                   │  Container  │
+                   └──────┬──────┘
+                          │
+                       FastCGI
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │  WordPress  │
+                   │   PHP-FPM   │
+                   │  Container  │
+                   └──────┬──────┘
+                          │
+                         SQL
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │   MariaDB   │
+                   │  Container  │
+                   └─────────────┘
+</code></pre>
+<p>이 세 Container는 Docker Network를 통해 서로 통신하며, 영속적으로 보관해야 하는 데이터는 Volume에 저장합니다.</p>
+<hr />
+<h2 id="1-vm-vs-container">1. VM vs Container</h2>
+<p>Born2beroot에서는 Virtual Machine을 사용했습니다.</p>
+<p>VM은 Hypervisor를 이용하여 하드웨어 자원을 가상화하고, 각 VM이 자신의 Guest OS와 Kernel을 가질 수 있습니다.</p>
+<pre><code class="language-text">Physical Machine
+       │
+     Host OS
+       │
+   Hypervisor
+       │
+ ┌─────┴─────┐
+ ▼           ▼
+VM           VM
+│            │
+Guest OS     Guest OS
+│            │
+Kernel       Kernel
+</code></pre>
+<p>Container는 일반적으로 Host의 Kernel을 공유하면서 프로세스, 파일 시스템, 네트워크 등의 실행 환경을 격리합니다.</p>
+<pre><code class="language-text">Physical Machine
+       │
+     Host OS
+       │
+     Kernel
+       │
+     Docker
+       │
+ ┌─────┼─────┐
+ ▼     ▼     ▼
+ C1    C2    C3
+</code></pre>
+<p>따라서 기본적인 차이는 다음과 같이 이해할 수 있습니다.</p>
+<pre><code class="language-text">VM
+→ 하나의 독립적인 컴퓨터 환경을 가상화
+
+Container
+→ 애플리케이션의 실행 환경을 격리
+</code></pre>
+<p>Container는 일반적으로 VM보다 가볍고 빠르게 생성할 수 있습니다.</p>
+<hr />
+<h2 id="2-docker">2. Docker</h2>
+<p>Docker는 <strong>Container Image를 만들고, 이를 기반으로 Container를 실행하고 관리하기 위한 플랫폼 및 도구 생태계</strong>입니다.</p>
+<p>Docker가 정상적으로 설치되어 있는지 확인:</p>
+<pre><code class="language-bash">docker --version
+</code></pre>
+<p>Docker의 전체적인 시스템 정보 확인:</p>
+<pre><code class="language-bash">docker info
+</code></pre>
+<p>현재 Docker에서 실행 중인 Container 확인:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>실행 여부와 관계없이 모든 Container 확인:</p>
+<pre><code class="language-bash">docker ps -a
+</code></pre>
+<hr />
+<h2 id="3-image-container">3. Image와 Container</h2>
+<h3 id="image">Image</h3>
+<p>Image는 <strong>Container를 생성하기 위한 템플릿</strong>입니다.</p>
+<pre><code class="language-text">Dockerfile
+    │
+    │ build
+    ▼
+  Image
+    │
+    │ run
+    ▼
+Container
+</code></pre>
+<p>현재 가지고 있는 Image 확인:</p>
+<pre><code class="language-bash">docker images
+</code></pre>
+<p>또는:</p>
+<pre><code class="language-bash">docker image ls
+</code></pre>
+<p>Image 삭제:</p>
+<pre><code class="language-bash">docker image rm &lt;image&gt;
+</code></pre>
+<h3 id="container">Container</h3>
+<p>Container는 Image를 기반으로 실제 실행된 인스턴스입니다.</p>
+<p>간단한 Container 실행:</p>
+<pre><code class="language-bash">docker run &lt;image&gt;
+</code></pre>
+<p>예를 들어:</p>
+<pre><code class="language-bash">docker run nginx
+</code></pre>
+<p>Container 중지:</p>
+<pre><code class="language-bash">docker stop &lt;container&gt;
+</code></pre>
+<p>다시 시작:</p>
+<pre><code class="language-bash">docker start &lt;container&gt;
+</code></pre>
+<p>Container 삭제:</p>
+<pre><code class="language-bash">docker rm &lt;container&gt;
+</code></pre>
+<hr />
+<h2 id="4-dockerfile">4. Dockerfile</h2>
+<p>Dockerfile은 <strong>Docker Image를 어떻게 만들 것인지 정의하는 파일</strong>입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-dockerfile">FROM debian:bookworm
+
+RUN apt-get update
+RUN apt-get install -y nginx
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<p>전체 흐름은 다음과 같습니다.</p>
+<pre><code class="language-text">Dockerfile
+    │
+    │ docker build
+    ▼
+  Image
+    │
+    │ docker run
+    ▼
+Container
+</code></pre>
+<p>현재 디렉터리의 Dockerfile을 이용하여 Image 생성:</p>
+<pre><code class="language-bash">docker build -t my-nginx .
+</code></pre>
+<p>생성 확인:</p>
+<pre><code class="language-bash">docker images
+</code></pre>
+<p>실행:</p>
+<pre><code class="language-bash">docker run my-nginx
+</code></pre>
+<h3 id="from">FROM</h3>
+<pre><code class="language-dockerfile">FROM debian:bookworm
+</code></pre>
+<p>Image를 만들 때 기반으로 사용할 Base Image를 지정합니다.</p>
+<h3 id="run">RUN</h3>
+<pre><code class="language-dockerfile">RUN apt-get update
+RUN apt-get install -y nginx
+</code></pre>
+<p>Image를 <strong>빌드하는 과정에서</strong> 명령을 실행합니다.</p>
+<h3 id="copy">COPY</h3>
+<pre><code class="language-dockerfile">COPY nginx.conf /etc/nginx/nginx.conf
+</code></pre>
+<p>Host의 파일을 Image 안으로 복사합니다.</p>
+<h3 id="cmd">CMD</h3>
+<pre><code class="language-dockerfile">CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<p>Container가 실행될 때 기본적으로 실행할 명령을 지정합니다.</p>
+<p><code>RUN</code>과 <code>CMD</code>의 차이는 중요합니다.</p>
+<pre><code class="language-text">RUN
+→ Image build 과정
+
+CMD
+→ Container 실행 시점
+</code></pre>
+<hr />
+<h2 id="5-container">5. Container 내부 확인</h2>
+<p>실행 중인 Container 안에서 직접 명령을 실행할 수도 있습니다.</p>
+<pre><code class="language-bash">docker exec &lt;container&gt; &lt;command&gt;
+</code></pre>
+<p>예:</p>
+<pre><code class="language-bash">docker exec nginx ls
+</code></pre>
+<p>Container 안에 Shell로 들어가려면:</p>
+<pre><code class="language-bash">docker exec -it &lt;container&gt; /bin/bash
+</code></pre>
+<p>Container가 가벼운 Image라 <code>bash</code>가 없다면 <code>/bin/sh</code>를 사용할 수도 있습니다.</p>
+<pre><code class="language-bash">docker exec -it &lt;container&gt; /bin/sh
+</code></pre>
+<p>이 명령은 Inception을 디버깅할 때 매우 유용합니다.</p>
+<hr />
+<h2 id="6-log">6. Log</h2>
+<p>Container가 정상적으로 동작하지 않는다면 가장 먼저 확인할 것 중 하나가 Log입니다.</p>
+<pre><code class="language-bash">docker logs &lt;container&gt;
+</code></pre>
+<p>실시간으로 계속 확인:</p>
+<pre><code class="language-bash">docker logs -f &lt;container&gt;
+</code></pre>
+<p>예:</p>
+<pre><code class="language-bash">docker logs wordpress
+</code></pre>
+<p>문제가 발생했을 때 무작정 Container 안으로 들어가기 전에 <strong>먼저 Log를 확인하는 습관</strong>이 중요합니다.</p>
+<hr />
+<h2 id="7-docker-network">7. Docker Network</h2>
+<p>Container는 서로 격리되어 있기 때문에 서로 통신하기 위한 Network가 필요합니다.</p>
+<pre><code class="language-text">             Docker Network
+                   │
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+      NGINX    WordPress   MariaDB
+</code></pre>
+<p>Docker Network 목록 확인:</p>
+<pre><code class="language-bash">docker network ls
+</code></pre>
+<p>특정 Network의 상세 정보 확인:</p>
+<pre><code class="language-bash">docker network inspect &lt;network&gt;
+</code></pre>
+<p>Network 생성:</p>
+<pre><code class="language-bash">docker network create my-network
+</code></pre>
+<p>Docker Compose를 사용하는 경우 필요한 Network를 Compose가 생성하고 관리하도록 구성할 수 있습니다.</p>
+<h3 id="container_1">Container 이름을 이용한 통신</h3>
+<p>같은 Docker Network에 연결된 Container는 Docker의 DNS를 이용하여 서비스 또는 Container 이름으로 서로를 찾을 수 있습니다.</p>
+<p>예를 들어 WordPress에서 MariaDB에 접근할 때:</p>
+<pre><code class="language-text">mariadb:3306
+</code></pre>
+<p>처럼 사용할 수 있습니다.</p>
+<p>즉 항상 Container의 IP 주소를 직접 알아낼 필요가 없습니다.</p>
+<pre><code class="language-text">WordPress
+    │
+    │ mariadb:3306
+    ▼
+Docker DNS
+    │
+    ▼
+MariaDB Container
+</code></pre>
+<hr />
+<h2 id="8-port">8. Port</h2>
+<p>Container 내부에서 서비스가 실행되고 있다고 해서 반드시 Host 외부에서도 접근할 수 있는 것은 아닙니다.</p>
+<p>예를 들어 NGINX가 Container 내부의 443 Port를 사용한다고 해봅시다.</p>
+<p>외부에서 접근할 수 있도록 Host Port와 연결할 수 있습니다.</p>
+<pre><code class="language-text">Host :443
+   │
+   ▼
+Container :443
+</code></pre>
+<p>Docker에서는 다음과 같이 실행할 수 있습니다.</p>
+<pre><code class="language-bash">docker run -p 443:443 my-nginx
+</code></pre>
+<p>형식은:</p>
+<pre><code class="language-text">-p HOST_PORT:CONTAINER_PORT
+</code></pre>
+<p>입니다.</p>
+<p>Inception에서는 외부 사용자가 접근해야 하는 NGINX를 통해 요청을 받고, WordPress와 MariaDB는 내부 Docker Network를 통해 통신하도록 구성합니다.</p>
+<pre><code class="language-text">Internet
+   │
+   │ 443
+   ▼
+ NGINX
+   │
+   │ Docker Network
+   ▼
+WordPress
+   │
+   │ Docker Network
+   ▼
+MariaDB
+</code></pre>
+<p>모든 서비스를 외부에 공개할 필요가 없습니다.</p>
+<hr />
+<h2 id="9-volume">9. Volume</h2>
+<p>Container는 교체 가능한 실행 환경으로 생각하는 것이 좋습니다.</p>
+<p>Container 내부에 중요한 데이터를 직접 저장하고 Container를 삭제하면 해당 데이터도 함께 잃을 수 있습니다.</p>
+<p>따라서 영속적으로 보관해야 하는 데이터는 Volume을 사용합니다.</p>
+<pre><code class="language-text">MariaDB Container
+       │
+       ▼
+     Volume
+       │
+       ▼
+  Database Data
+</code></pre>
+<p>Container가 삭제되어도 Volume을 유지하면 새 Container가 기존 데이터를 다시 사용할 수 있습니다.</p>
+<pre><code class="language-text">Old Container
+      X
+      │
+   Volume
+      │
+      ▼
+New Container
+</code></pre>
+<p>Volume 목록 확인:</p>
+<pre><code class="language-bash">docker volume ls
+</code></pre>
+<p>Volume 상세 정보 확인:</p>
+<pre><code class="language-bash">docker volume inspect &lt;volume&gt;
+</code></pre>
+<p>Volume 생성:</p>
+<pre><code class="language-bash">docker volume create my-volume
+</code></pre>
+<p>Volume 삭제:</p>
+<pre><code class="language-bash">docker volume rm &lt;volume&gt;
+</code></pre>
+<p>핵심은:</p>
+<blockquote>
+<p><strong>Container의 생명주기와 Data의 생명주기를 분리한다.</strong></p>
+</blockquote>
+<hr />
+<h2 id="10-nginx">10. NGINX</h2>
+<p>NGINX는 Inception에서 외부 요청을 가장 먼저 받는 <strong>Web Server이자 진입점</strong> 역할을 합니다.</p>
+<pre><code class="language-text">Client
+   │
+ HTTPS
+   ▼
+ NGINX
+</code></pre>
+<p>Inception에서는 NGINX가 HTTPS 연결을 처리하고 PHP 요청을 WordPress의 PHP-FPM으로 전달합니다.</p>
+<pre><code class="language-text">Client
+   │
+ HTTPS
+   ▼
+NGINX
+   │
+ FastCGI
+   ▼
+PHP-FPM
+</code></pre>
+<p>NGINX Container의 로그 확인:</p>
+<pre><code class="language-bash">docker logs nginx
+</code></pre>
+<p>Container 내부에서 NGINX 설정 문법 확인:</p>
+<pre><code class="language-bash">docker exec nginx nginx -t
+</code></pre>
+<hr />
+<h2 id="11-tls-https">11. TLS / HTTPS</h2>
+<p>HTTP 통신을 암호화하기 위해 TLS를 사용합니다.</p>
+<pre><code class="language-text">HTTP
+→ 암호화되지 않은 웹 통신
+
+HTTPS
+→ HTTP + TLS
+</code></pre>
+<p>Inception에서는 NGINX가 TLS 연결을 처리합니다.</p>
+<pre><code class="language-text">Browser
+   │
+ HTTPS
+   │
+   ▼
+NGINX
+   │
+Certificate
+</code></pre>
+<p>따라서 외부에서 애플리케이션으로 들어오는 보안 연결의 시작점이 NGINX입니다.</p>
+<hr />
+<h2 id="12-wordpress-php-fpm">12. WordPress와 PHP-FPM</h2>
+<p>WordPress는 PHP로 만들어진 Web Application입니다.</p>
+<p>NGINX는 PHP 코드를 직접 실행하지 않습니다.</p>
+<p>따라서 PHP 실행을 담당하는 PHP-FPM이 필요합니다.</p>
+<pre><code class="language-text">NGINX
+   │
+   │ FastCGI
+   ▼
+PHP-FPM
+   │
+   ▼
+WordPress PHP Code
+</code></pre>
+<p>PHP-FPM은 <strong>PHP FastCGI Process Manager</strong>입니다.</p>
+<p>NGINX가 PHP 요청을 PHP-FPM에게 전달하면 PHP-FPM이 PHP 코드를 실행하고 결과를 반환합니다.</p>
+<hr />
+<h2 id="13-mariadb">13. MariaDB</h2>
+<p>MariaDB는 관계형 데이터베이스 관리 시스템(RDBMS)입니다.</p>
+<p>WordPress는 사용자, 게시글, 설정 등의 데이터를 MariaDB에 저장합니다.</p>
+<pre><code class="language-text">WordPress
+    │
+    │ SQL
+    ▼
+ MariaDB
+    │
+    ▼
+  Volume
+</code></pre>
+<p>MariaDB Container가 실행 중인지 확인:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>로그 확인:</p>
+<pre><code class="language-bash">docker logs mariadb
+</code></pre>
+<p>Container 내부의 MariaDB Client를 이용하는 구성이라면 다음과 같은 방식으로 DB에 접속할 수도 있습니다.</p>
+<pre><code class="language-bash">docker exec -it mariadb mariadb -u &lt;user&gt; -p
+</code></pre>
+<p>실제 실행 파일 이름은 사용한 MariaDB 버전과 Image 구성에 따라 달라질 수 있습니다.</p>
+<hr />
+<h2 id="14-docker-compose">14. Docker Compose</h2>
+<p>지금까지 필요한 것들을 보면 상당히 많습니다.</p>
+<pre><code class="language-text">NGINX
+WordPress
+MariaDB
+
+Images
+Containers
+Network
+Volumes
+Ports
+Environment Variables
+</code></pre>
+<p>이 모든 것을 <code>docker run</code> 명령으로 하나씩 관리하면 복잡해집니다.</p>
+<p>Docker Compose를 이용하면 여러 Container와 관련 리소스의 구성을 하나의 YAML 파일에 선언할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-yaml">services:
+
+  nginx:
+    build: ./nginx
+    ports:
+      - &quot;443:443&quot;
+
+  wordpress:
+    build: ./wordpress
+
+  mariadb:
+    build: ./mariadb
+
+networks:
+  inception:
+
+volumes:
+  wordpress:
+  mariadb:
+</code></pre>
+<p>즉 Compose 파일은 단순히 명령어를 줄여주는 파일이라기보다:</p>
+<blockquote>
+<p><strong>애플리케이션 전체의 실행 구성을 선언하는 파일</strong></p>
+</blockquote>
+<p>이라고 이해하는 것이 좋습니다.</p>
+<hr />
+<h2 id="15-docker-compose">15. Docker Compose 기본 명령어</h2>
+<p>Compose 파일에 정의된 서비스 실행:</p>
+<pre><code class="language-bash">docker compose up
+</code></pre>
+<p>백그라운드에서 실행:</p>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<p>Image를 다시 Build하면서 실행:</p>
+<pre><code class="language-bash">docker compose up --build
+</code></pre>
+<p>서비스 상태 확인:</p>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<p>로그 확인:</p>
+<pre><code class="language-bash">docker compose logs
+</code></pre>
+<p>특정 서비스 로그:</p>
+<pre><code class="language-bash">docker compose logs nginx
+</code></pre>
+<p>실시간 로그:</p>
+<pre><code class="language-bash">docker compose logs -f
+</code></pre>
+<p>서비스 중지 및 Container/Network 정리:</p>
+<pre><code class="language-bash">docker compose down
+</code></pre>
+<p>Image Build:</p>
+<pre><code class="language-bash">docker compose build
+</code></pre>
+<p>특정 서비스 안에서 명령 실행:</p>
+<pre><code class="language-bash">docker compose exec &lt;service&gt; &lt;command&gt;
+</code></pre>
+<p>예:</p>
+<pre><code class="language-bash">docker compose exec nginx nginx -t
+</code></pre>
+<h3 id="_1">매우 자주 쓰는 흐름</h3>
+<p>개발하면서 가장 자주 보게 되는 흐름은 대략 다음과 같습니다.</p>
+<pre><code class="language-bash">docker compose up -d --build
+docker compose ps
+docker compose logs
+docker compose down
+</code></pre>
+<hr />
+<h2 id="16-environment-variables">16. Environment Variables</h2>
+<p>Container의 동작에는 환경에 따라 달라지는 설정값이 필요할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">Database Name
+Database User
+Database Password
+Domain
+</code></pre>
+<p>이러한 값을 애플리케이션 코드나 Dockerfile에 직접 하드코딩하기보다는 실행 환경과 분리하여 관리할 수 있습니다.</p>
+<pre><code class="language-text">Image
+   +
+Environment
+   ↓
+Container
+</code></pre>
+<p>Shell에서 환경 변수 확인:</p>
+<pre><code class="language-bash">env
+</code></pre>
+<p>Container 내부 환경 변수 확인:</p>
+<pre><code class="language-bash">docker exec &lt;container&gt; env
+</code></pre>
+<p>Docker Compose에서는 <code>environment</code>, <code>env_file</code>, secrets 등의 방식으로 설정을 전달할 수 있습니다.</p>
+<p>비밀번호 같은 민감한 정보는 Git Repository에 그대로 commit하지 않는 것이 중요합니다.</p>
+<hr />
+<h2 id="17-container-lifecycle">17. Container Lifecycle</h2>
+<p>Container는 실행되고, 중지되고, 삭제되고, 다시 생성될 수 있습니다.</p>
+<pre><code class="language-text">Image
+  │
+  ▼
+Create
+  │
+  ▼
+Running
+  │
+  ▼
+Stopped
+  │
+  ▼
+Removed
+</code></pre>
+<p>현재 상태 확인:</p>
+<pre><code class="language-bash">docker ps -a
+</code></pre>
+<p>Docker Compose를 사용하면 여러 서비스의 lifecycle을 함께 관리할 수 있습니다.</p>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<p>↓</p>
+<pre><code class="language-bash">docker compose down
+</code></pre>
+<p>중요한 데이터는 Container가 아니라 Volume에 저장하기 때문에 Container를 다시 생성해도 데이터를 유지할 수 있습니다.</p>
+<hr />
+<h2 id="18-inception">18. Inception 전체 구조</h2>
+<p>지금까지의 개념을 하나로 합치면 다음과 같습니다.</p>
+<pre><code class="language-text">                         Client
+                           │
+                         HTTPS
+                           │
+                           ▼
+                  ┌────────────────┐
+                  │     NGINX      │
+                  │   Container    │
+                  └───────┬────────┘
+                          │
+                       FastCGI
+                          │
+                          ▼
+                  ┌────────────────┐
+                  │   WordPress    │
+                  │    PHP-FPM     │
+                  │   Container    │
+                  └───────┬────────┘
+                          │
+                         SQL
+                          │
+                          ▼
+                  ┌────────────────┐
+                  │    MariaDB     │
+                  │   Container    │
+                  └────────────────┘
+
+                       Docker Network
+
+                    ┌──────┴──────┐
+                    ▼             ▼
+             WordPress Volume  MariaDB Volume
+</code></pre>
+<p>그리고 이 전체 구성을 다음 파일들을 통해 정의합니다.</p>
+<pre><code class="language-text">Dockerfile
+     │
+     └── Image를 어떻게 만들 것인가?
+
+compose.yaml
+     │
+     └── Container들을 어떻게 실행하고 연결할 것인가?
+
+configuration
+     │
+     └── 각 Service를 어떻게 설정할 것인가?
+
+environment / secrets
+     │
+     └── 환경별 설정값은 무엇인가?
+</code></pre>
+<hr />
+<h2 id="19-docker">19. 자주 사용하는 Docker 명령어</h2>
+<p>Inception을 다시 확인하거나 디버깅할 때 최소한 다음 명령어들은 알고 있으면 좋습니다.</p>
+<table>
+<thead>
+<tr>
+<th>목적</th>
+<th>명령어</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>실행 중인 Container</td>
+<td><code>docker ps</code></td>
+</tr>
+<tr>
+<td>모든 Container</td>
+<td><code>docker ps -a</code></td>
+</tr>
+<tr>
+<td>Image 목록</td>
+<td><code>docker images</code></td>
+</tr>
+<tr>
+<td>Network 목록</td>
+<td><code>docker network ls</code></td>
+</tr>
+<tr>
+<td>Volume 목록</td>
+<td><code>docker volume ls</code></td>
+</tr>
+<tr>
+<td>Container 로그</td>
+<td><code>docker logs &lt;container&gt;</code></td>
+</tr>
+<tr>
+<td>Container 내부 Shell</td>
+<td><code>docker exec -it &lt;container&gt; /bin/bash</code></td>
+</tr>
+<tr>
+<td>Compose 실행</td>
+<td><code>docker compose up -d</code></td>
+</tr>
+<tr>
+<td>다시 Build 후 실행</td>
+<td><code>docker compose up -d --build</code></td>
+</tr>
+<tr>
+<td>Compose 상태</td>
+<td><code>docker compose ps</code></td>
+</tr>
+<tr>
+<td>Compose 로그</td>
+<td><code>docker compose logs</code></td>
+</tr>
+<tr>
+<td>Compose 종료</td>
+<td><code>docker compose down</code></td>
+</tr>
+</tbody>
+</table>
+<p>명령어를 전부 암기하는 것보다:</p>
+<pre><code class="language-text">상태 확인
+    ↓
+docker ps
+
+문제 발견
+    ↓
+docker logs
+
+내부 확인 필요
+    ↓
+docker exec
+
+구성 전체 관리
+    ↓
+docker compose
+</code></pre>
+<p>라는 흐름을 이해하는 것이 더 중요합니다.</p>
+<hr />
+<h2 id="what-i-learned">What I Learned</h2>
+<p>Born2beroot에서는 <strong>하나의 Linux 서버를 관리하는 방법</strong>을 학습했습니다.</p>
+<p>Inception에서는 그 위에서 실행되는 애플리케이션을 <strong>Container라는 독립적인 실행 단위로 분리하고 관리하는 방법</strong>을 학습합니다.</p>
+<pre><code class="language-text">Born2beroot
+
+Linux Server
+    │
+    └── Services
+
+          ↓
+
+Inception
+
+Linux Server
+    │
+   Docker
+    │
+    ├── NGINX Container
+    ├── WordPress Container
+    └── MariaDB Container
+</code></pre>
+<p>여기서 중요한 개념은 다음과 같습니다.</p>
+<pre><code class="language-text">Dockerfile
+    ↓
+  Image
+    ↓
+Container
+    │
+    ├── Network → Container 간 통신
+    │
+    └── Volume  → Data 영속화
+
+Docker Compose
+    ↓
+전체 구성 관리
+</code></pre>
+<p>하지만 Docker Compose를 이용한 구성은 기본적으로 하나의 Docker 환경에서 여러 Container를 관리하는 데 적합합니다.</p>
+<p>서비스의 규모가 커져 여러 머신에 걸쳐 많은 Container를 운영해야 한다면 새로운 문제가 발생합니다.</p>
+<pre><code class="language-text">어떤 서버에서 Container를 실행할 것인가?
+
+Container가 죽으면 누가 복구할 것인가?
+
+필요한 Container 수를 어떻게 유지할 것인가?
+
+여러 Container에 트래픽을 어떻게 전달할 것인가?
+
+여러 서버와 Container의 상태를 어떻게 관리할 것인가?
+</code></pre>
+<p>이러한 문제를 해결하기 위해 <strong>Container Orchestration</strong>이 필요해집니다.</p>
+<p>그리고 다음 프로젝트인 Inception of Things에서는 Kubernetes를 사용하여 이 문제를 다룹니다.</p>
+<pre><code class="language-text">Born2beroot
+     │
+     │ Linux / VM
+     ▼
+ Inception
+     │
+     │ Docker / Container
+     ▼
+Inception of Things
+     │
+     │ Kubernetes
+     ▼
+Container Orchestration
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../born2beroot/" class="btn btn-neutral float-left" title="Born2beroot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../iot/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../born2beroot/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../iot/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
