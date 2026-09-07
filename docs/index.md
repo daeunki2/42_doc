@@ -28,7 +28,7 @@
 하나의 서버가 어떻게 만들어지고 관리되는지를 배웁니다.
 
 사용자와 권한, SSH, 방화벽, 서비스, 디스크, 시스템 모니터링 등을 다루면서  
-이후 모든 인프라 학습의 기반이 되는 **Linux와 Server Administration**을 이해합니다.
+이후 인프라 학습의 기반이 되는 **Linux와 Server Administration**을 이해합니다.
 
 ---
 
@@ -73,7 +73,6 @@ Born2beroot
     ▼
 Linux / Virtual Machine
     │
-    │
     ▼
 Inception
     │
@@ -81,18 +80,77 @@ Inception
     ▼
 Docker / Container
     │
-    │
     ▼
 Inception of Things
     │
-    │  How do we manage containers at scale?
+    │  How do we manage containers?
     ▼
 Kubernetes
     │
-    │
+    │  How do we automate deployment state?
     ▼
+GitOps / Argo CD
+```
+
+각 프로젝트에서 새로운 도구가 등장하지만, 중요한 것은 도구 자체를 외우는 것이 아닙니다.
+
+```text
+Linux
+  ↓
+Server
+  ↓
+Container
+  ↓
+Orchestration
+  ↓
+Deployment Automation
+```
+
+**문제가 어떻게 변하고, 그 문제를 해결하기 위해 다음 기술이 왜 등장하는지 이해하는 것.**
+
+이것이 이 문서의 가장 중요한 학습 방향입니다.
+
+---
+
+## How This Documentation Is Organized
+
+각 프로젝트의 문서는 가능한 한 다음 순서로 정리합니다.
+
+```text
+What?
+  ↓
+Why?
+  ↓
+How does it work?
+  ↓
+How do the components connect?
+  ↓
+Implementation
+  ↓
+Verification
+```
+
+명령어나 설정 파일을 바로 작성하기 전에  
+먼저 **무엇을 만들고 있는지와 왜 그렇게 구성하는지** 이해합니다.
+
+구현 후에는 실제 명령어와 동작 결과를 통해  
+배운 개념이 시스템에서 어떻게 나타나는지 다시 확인합니다.
+
+---
+
+## Current Progress
+
+```text
+Born2beroot          ✓
+      ↓
+Inception            ✓
+      ↓
+Inception of Things  ← Current
+      ↓
+Kubernetes
+      ↓
 GitOps
-    │
-    │  How do we automate and maintain deployment state?
-    ▼
-Argo CD
+```
+
+현재는 **Inception of Things**를 통해  
+Docker 이후의 Container Orchestration과 GitOps를 학습하고 있습니다.
