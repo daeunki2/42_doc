@@ -46,6 +46,8 @@
               <p class="caption"><span class="caption-text">Preview</span></p>
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Born2beroot</a>
+    <ul class="current">
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../inception/">Inception</a>
                   </li>
@@ -94,86 +96,91 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>orn2beroot</p>
+                <h1 id="born2beroot">Born2beroot</h1>
+<blockquote>
 <p>From a computer to a Linux server.</p>
-<p>Born2beroot는 Virtual Machine 위에 Linux Server를 구축하고 직접 관리하면서 서버와 System Administration의 기본 개념을 학습하는 프로젝트입니다.</p>
-<p>이 문서에서는 명령어부터 시작하지 않습니다. 서버란 무엇인가? → 왜 VM이 필요한가? → OS/Linux는 무슨 일을 하는가? → 서버를 어떻게 안전하게 운영하는가?라는 흐름으로 각 기술이 등장한 이유를 먼저 이해합니다.</p>
-<ol>
-<li>Server</li>
-</ol>
-<p>서버가 필요한 이유</p>
+</blockquote>
+<p>Born2beroot는 Virtual Machine 위에 Linux Server를 구축하고 직접 관리하면서 <strong>서버와 System Administration의 기본 개념을 학습하는 프로젝트</strong>입니다.</p>
+<p>이 문서에서는 명령어부터 시작하지 않습니다. <code>서버란 무엇인가? → 왜 VM이 필요한가? → OS/Linux는 무슨 일을 하는가? → 서버를 어떻게 안전하게 운영하는가?</code>라는 흐름으로 각 기술이 등장한 이유를 먼저 이해합니다.</p>
+<hr />
+<h1 id="1-server">1. Server</h1>
+<h2 id="_1">서버가 필요한 이유</h2>
 <p>우리가 사용하는 많은 프로그램은 혼자서 모든 일을 처리하지 않습니다. 예를 들어 Browser는 인터넷의 모든 Web Page를 가지고 있지 않습니다. 사용자가 페이지를 요청하면 어딘가의 시스템이 요청을 받아 데이터를 돌려줘야 합니다.</p>
-<p>Browser (Client)
+<pre><code class="language-text">Browser (Client)
       │ Request
       ▼
     Server
       │ Response
       ▼
-Browser</p>
-<p>요청하는 쪽을 Client, 요청을 받아 기능이나 데이터를 제공하는 쪽을 Server라고 합니다.</p>
-<p>Server란?</p>
-<p>Server는 다른 프로그램이나 컴퓨터의 요청을 받아 Service를 제공하는 컴퓨터 또는 프로그램입니다.</p>
-<p>Web Server       → Web Page 제공
+Browser
+</code></pre>
+<p>요청하는 쪽을 <strong>Client</strong>, 요청을 받아 기능이나 데이터를 제공하는 쪽을 <strong>Server</strong>라고 합니다.</p>
+<h2 id="server">Server란?</h2>
+<p>Server는 다른 프로그램이나 컴퓨터의 요청을 받아 <strong>Service를 제공하는 컴퓨터 또는 프로그램</strong>입니다.</p>
+<pre><code class="language-text">Web Server       → Web Page 제공
 Database Server  → Data 저장 / 조회
 File Server      → File 제공
-SSH Server       → Remote Shell 제공</p>
+SSH Server       → Remote Shell 제공
+</code></pre>
 <p>Server는 반드시 특별한 종류의 거대한 컴퓨터를 뜻하지 않습니다. 일반 Computer도 필요한 프로그램을 실행하고 Network를 통해 Service를 제공하도록 구성하면 Server 역할을 할 수 있습니다.</p>
-<p>Server를 운영한다는 것은 단순히 컴퓨터를 켜두는 것이 아닙니다. User와 Permission, Network 접근, Software, Storage, Service 상태 등을 지속적으로 관리해야 합니다. 이러한 작업을 System Administration이라고 합니다.</p>
-<ol>
-<li>서버를 어떻게 연습할까?</li>
-</ol>
+<p>Server를 운영한다는 것은 단순히 컴퓨터를 켜두는 것이 아닙니다. User와 Permission, Network 접근, Software, Storage, Service 상태 등을 지속적으로 관리해야 합니다. 이러한 작업을 <strong>System Administration</strong>이라고 합니다.</p>
+<hr />
+<h1 id="2">2. 서버를 어떻게 연습할까?</h1>
 <p>Linux Server를 공부하려면 직접 관리할 Server 환경이 필요합니다. 별도의 물리 Computer를 준비할 수도 있지만 학습할 때마다 Hardware를 준비하는 것은 비효율적이고, OS나 Network 설정을 실험하다 Host 환경을 망가뜨릴 수도 있습니다.</p>
 <p>우리가 원하는 것은 다음과 같습니다.</p>
-<p>내 실제 Computer
+<pre><code class="language-text">내 실제 Computer
       │
       ├── 기존 환경 유지
       │
-      └── 독립적인 Linux Server 실습 환경</p>
-<p>이 문제를 해결할 수 있는 대표적인 방법이 Virtualization입니다.</p>
-<ol>
-<li>Virtualization</li>
-</ol>
-<p>독립적인 System마다 Physical Machine을 하나씩 사용하면 격리는 쉽지만 Hardware가 계속 필요하고, 각 Machine에서 사용하지 않는 CPU와 RAM도 생깁니다.</p>
-<p>Physical Machine A → System A
-Physical Machine B → System B
-Physical Machine C → System C</p>
-<p>그래서 이런 질문이 생깁니다.</p>
-<p>하나의 물리 Computer를 여러 개의 독립적인 Computer처럼 사용할 수 없을까?</p>
-<p>Virtualization은 물리 Computing Resource를 추상화하여 하나의 물리 System 위에 여러 독립적인 실행 환경을 만들 수 있게 합니다.</p>
-<pre><code>         Physical Machine
-      CPU / RAM / Disk / Network
-                 │
-                 ▼
-           Virtualization
-                 │
-      ┌──────────┼──────────┐
-      ▼          ▼          ▼
-    VM 1       VM 2       VM 3
+      └── 독립적인 Linux Server 실습 환경
 </code></pre>
-<p>Hypervisor</p>
-<p>물리 Hardware를 Virtual Machine에 나누어 제공하고 VM을 관리하는 Software 계층을 Hypervisor라고 합니다.</p>
-<pre><code>   VM 1          VM 2
-    │             │
-    └──────┬──────┘
-           ▼
-      Hypervisor
-           │
-           ▼
- Physical Hardware
+<p>이 문제를 해결할 수 있는 대표적인 방법이 <strong>Virtualization</strong>입니다.</p>
+<hr />
+<h1 id="3-virtualization">3. Virtualization</h1>
+<p>독립적인 System마다 Physical Machine을 하나씩 사용하면 격리는 쉽지만 Hardware가 계속 필요하고, 각 Machine에서 사용하지 않는 CPU와 RAM도 생깁니다.</p>
+<pre><code class="language-text">Physical Machine A → System A
+Physical Machine B → System B
+Physical Machine C → System C
+</code></pre>
+<p>그래서 이런 질문이 생깁니다.</p>
+<blockquote>
+<p>하나의 물리 Computer를 여러 개의 독립적인 Computer처럼 사용할 수 없을까?</p>
+</blockquote>
+<p><strong>Virtualization</strong>은 물리 Computing Resource를 추상화하여 하나의 물리 System 위에 여러 독립적인 실행 환경을 만들 수 있게 합니다.</p>
+<pre><code class="language-text">             Physical Machine
+          CPU / RAM / Disk / Network
+                     │
+                     ▼
+               Virtualization
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+        VM 1       VM 2       VM 3
+</code></pre>
+<h2 id="hypervisor">Hypervisor</h2>
+<p>물리 Hardware를 Virtual Machine에 나누어 제공하고 VM을 관리하는 Software 계층을 <strong>Hypervisor</strong>라고 합니다.</p>
+<pre><code class="language-text">       VM 1          VM 2
+        │             │
+        └──────┬──────┘
+               ▼
+          Hypervisor
+               │
+               ▼
+     Physical Hardware
 </code></pre>
 <p>Born2beroot에서 사용하는 VirtualBox도 이러한 Virtualization 환경을 제공합니다.</p>
-<ol>
-<li>Virtual Machine</li>
-</ol>
+<hr />
+<h1 id="4-virtual-machine">4. Virtual Machine</h1>
 <p><strong>Virtual Machine(VM)</strong>은 Virtualization을 통해 만들어진 가상의 Computer 환경입니다.</p>
-<p>Virtual Machine
+<pre><code class="language-text">Virtual Machine
 ├── Virtual CPU
 ├── Virtual RAM
 ├── Virtual Disk
 ├── Virtual Network Interface
-└── Operating System</p>
+└── Operating System
+</code></pre>
 <p>각 VM은 독립적인 Operating System을 실행할 수 있습니다.</p>
-<p>Physical Computer
+<pre><code class="language-text">Physical Computer
         │
         ▼
     Hypervisor
@@ -182,11 +189,12 @@ Physical Machine C → System C</p>
    ▼         ▼
  VM 1       VM 2
    │         │
-Debian     Ubuntu</p>
-<p>VM은 Isolation, 물리 Resource의 효율적인 사용, 서로 다른 OS 환경 구성, 안전한 Test Environment라는 장점을 줍니다. 반면 각 VM이 Guest OS 전체를 실행하므로 Container에 비해 일반적으로 더 많은 Resource를 사용합니다.</p>
-<p>Born2beroot에서는 왜 VM을 사용할까?</p>
+Debian     Ubuntu
+</code></pre>
+<p>VM은 <strong>Isolation</strong>, 물리 Resource의 효율적인 사용, 서로 다른 OS 환경 구성, 안전한 Test Environment라는 장점을 줍니다. 반면 각 VM이 Guest OS 전체를 실행하므로 Container에 비해 일반적으로 더 많은 Resource를 사용합니다.</p>
+<h2 id="born2beroot-vm">Born2beroot에서는 왜 VM을 사용할까?</h2>
 <p>Born2beroot의 목적은 Linux Server를 직접 구축하고 관리하는 것입니다.</p>
-<p>My Computer
+<pre><code class="language-text">My Computer
     ↓
 VirtualBox
     ↓
@@ -194,93 +202,98 @@ Virtual Machine
     ↓
 Linux
     ↓
-Server Administration</p>
+Server Administration
+</code></pre>
 <p>VM 덕분에 Host Computer를 크게 변경하지 않고 독립적인 Linux Server를 만들 수 있습니다.</p>
 <p>그런데 Computer만 있다고 Program이 저절로 실행되는 것은 아닙니다. Hardware와 Application 사이에서 System 전체를 관리할 무언가가 필요합니다.</p>
-<ol>
-<li>Operating System</li>
-</ol>
+<hr />
+<h1 id="5-operating-system">5. Operating System</h1>
 <p>여러 Program이 CPU, Memory, Disk, Network Device를 동시에 사용하려고 합니다. 각각이 Hardware를 직접 제어한다면 자원 충돌과 보안 문제가 생깁니다.</p>
-<p>Applications
+<pre><code class="language-text">Applications
      │
      ▼
 Operating System
      │
      ▼
-Hardware</p>
+Hardware
+</code></pre>
 <p><strong>Operating System(OS)</strong>은 Hardware Resource를 관리하고 Application이 Computer를 사용할 수 있는 환경과 Interface를 제공합니다.</p>
-<p>CPU     → Process 실행 관리
+<pre><code class="language-text">CPU     → Process 실행 관리
 Memory  → Memory 할당과 보호
 Disk    → File과 Storage 관리
 Device  → Hardware Device 관리
 User    → 사용자와 권한 관리
-Network → Network Resource 관리</p>
-<ol>
-<li>Linux와 Debian</li>
-</ol>
-<p>엄밀히 말하면 Linux는 Kernel입니다. Kernel은 OS의 핵심 부분으로 CPU, Process, Memory, Device 등 Hardware Resource를 관리합니다.</p>
-<p>Applications
+Network → Network Resource 관리
+</code></pre>
+<hr />
+<h1 id="6-linux-debian">6. Linux와 Debian</h1>
+<p>엄밀히 말하면 <strong>Linux는 Kernel</strong>입니다. Kernel은 OS의 핵심 부분으로 CPU, Process, Memory, Device 등 Hardware Resource를 관리합니다.</p>
+<pre><code class="language-text">Applications
      ↓
 System Tools / Libraries
      ↓
 Linux Kernel
      ↓
-Hardware</p>
-<p>Linux Kernel에 System Tool, Library, Package Manager 등을 묶어 실제 사용할 수 있는 OS 형태로 제공하는 것을 Linux Distribution이라고 합니다.</p>
-<p>Linux
+Hardware
+</code></pre>
+<p>Linux Kernel에 System Tool, Library, Package Manager 등을 묶어 실제 사용할 수 있는 OS 형태로 제공하는 것을 <strong>Linux Distribution</strong>이라고 합니다.</p>
+<pre><code class="language-text">Linux
 ├── Debian
 ├── Ubuntu
 ├── Rocky Linux
-└── ...</p>
+└── ...
+</code></pre>
 <p>Born2beroot에서는 Linux Distribution을 설치하고 직접 Server 환경으로 구성합니다.</p>
 <p>이제 Server와 OS가 준비되었습니다. 다음 문제는 <strong>여러 사용자가 같은 System을 사용한다면 누가 무엇을 할 수 있는가?</strong>입니다.</p>
-<ol>
-<li>User, Group, Permission</li>
-</ol>
+<hr />
+<h1 id="7-user-group-permission">7. User, Group, Permission</h1>
 <p>모든 사용자가 모든 File과 System 설정을 자유롭게 수정할 수 있다면 Server를 안전하게 운영할 수 없습니다.</p>
-<p>Linux는 User라는 Identity로 사용자를 구분하고, 여러 User를 Group으로 묶어 관리할 수 있습니다.</p>
+<p>Linux는 <strong>User</strong>라는 Identity로 사용자를 구분하고, 여러 User를 <strong>Group</strong>으로 묶어 관리할 수 있습니다.</p>
 <p>File에는 대표적으로 다음 Permission이 있습니다.</p>
-<p>r → read
+<pre><code class="language-text">r → read
 w → write
-x → execute</p>
-<p>권한의 대상은 user / group / others로 나뉩니다.</p>
-<p>-rwxr-x---</p>
-<p>이를 통해 누가 어떤 Resource를 읽고, 수정하고, 실행할 수 있는가를 통제합니다.</p>
+x → execute
+</code></pre>
+<p>권한의 대상은 <code>user / group / others</code>로 나뉩니다.</p>
+<pre><code class="language-text">-rwxr-x---
+</code></pre>
+<p>이를 통해 <strong>누가 어떤 Resource를 읽고, 수정하고, 실행할 수 있는가</strong>를 통제합니다.</p>
 <p>확인:</p>
-<p>id
+<pre><code class="language-bash">id
 groups
-ls -l</p>
-<ol>
-<li>root와 sudo</li>
-</ol>
+ls -l
+</code></pre>
+<hr />
+<h1 id="8-root-sudo">8. root와 sudo</h1>
 <p>System File 수정, Package 설치, User 관리, Network 설정 같은 작업은 System 전체에 영향을 줄 수 있습니다.</p>
-<p>Linux의 강력한 관리자 계정이 root입니다. 하지만 모든 작업을 root로 하면 작은 실수도 System 전체에 영향을 줄 수 있습니다.</p>
-<p>Normal User
+<p>Linux의 강력한 관리자 계정이 <strong>root</strong>입니다. 하지만 모든 작업을 root로 하면 작은 실수도 System 전체에 영향을 줄 수 있습니다.</p>
+<pre><code class="language-text">Normal User
      │
      │ 필요한 순간에만
      ▼
     sudo
      │
      ▼
-Privileged Command</p>
-<p>sudo는 허가된 User가 필요한 Command에 대해 관리자 권한을 사용하도록 해줍니다.</p>
-<p>즉 Born2beroot의 sudo 설정은 단순한 명령어 학습이 아니라 관리자 권한을 어떻게 제한하고 위임할 것인가를 배우는 과정입니다.</p>
-<ol>
-<li>Authentication과 Password Policy</li>
-</ol>
+Privileged Command
+</code></pre>
+<p><strong>sudo</strong>는 허가된 User가 필요한 Command에 대해 관리자 권한을 사용하도록 해줍니다.</p>
+<p>즉 Born2beroot의 sudo 설정은 단순한 명령어 학습이 아니라 <strong>관리자 권한을 어떻게 제한하고 위임할 것인가</strong>를 배우는 과정입니다.</p>
+<hr />
+<h1 id="9-authentication-password-policy">9. Authentication과 Password Policy</h1>
 <p>Permission이 잘 설정되어 있어도 다른 사람이 User의 계정으로 쉽게 로그인할 수 있다면 의미가 없습니다.</p>
-<p>Authorization
-"이 User는 무엇을 할 수 있는가?"</p>
-<p>Authentication
-"지금 접속한 사람이 정말 그 User인가?"</p>
-<p>Password는 Authentication 방법 중 하나입니다. Password Policy는 길이, 복잡성, 변경 주기 등의 규칙을 적용하여 너무 약한 인증 정보를 사용하는 위험을 줄입니다.</p>
+<pre><code class="language-text">Authorization
+&quot;이 User는 무엇을 할 수 있는가?&quot;
+
+Authentication
+&quot;지금 접속한 사람이 정말 그 User인가?&quot;
+</code></pre>
+<p>Password는 Authentication 방법 중 하나입니다. <strong>Password Policy</strong>는 길이, 복잡성, 변경 주기 등의 규칙을 적용하여 너무 약한 인증 정보를 사용하는 위험을 줄입니다.</p>
 <p>Born2beroot에서는 개별 Password뿐 아니라 System 차원의 인증 정책을 다룹니다.</p>
-<ol>
-<li>Remote Administration과 SSH</li>
-</ol>
+<hr />
+<h1 id="10-remote-administration-ssh">10. Remote Administration과 SSH</h1>
 <p>실제 Server는 관리자 바로 옆에 있지 않을 수 있습니다. Data Center나 다른 장소에 있는 Server를 관리하려면 Network를 통해 명령을 실행할 방법이 필요합니다.</p>
 <p><strong>SSH(Secure Shell)</strong>는 Network를 통해 다른 Computer에 안전하게 접속하고 명령을 실행하기 위한 Protocol입니다.</p>
-<p>Administrator
+<pre><code class="language-text">Administrator
      │
      │ SSH
      ▼
@@ -290,52 +303,56 @@ Privileged Command</p>
 Linux Server
      │
      ▼
-   Shell</p>
+   Shell
+</code></pre>
 <p>SSH는 원격 관리뿐 아니라 통신 내용을 암호화한다는 점도 중요합니다.</p>
 <p>Born2beroot에서는 VM에서 SSH Server를 실행하고 Host에서 VM으로 접속합니다.</p>
-<p>ssh -p 4242 user@host
-systemctl status ssh</p>
-<ol>
-<li>IP Address와 Port</li>
-</ol>
-<p>Network에서 Server에 접속하려면 먼저 어느 Host인지 알아야 합니다. 이를 식별하는 데 IP Address가 사용됩니다.</p>
+<pre><code class="language-bash">ssh -p 4242 user@host
+systemctl status ssh
+</code></pre>
+<hr />
+<h1 id="11-ip-address-port">11. IP Address와 Port</h1>
+<p>Network에서 Server에 접속하려면 먼저 <strong>어느 Host인지</strong> 알아야 합니다. 이를 식별하는 데 IP Address가 사용됩니다.</p>
 <p>하지만 하나의 Server에서는 여러 Network Service가 동시에 실행될 수 있습니다.</p>
-<p>One Server
+<pre><code class="language-text">One Server
 ├── SSH
 ├── Web Server
-└── Database</p>
-<p>그래서 하나의 Host 안에서 Service를 구분하기 위해 Port를 사용합니다.</p>
-<p>IP Address
+└── Database
+</code></pre>
+<p>그래서 하나의 Host 안에서 Service를 구분하기 위해 <strong>Port</strong>를 사용합니다.</p>
+<pre><code class="language-text">IP Address
     │
     ├── Port 22  → SSH의 일반적인 Port
     ├── Port 80  → HTTP
-    └── Port 443 → HTTPS</p>
+    └── Port 443 → HTTPS
+</code></pre>
 <p>즉 간단히 보면:</p>
-<p>IP Address → 어느 Computer?
-Port       → 그 Computer의 어느 Network Service?</p>
+<pre><code class="language-text">IP Address → 어느 Computer?
+Port       → 그 Computer의 어느 Network Service?
+</code></pre>
 <p>Born2beroot에서 SSH Port를 설정하면서 이 관계를 직접 확인합니다.</p>
-<ol>
-<li>Firewall</li>
-</ol>
+<hr />
+<h1 id="12-firewall">12. Firewall</h1>
 <p>Server가 Network에 연결되면 외부에서 들어오는 Connection도 생깁니다. 모든 접근을 허용할 필요는 없습니다.</p>
-<p>Firewall은 Network Traffic에 규칙을 적용하여 어떤 접근을 허용하고 차단할지 결정합니다.</p>
-<p>Network
+<p><strong>Firewall</strong>은 Network Traffic에 규칙을 적용하여 어떤 접근을 허용하고 차단할지 결정합니다.</p>
+<pre><code class="language-text">Network
    │
    ▼
 Firewall
    │
    ├── Allowed → Server
-   └── Denied  → Block</p>
-<p>Born2beroot에서는 필요한 Port만 허용하여 Service는 제공하면서 불필요한 Network 노출은 줄이는 것을 연습합니다.</p>
+   └── Denied  → Block
+</code></pre>
+<p>Born2beroot에서는 필요한 Port만 허용하여 <strong>Service는 제공하면서 불필요한 Network 노출은 줄이는 것</strong>을 연습합니다.</p>
 <p>Debian에서 UFW를 사용한다면 상태를 다음처럼 확인할 수 있습니다.</p>
-<p>sudo ufw status</p>
-<ol>
-<li>Storage, Partition, LVM</li>
-</ol>
+<pre><code class="language-bash">sudo ufw status
+</code></pre>
+<hr />
+<h1 id="13-storage-partition-lvm">13. Storage, Partition, LVM</h1>
 <p>Server는 OS, Application, Log, User Data 등을 Disk에 저장합니다.</p>
 <p>Storage를 목적에 따라 분리할 수 있지만 고정된 Partition만으로 관리하면 나중에 공간을 조정하기 불편할 수 있습니다.</p>
 <p><strong>LVM(Logical Volume Manager)</strong>은 Physical Storage와 실제 사용하는 Volume 사이에 논리적인 관리 계층을 둡니다.</p>
-<p>Physical Disk
+<pre><code class="language-text">Physical Disk
      ↓
 Physical Volume
      ↓
@@ -343,73 +360,78 @@ Volume Group
      │
      ├── Logical Volume A
      ├── Logical Volume B
-     └── Logical Volume C</p>
+     └── Logical Volume C
+</code></pre>
 <p>이 구조를 통해 Storage를 더 유연하게 구성하고 확장할 수 있습니다.</p>
 <p>확인:</p>
-<p>lsblk
+<pre><code class="language-bash">lsblk
 sudo pvs
 sudo vgs
-sudo lvs</p>
-<p>Born2beroot에서 LVM을 사용하는 목적은 Partition 이름을 외우는 것이 아니라 Server Storage가 어떻게 구조화되고 관리되는지 이해하는 데 있습니다.</p>
-<ol>
-<li>Package Manager</li>
-</ol>
+sudo lvs
+</code></pre>
+<p>Born2beroot에서 LVM을 사용하는 목적은 Partition 이름을 외우는 것이 아니라 <strong>Server Storage가 어떻게 구조화되고 관리되는지</strong> 이해하는 데 있습니다.</p>
+<hr />
+<h1 id="14-package-manager">14. Package Manager</h1>
 <p>Server를 운영하면서 새로운 Software를 설치하고 Update해야 합니다.</p>
 <p>Program을 인터넷에서 하나씩 직접 찾아 설치한다면 Version, Dependency, Update, 삭제를 모두 직접 관리해야 합니다.</p>
-<p>Package Repository
+<pre><code class="language-text">Package Repository
         ↓
 Package Manager
         │
         ├── Install
         ├── Update
         ├── Upgrade
-        └── Remove</p>
-<p>Debian 계열에서는 APT를 사용합니다.</p>
-<p>sudo apt update
-sudo apt install <package></p>
-<p>apt update는 설치된 Package를 모두 새 Version으로 바꾸는 명령이 아니라 Repository의 Package 목록 정보를 갱신하는 명령입니다.</p>
-<ol>
-<li>Process, Daemon, Service, systemd</li>
-</ol>
-<p>Program을 실행하면 OS는 실행 중인 작업을 Process로 관리합니다.</p>
-<p>Program
+        └── Remove
+</code></pre>
+<p>Debian 계열에서는 <strong>APT</strong>를 사용합니다.</p>
+<pre><code class="language-bash">sudo apt update
+sudo apt install &lt;package&gt;
+</code></pre>
+<p><code>apt update</code>는 설치된 Package를 모두 새 Version으로 바꾸는 명령이 아니라 <strong>Repository의 Package 목록 정보를 갱신하는 명령</strong>입니다.</p>
+<hr />
+<h1 id="15-process-daemon-service-systemd">15. Process, Daemon, Service, systemd</h1>
+<p>Program을 실행하면 OS는 실행 중인 작업을 <strong>Process</strong>로 관리합니다.</p>
+<pre><code class="language-text">Program
    │ execute
    ▼
-Process</p>
+Process
+</code></pre>
 <p>하지만 SSH Server 같은 Program은 사용자가 Terminal을 열어둔 동안만 실행되어서는 안 됩니다. Background에서 계속 요청을 기다려야 합니다.</p>
-<p>Unix/Linux 환경에서 이런 형태로 Background에서 지속적으로 동작하는 Program을 흔히 Daemon이라고 합니다.</p>
-<p>그리고 Service를 시작하고 중지하고, Boot 시 자동 실행하고, 상태를 확인하는 관리 체계가 필요합니다. 많은 Linux Distribution에서는 systemd가 이 역할을 담당합니다.</p>
-<p>systemd
+<p>Unix/Linux 환경에서 이런 형태로 Background에서 지속적으로 동작하는 Program을 흔히 <strong>Daemon</strong>이라고 합니다.</p>
+<p>그리고 Service를 시작하고 중지하고, Boot 시 자동 실행하고, 상태를 확인하는 관리 체계가 필요합니다. 많은 Linux Distribution에서는 <strong>systemd</strong>가 이 역할을 담당합니다.</p>
+<pre><code class="language-text">systemd
 ├── start
 ├── stop
 ├── restart
 ├── enable
-└── status</p>
+└── status
+</code></pre>
 <p>예:</p>
-<p>systemctl status ssh
-sudo systemctl restart ssh</p>
-<ol>
-<li>Automation과 cron</li>
-</ol>
+<pre><code class="language-bash">systemctl status ssh
+sudo systemctl restart ssh
+</code></pre>
+<hr />
+<h1 id="16-automation-cron">16. Automation과 cron</h1>
 <p>Server Administration에는 반복 작업이 많습니다.</p>
-<p>Backup
+<pre><code class="language-text">Backup
 Status Check
 Maintenance
-Script 실행</p>
+Script 실행
+</code></pre>
 <p>사람이 정해진 시간마다 직접 실행하면 비효율적이고 실수하기 쉽습니다.</p>
-<p>cron은 정해진 시간이나 주기에 Command 또는 Script를 자동 실행할 수 있게 합니다.</p>
-<p>Schedule
+<p><strong>cron</strong>은 정해진 시간이나 주기에 Command 또는 Script를 자동 실행할 수 있게 합니다.</p>
+<pre><code class="language-text">Schedule
    ↓
  cron
    ↓
-Command / Script</p>
+Command / Script
+</code></pre>
 <p>Born2beroot에서는 Monitoring Script를 주기적으로 실행하면서 기본적인 System Automation을 경험합니다.</p>
-<ol>
-<li>Monitoring</li>
-</ol>
+<hr />
+<h1 id="17-monitoring">17. Monitoring</h1>
 <p>Server가 켜져 있다는 것과 Server가 정상적으로 동작한다는 것은 다릅니다.</p>
 <p>관리자는 CPU, Memory, Disk, Process, User, Network 등 System 상태를 파악할 수 있어야 합니다.</p>
-<p>Server
+<pre><code class="language-text">Server
 ├── CPU
 ├── Memory
 ├── Disk
@@ -421,13 +443,13 @@ Command / Script</p>
  Monitoring
      │
      ▼
-Administrator</p>
-<p>Born2beroot에서는 monitoring.sh 같은 Script로 여러 System 정보를 수집하고 주기적으로 출력하면서 Monitoring + Shell Script + Automation이 어떻게 연결되는지 경험합니다.</p>
-<ol>
-<li>Born2beroot의 전체 그림</li>
-</ol>
+Administrator
+</code></pre>
+<p>Born2beroot에서는 <code>monitoring.sh</code> 같은 Script로 여러 System 정보를 수집하고 주기적으로 출력하면서 <strong>Monitoring + Shell Script + Automation</strong>이 어떻게 연결되는지 경험합니다.</p>
+<hr />
+<h1 id="18-born2beroot">18. Born2beroot의 전체 그림</h1>
 <p>각 기술은 서로 떨어져 있는 것이 아닙니다.</p>
-<p>Service를 제공하는 Computer가 필요하다
+<pre><code class="language-text">Service를 제공하는 Computer가 필요하다
                 ↓
               Server
                 ↓
@@ -483,31 +505,37 @@ Server Program을 지속적으로 운영해야 한다
                 ↓
 Server 상태를 파악해야 한다
                 ↓
-           Monitoring</p>
+           Monitoring
+</code></pre>
 <p>결국 Born2beroot가 던지는 큰 질문은 하나입니다.</p>
-<p>Linux Server 한 대를 안전하고 지속적으로 운영하려면 무엇이 필요한가?</p>
-<ol>
-<li>다음 단계: Inception</li>
-</ol>
-<p>Born2beroot에서는 Linux Server 한 대를 구성하고 관리하는 기본을 배웠습니다.</p>
+<blockquote>
+<p><strong>Linux Server 한 대를 안전하고 지속적으로 운영하려면 무엇이 필요한가?</strong></p>
+</blockquote>
+<hr />
+<h1 id="19-inception">19. 다음 단계: Inception</h1>
+<p>Born2beroot에서는 <strong>Linux Server 한 대를 구성하고 관리하는 기본</strong>을 배웠습니다.</p>
 <p>그런데 하나의 Server에 여러 Application을 직접 설치하기 시작하면 새로운 문제가 생깁니다.</p>
-<p>Linux Server
+<pre><code class="language-text">Linux Server
 ├── Web Server
 ├── WordPress
 ├── Database
-└── Other Applications</p>
+└── Other Applications
+</code></pre>
 <p>각 Application은 서로 다른 Version, Library, Configuration을 요구할 수 있고 서로의 환경에 영향을 줄 수 있습니다.</p>
 <p>그래서 다음 질문으로 이어집니다.</p>
+<blockquote>
 <p>여러 Application을 하나의 Server에서 서로 분리된 환경으로 실행할 수 없을까?</p>
-<p>Born2beroot
+</blockquote>
+<pre><code class="language-text">Born2beroot
 Linux Server Administration
         ↓
-"Application 환경을 어떻게 분리하지?"
+&quot;Application 환경을 어떻게 분리하지?&quot;
         ↓
 Inception
         ↓
-Docker / Container</p>
-<p>이 질문이 다음 프로젝트인 Inception으로 이어집니다.</p>
+Docker / Container
+</code></pre>
+<p>이 질문이 다음 프로젝트인 <strong>Inception</strong>으로 이어집니다.</p>
               
             </div>
           </div><footer>
