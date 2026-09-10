@@ -1,0 +1,3832 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Inception - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Inception";
+        var mkdocs_page_input_path = "preview/inception.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Preview</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../born2beroot/">Born2beroot</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Inception</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inception of Things</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/subject/">Project Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part1/">Part 1 — K3s & Vagrant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part2/">Part 2 — K3s & Applications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part3/">Part 3 — K3d & Argo CD</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/bonus/">Bonus — GitLab</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Review</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../review/">Review</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Preview</li>
+      <li class="breadcrumb-item active">Inception</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="inception">Inception</h1>
+<blockquote>
+<p>Linux Server 위에서 Application을 격리하고, 연결하고, 지속적으로 운영하는 방법을 배운다.</p>
+</blockquote>
+<hr />
+<h1 id="0">0. 이 문서는 무엇을 배우기 위한 문서인가?</h1>
+<p>Born2beroot에서 우리는 <strong>Linux Server 한 대를 관리하는 방법</strong>을 배웠습니다.</p>
+<p>예를 들어 다음과 같은 개념들을 만났습니다.</p>
+<pre><code class="language-text">Server
+  ↓
+Operating System
+  ↓
+Linux
+  ↓
+Process
+  ↓
+User / Permission
+  ↓
+Service
+  ↓
+Network
+  ↓
+Port
+  ↓
+Storage
+</code></pre>
+<p>이제 Server 자체는 어느 정도 준비할 수 있습니다.</p>
+<p>그렇다면 다음 질문은 자연스럽습니다.</p>
+<blockquote>
+<p>이 Server 위에서 실제 Application은 어떻게 운영할까?</p>
+</blockquote>
+<p>예를 들어 WordPress Website를 운영한다고 생각해봅시다.</p>
+<p>WordPress 하나를 운영하기 위해서도 여러 Software가 필요합니다.</p>
+<pre><code class="language-text">Browser
+   ↓
+Web Server
+   ↓
+WordPress / PHP
+   ↓
+Database
+</code></pre>
+<p>Inception에서는 이것을 대략 다음과 같은 구조로 만듭니다.</p>
+<pre><code class="language-text">Internet
+   │
+   │ HTTPS
+   ▼
+┌───────────────┐
+│     NGINX     │
+└───────┬───────┘
+        │
+        │ FastCGI
+        ▼
+┌───────────────┐
+│   WordPress   │
+│   + PHP-FPM   │
+└───────┬───────┘
+        │
+        │ Database Connection
+        ▼
+┌───────────────┐
+│    MariaDB    │
+└───────────────┘
+</code></pre>
+<p>그런데 Inception의 진짜 핵심은 단순히 WordPress Website를 만드는 것이 아닙니다.</p>
+<p>핵심 질문은 이것입니다.</p>
+<blockquote>
+<p><strong>여러 Application을 하나의 Server에서 서로 격리하면서도 함께 동작하게 만들려면 어떻게 해야 할까?</strong></p>
+</blockquote>
+<p>이 질문에서 Container가 등장합니다.</p>
+<p>그리고 Container를 관리하기 위해 Docker를 사용합니다.</p>
+<p>이 문서에서는 다음 흐름으로 개념을 연결합니다.</p>
+<pre><code class="language-text">Born2beroot
+Linux Server
+     ↓
+Application을 설치한다
+     ↓
+Application 환경이 뒤섞인다
+     ↓
+환경을 격리하고 싶다
+     ↓
+Process
+     ↓
+Container
+     ↓
+Namespace / cgroup
+     ↓
+Docker
+     ↓
+Image
+     ↓
+Dockerfile
+     ↓
+Container Filesystem
+     ↓
+Volume
+     ↓
+Container Network
+     ↓
+NGINX
+     ↓
+HTTP / HTTPS / TLS
+     ↓
+PHP-FPM / FastCGI
+     ↓
+WordPress
+     ↓
+MariaDB
+     ↓
+Docker Compose
+</code></pre>
+<hr />
+<h1 id="1-server-application">1. Server에 Application을 직접 설치하면 안 될까?</h1>
+<p>물론 가능합니다.</p>
+<p>Linux Server가 하나 있다고 생각해봅시다.</p>
+<p>그 안에 필요한 Software를 직접 설치할 수 있습니다.</p>
+<pre><code class="language-text">Linux Server
+
+├── NGINX
+├── PHP
+├── WordPress
+└── MariaDB
+</code></pre>
+<p>예를 들어 Debian이라면 Package Manager를 이용해서 Software를 설치할 수도 있습니다.</p>
+<pre><code class="language-bash">apt install nginx
+</code></pre>
+<p>Born2beroot에서 배운 방식과 크게 다르지 않습니다.</p>
+<p>그런데 Server에서 운영하는 Application이 많아지기 시작하면 문제가 생길 수 있습니다.</p>
+<hr />
+<h2 id="11-dependency">1.1 Dependency</h2>
+<p>Application은 혼자 존재하지 않는 경우가 많습니다.</p>
+<p>다른 Software나 Library에 의존합니다.</p>
+<p>이것을 <strong>Dependency</strong>라고 합니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Application A
+└── Library X version 1 필요
+
+Application B
+└── Library X version 2 필요
+</code></pre>
+<p>두 Application이 서로 다른 Version을 요구할 수 있습니다.</p>
+<p>그러면 하나의 Operating System 안에서 환경을 관리하기가 복잡해집니다.</p>
+<hr />
+<h2 id="12-configuration">1.2 Configuration</h2>
+<p>Application마다 설정도 필요합니다.</p>
+<pre><code class="language-text">NGINX
+→ nginx.conf
+
+PHP
+→ php.ini
+
+MariaDB
+→ Database 설정
+
+Application
+→ Environment Variable
+</code></pre>
+<p>모든 Application을 Host OS에 직접 설치하면 이런 설정들이 하나의 System 안에 쌓이게 됩니다.</p>
+<hr />
+<h2 id="13">1.3 재현성</h2>
+<p>더 큰 문제는 다른 Server에서 같은 환경을 다시 만드는 것입니다.</p>
+<p>Server A에서 Application이 잘 동작한다고 해봅시다.</p>
+<p>그런데 Server B에서도 똑같이 실행하려면:</p>
+<pre><code class="language-text">같은 OS Version
+같은 Package
+같은 Library Version
+같은 Configuration
+같은 Directory
+같은 Permission
+</code></pre>
+<p>등을 다시 맞춰야 합니다.</p>
+<p>사람이 직접 설정하면 작은 차이가 생길 수 있습니다.</p>
+<pre><code class="language-text">Server A
+→ 잘 동작함
+
+Server B
+→ &quot;왜 여기서는 안 되지?&quot;
+</code></pre>
+<p>그래서 이런 생각을 할 수 있습니다.</p>
+<blockquote>
+<p>Application뿐 아니라 <strong>Application이 실행되는 환경 자체를 하나의 단위로 만들 수 없을까?</strong></p>
+</blockquote>
+<p>Container는 이 문제를 해결하기 위한 방법 중 하나입니다.</p>
+<hr />
+<h1 id="2-container-process">2. Container를 이해하기 전에: Process</h1>
+<p>Container를 제대로 이해하려면 먼저 <strong>Process</strong>를 알아야 합니다.</p>
+<p>Container는 결국 Linux Process와 매우 밀접한 기술이기 때문입니다.</p>
+<hr />
+<h1 id="3-program-process">3. Program과 Process</h1>
+<p>Program과 Process는 같은 것이 아닙니다.</p>
+<p>Program은 Disk에 저장되어 있는 실행 가능한 Code입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">/usr/sbin/nginx
+/usr/bin/bash
+/usr/bin/python3
+</code></pre>
+<p>이것들은 File입니다.</p>
+<p>아직 실행되고 있지 않을 수도 있습니다.</p>
+<p>Program을 실행하면 Operating System은 그 Program을 실행하기 위한 상태를 Memory에 만들고 CPU 시간을 할당합니다.</p>
+<p>이렇게 <strong>현재 실행 중인 Program의 Instance</strong>를 Process라고 합니다.</p>
+<pre><code class="language-text">Program
+Disk에 저장된 Code
+      │
+      │ 실행
+      ▼
+Process
+Memory에서 실행 중인 상태
+</code></pre>
+<p>같은 Program을 여러 번 실행하면 여러 Process가 존재할 수도 있습니다.</p>
+<pre><code class="language-text">bash Program
+
+├── bash Process
+├── bash Process
+└── bash Process
+</code></pre>
+<hr />
+<h1 id="4-pid">4. PID란?</h1>
+<p>Operating System은 여러 Process를 구분해야 합니다.</p>
+<p>그래서 각각의 Process에 번호를 부여합니다.</p>
+<p>이 번호가:</p>
+<p><strong>PID — Process ID</strong></p>
+<p>입니다.</p>
+<p>현재 Process를 확인하는 대표적인 명령어는:</p>
+<pre><code class="language-bash">ps
+</code></pre>
+<p>조금 더 많은 Process를 보고 싶다면:</p>
+<pre><code class="language-bash">ps aux
+</code></pre>
+<p>예를 들어:</p>
+<pre><code class="language-text">PID    COMMAND
+
+1      systemd
+742    sshd
+810    dockerd
+1250   nginx
+</code></pre>
+<p>처럼 볼 수 있습니다.</p>
+<p>PID를 통해 Operating System은 어떤 Process를 종료하거나 관찰할지 구분할 수 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-bash">kill 1250
+</code></pre>
+<p>은 PID 1250 Process에 Signal을 보냅니다.</p>
+<hr />
+<h1 id="5-pid-1">5. PID 1은 왜 특별할까?</h1>
+<p>Linux가 시작되면 Kernel이 준비된 뒤 User Space의 첫 Process가 시작됩니다.</p>
+<p>일반적인 Linux Distribution에서는 이것이 <code>systemd</code>인 경우가 많습니다.</p>
+<pre><code class="language-text">Computer Boot
+     ↓
+Linux Kernel
+     ↓
+PID 1
+systemd
+     ↓
+여러 Service / Process
+</code></pre>
+<p>그래서 일반적인 Linux Host에서:</p>
+<pre><code class="language-bash">ps -p 1
+</code></pre>
+<p>을 실행하면 PID 1 Process를 확인할 수 있습니다.</p>
+<p>PID 1은 단순히 첫 번째 번호라는 것 이상의 의미가 있습니다.</p>
+<p>System의 다른 Process들을 시작하고 관리하는 init 역할을 담당할 수 있고,
+고아가 된 Process를 처리하는 역할도 가집니다.</p>
+<p>그리고 Signal 처리 측면에서도 일반 Process와 조금 다른 특성이 있습니다.</p>
+<p>이 개념은 조금 뒤 Container에서 다시 등장합니다.</p>
+<hr />
+<h1 id="6-application-process">6. Application마다 Process를 분리하면 충분하지 않을까?</h1>
+<p>Linux에서는 원래 여러 Process가 동시에 실행됩니다.</p>
+<pre><code class="language-text">Linux
+
+├── nginx process
+├── mariadb process
+├── sshd process
+└── bash process
+</code></pre>
+<p>그렇다면 그냥 Process만 따로 실행하면 Application이 분리되는 것 아닐까요?</p>
+<p>문제는 Process들이 기본적으로 같은 System을 바라본다는 것입니다.</p>
+<p>예를 들어 같은 Host에서 실행되는 Process들은 상황에 따라:</p>
+<pre><code class="language-text">같은 Process 목록
+같은 Network 환경
+같은 Filesystem
+같은 Hostname
+같은 System Resource
+</code></pre>
+<p>등을 공유하거나 볼 수 있습니다.</p>
+<p>우리가 원하는 것은 단순히 Process를 여러 개 실행하는 것이 아닙니다.</p>
+<pre><code class="language-text">Application A
+→ 자기 Process만 보이는 것처럼
+
+Application B
+→ 자기 Network가 있는 것처럼
+
+Application C
+→ 자기 Filesystem이 있는 것처럼
+</code></pre>
+<p><strong>Process마다 독립된 환경을 가진 것처럼 보이게 하는 것</strong>입니다.</p>
+<p>여기서 Linux의 <strong>Namespace</strong>가 등장합니다.</p>
+<hr />
+<h1 id="7-namespace">7. Namespace</h1>
+<p>Namespace는 Linux Kernel이 제공하는 격리 기능입니다.</p>
+<p>쉽게 생각하면:</p>
+<blockquote>
+<p><strong>Process가 System의 어떤 부분을 볼 수 있는지를 분리하는 기능</strong></p>
+</blockquote>
+<p>입니다.</p>
+<p>실제 Computer는 하나지만 Process마다 서로 다른 System을 보고 있는 것처럼 만들 수 있습니다.</p>
+<pre><code class="language-text">                Linux Kernel
+                     │
+          ┌──────────┴──────────┐
+          │                     │
+     Namespace A           Namespace B
+          │                     │
+     Process A             Process B
+</code></pre>
+<p>Process A와 Process B는 같은 Kernel 위에서 실행되고 있지만 서로 다른 환경에 있다고 느낄 수 있습니다.</p>
+<hr />
+<h1 id="8-pid-namespace">8. PID Namespace</h1>
+<p>Namespace에는 여러 종류가 있습니다.</p>
+<p>그중 하나가 <strong>PID Namespace</strong>입니다.</p>
+<p>PID Namespace는 Process가 볼 수 있는 Process ID 공간을 분리합니다.</p>
+<p>Host에서는 다음처럼 보이는 Process가 있다고 생각해봅시다.</p>
+<pre><code class="language-text">Host
+
+PID 1      systemd
+PID 800    dockerd
+PID 1427   nginx
+</code></pre>
+<p>그런데 nginx Process를 별도의 PID Namespace 안에서 실행하면 그 Namespace 내부에서는:</p>
+<pre><code class="language-text">Container
+
+PID 1      nginx
+</code></pre>
+<p>처럼 보일 수 있습니다.</p>
+<p>즉 <strong>같은 Process가 어디에서 관찰되느냐에 따라 다른 PID로 보일 수 있습니다.</strong></p>
+<pre><code class="language-text">Host에서 바라봄
+nginx → PID 1427
+
+Container에서 바라봄
+nginx → PID 1
+</code></pre>
+<p>Host의 PID 1이 nginx로 바뀐 것이 아닙니다.</p>
+<p>Container가 자기만의 PID Namespace를 가지고 있기 때문에 그 안에서 번호 체계가 다시 보이는 것입니다.</p>
+<hr />
+<h1 id="9-container-pid-1">9. Container의 PID 1</h1>
+<p>이제 Docker Container에서 자주 보게 되는 현상을 이해할 수 있습니다.</p>
+<p>예를 들어 NGINX Container를 실행하면 Container 안에서는 NGINX Main Process가 PID 1로 보일 수 있습니다.</p>
+<pre><code class="language-text">Container
+
+PID 1
+nginx
+</code></pre>
+<p>Container Runtime은 이 Main Process의 생명주기와 Container의 생명주기를 밀접하게 연결합니다.</p>
+<pre><code class="language-text">Main Process 시작
+      ↓
+Container Running
+
+Main Process 종료
+      ↓
+Container Stopped
+</code></pre>
+<p>그래서 중요한 문장이 하나 나옵니다.</p>
+<blockquote>
+<p><strong>Container가 실행된다는 것은 결국 격리된 환경 안에서 Process가 실행된다는 뜻이다.</strong></p>
+</blockquote>
+<p>Container를 작은 VM이라고만 생각하면 이 부분을 놓치기 쉽습니다.</p>
+<hr />
+<h1 id="10-foreground-background">10. Foreground와 Background</h1>
+<p>Linux Program은 Foreground 또는 Background에서 실행될 수 있습니다.</p>
+<p>Foreground Process는 현재 Terminal과 직접 연결되어 실행됩니다.</p>
+<pre><code class="language-text">Terminal
+   │
+   ▼
+Process
+</code></pre>
+<p>반대로 Server Program은 전통적으로 Background에서 실행되는 경우가 많습니다.</p>
+<p>이런 Background Service Process를 <strong>daemon</strong>이라고 부르기도 합니다.</p>
+<pre><code class="language-text">Terminal
+   │
+   │ Program 시작
+   ▼
+Server Process
+   │
+   └── Background에서 계속 실행
+</code></pre>
+<p>일반 Linux Server에서는 systemd 같은 Service Manager가 이런 Service를 관리합니다.</p>
+<hr />
+<h1 id="11-docker-nginx-daemon-off">11. 왜 Docker의 NGINX에서 <code>daemon off;</code>를 사용할까?</h1>
+<p>Docker Container에서는 Main Process가 계속 실행되고 있어야 합니다.</p>
+<p>그런데 NGINX가 기존 Server 방식처럼 스스로 Background daemon으로 이동하면 Container의 Main Foreground Process가 종료될 수 있습니다.</p>
+<p>그래서 Container 환경에서는 NGINX를 Foreground에서 실행하는 방식을 사용합니다.</p>
+<pre><code class="language-bash">nginx -g &quot;daemon off;&quot;
+</code></pre>
+<p>Dockerfile에서는 다음처럼 볼 수 있습니다.</p>
+<pre><code class="language-dockerfile">CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<p>흐름을 보면:</p>
+<pre><code class="language-text">Container Start
+      ↓
+nginx 실행
+      ↓
+Foreground 유지
+      ↓
+nginx Main Process가 살아 있음
+      ↓
+Container Running
+</code></pre>
+<p>NGINX가 종료되면:</p>
+<pre><code class="language-text">nginx 종료
+    ↓
+Main Process 종료
+    ↓
+Container 종료
+</code></pre>
+<p>즉 <code>daemon off;</code>는 단순히 Inception에서 외워야 하는 이상한 옵션이 아닙니다.</p>
+<p>앞에서 배운:</p>
+<pre><code class="language-text">Process
+  ↓
+PID
+  ↓
+PID Namespace
+  ↓
+PID 1
+  ↓
+Container Lifecycle
+</code></pre>
+<p>이 모두 연결되어 만들어지는 설정입니다.</p>
+<hr />
+<h1 id="12-namespace">12. 다른 Namespace들</h1>
+<p>PID만 분리한다고 완전한 Container 환경이 되는 것은 아닙니다.</p>
+<p>Linux에는 여러 Namespace가 있습니다.</p>
+<p>대표적으로 다음과 같은 것들이 있습니다.</p>
+<pre><code class="language-text">PID Namespace
+→ Process ID 공간 분리
+
+Network Namespace
+→ Network 환경 분리
+
+Mount Namespace
+→ Mount / Filesystem 관점 분리
+
+UTS Namespace
+→ Hostname 등의 System Identifier 분리
+
+IPC Namespace
+→ Process 간 통신 Resource 분리
+
+User Namespace
+→ User / UID 관점 분리
+</code></pre>
+<p>모든 세부 구현을 외울 필요는 없습니다.</p>
+<p>핵심은:</p>
+<blockquote>
+<p><strong>Container는 Linux Kernel의 여러 격리 기능을 조합해 Process에게 독립된 System처럼 보이는 환경을 제공한다.</strong></p>
+</blockquote>
+<p>입니다.</p>
+<hr />
+<h1 id="13-network-namespace">13. Network Namespace</h1>
+<p>Network Namespace가 분리되면 Process는 자기만의 Network 환경을 가진 것처럼 볼 수 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Container A
+
+eth0
+IP A
+Route A
+
+
+Container B
+
+eth0
+IP B
+Route B
+</code></pre>
+<p>실제로는 하나의 Host 위에 있지만 각 Container는 서로 다른 Network 환경을 가진 것처럼 동작합니다.</p>
+<p>이 개념 때문에 나중에 아주 중요한 현상이 생깁니다.</p>
+<blockquote>
+<p>Container 안의 <code>localhost</code>는 Host가 아니다.</p>
+</blockquote>
+<p>이것은 Network 부분에서 자세히 살펴봅니다.</p>
+<hr />
+<h1 id="14-namespace">14. Namespace만 있으면 충분할까?</h1>
+<p>Namespace는 <strong>무엇을 볼 수 있는가</strong>를 분리하는 데 강합니다.</p>
+<p>하지만 다른 문제가 있습니다.</p>
+<p>Container A가 CPU를 전부 사용한다면 어떻게 될까요?</p>
+<pre><code class="language-text">Container A
+CPU 100%
+
+Container B
+CPU를 거의 사용하지 못함
+</code></pre>
+<p>또 Container 하나가 Memory를 무제한 사용하면 Host 전체에 영향을 줄 수 있습니다.</p>
+<p>따라서:</p>
+<blockquote>
+<p><strong>Process가 얼마나 많은 Resource를 사용할 수 있는지도 관리해야 합니다.</strong></p>
+</blockquote>
+<p>이 문제를 해결하는 Linux 기능이 <strong>cgroup</strong>입니다.</p>
+<hr />
+<h1 id="15-cgroup">15. cgroup</h1>
+<p>cgroup은 <strong>control group</strong>의 줄임말입니다.</p>
+<p>Process가 사용할 수 있는 System Resource를 관리하고 계측하는 Linux Kernel 기능입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">CPU
+Memory
+I/O
+Process 수
+</code></pre>
+<p>등을 관리하는 데 사용될 수 있습니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">Namespace
+→ 무엇을 볼 수 있는가?
+
+cgroup
+→ 얼마나 사용할 수 있는가?
+</code></pre>
+<p>라고 기억하면 이해하기 쉽습니다.</p>
+<p>Container 기술은 이런 Linux 기능들을 함께 이용합니다.</p>
+<pre><code class="language-text">Linux Process
+      +
+Namespaces
+      +
+cgroups
+      +
+Filesystem Isolation
+      +
+Network
+      ↓
+Container Environment
+</code></pre>
+<hr />
+<h1 id="16-container">16. 그래서 Container란 무엇인가?</h1>
+<p>이제 처음보다 조금 더 정확하게 정의할 수 있습니다.</p>
+<p>Container는 별도의 작은 Computer가 아닙니다.</p>
+<p>Container는:</p>
+<blockquote>
+<p><strong>Host Kernel을 공유하면서, Linux의 격리 기능을 이용해 독립된 환경처럼 실행되는 Process 또는 Process Group</strong></p>
+</blockquote>
+<p>이라고 이해할 수 있습니다.</p>
+<pre><code class="language-text">Physical Computer
+       ↓
+Linux Kernel
+       │
+       ├── Container A
+       │      └── Process
+       │
+       ├── Container B
+       │      └── Process
+       │
+       └── Container C
+              └── Process
+</code></pre>
+<hr />
+<h1 id="17-vm-container">17. VM과 Container의 차이</h1>
+<p>Born2beroot에서는 Virtual Machine을 사용했습니다.</p>
+<p>VM과 Container는 둘 다 <strong>격리된 환경</strong>을 만드는 데 사용할 수 있지만 방법이 다릅니다.</p>
+<h2 id="virtual-machine">Virtual Machine</h2>
+<pre><code class="language-text">Physical Hardware
+       ↓
+Hypervisor
+       │
+ ┌─────┴─────┐
+ │           │
+VM A        VM B
+ │           │
+Guest OS    Guest OS
+ │           │
+Kernel      Kernel
+ │           │
+App         App
+</code></pre>
+<p>각 VM은 자신의 Operating System과 Kernel을 가집니다.</p>
+<hr />
+<h2 id="container">Container</h2>
+<pre><code class="language-text">Physical Hardware
+       ↓
+Host Operating System
+       ↓
+Linux Kernel
+       │
+ ┌─────┼─────┐
+ │     │     │
+ C1    C2    C3
+ │     │     │
+App   App   App
+</code></pre>
+<p>Container들은 Host Kernel을 공유합니다.</p>
+<hr />
+<h2 id="_1">핵심 차이</h2>
+<table>
+<thead>
+<tr>
+<th>Virtual Machine</th>
+<th>Container</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Virtual Hardware를 제공</td>
+<td>Process 실행 환경을 격리</td>
+</tr>
+<tr>
+<td>Guest OS 존재</td>
+<td>Host Kernel 공유</td>
+</tr>
+<tr>
+<td>각 VM이 Kernel을 가짐</td>
+<td>별도 Kernel 없음</td>
+</tr>
+<tr>
+<td>일반적으로 더 무거움</td>
+<td>일반적으로 더 가벼움</td>
+</tr>
+<tr>
+<td>Machine 단위 격리</td>
+<td>Process/Application 단위 격리</td>
+</tr>
+</tbody>
+</table>
+<p>Container가 VM보다 무조건 좋다는 뜻은 아닙니다.</p>
+<p>둘은 목적과 격리 방식이 다릅니다.</p>
+<hr />
+<h1 id="18-container">18. Container를 직접 만들어야 할까?</h1>
+<p>여기까지 보면 Container를 만들려면 많은 Linux 기능이 필요합니다.</p>
+<pre><code class="language-text">Namespace
+cgroup
+Filesystem
+Network
+Process
+</code></pre>
+<p>이 모든 것을 사람이 직접 설정하는 것은 상당히 복잡합니다.</p>
+<p>예를 들어 우리는 단순히:</p>
+<blockquote>
+<p>"NGINX를 격리된 환경에서 실행하고 싶다."</p>
+</blockquote>
+<p>라고 생각했을 뿐인데 실제로는:</p>
+<pre><code class="language-text">Filesystem 준비
+Namespace 생성
+Network 구성
+Resource 관리
+Process 실행
+Lifecycle 관리
+</code></pre>
+<p>등을 처리해야 합니다.</p>
+<p>그래서 이 작업을 편리하게 처리할 도구가 필요합니다.</p>
+<p>여기서 <strong>Docker</strong>가 등장합니다.</p>
+<hr />
+<h1 id="19-docker">19. Docker</h1>
+<p>Docker는 Container를 만들고 실행하고 관리하기 위한 Platform입니다.</p>
+<p>Docker를 사용하면 복잡한 Linux Container 기능을 직접 하나하나 조작하지 않고 높은 수준의 명령으로 Container를 관리할 수 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-bash">docker run nginx
+</code></pre>
+<p>이라는 명령 하나로 NGINX Container를 실행할 수 있습니다.</p>
+<p>내부적으로는 훨씬 많은 일이 필요하지만 사용자는 Docker를 통해 이를 쉽게 관리합니다.</p>
+<hr />
+<h1 id="20-container-docker">20. Container와 Docker는 같은 것인가?</h1>
+<p>아닙니다.</p>
+<p>이 구분은 중요합니다.</p>
+<pre><code class="language-text">Container
+→ 격리된 Process 실행 방식 / 개념
+
+Docker
+→ Container를 만들고 관리하는 Platform
+</code></pre>
+<p>Container라는 개념 자체가 Docker와 동일한 것은 아닙니다.</p>
+<p>Docker가 Container 기술을 매우 쉽게 사용할 수 있게 만든 것입니다.</p>
+<hr />
+<h1 id="21-docker">21. Docker의 기본 구조</h1>
+<p>우리가 Terminal에서:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>라고 입력하면 <code>docker</code> Command가 직접 모든 Container를 관리하는 것은 아닙니다.</p>
+<p>큰 구조는 다음처럼 생각할 수 있습니다.</p>
+<pre><code class="language-text">User
+ │
+ │ docker ps
+ ▼
+Docker CLI
+ │
+ │ API
+ ▼
+Docker daemon
+ │
+ ├── Image 관리
+ ├── Container 관리
+ ├── Network 관리
+ └── Volume 관리
+</code></pre>
+<hr />
+<h1 id="22-docker-cli">22. Docker CLI</h1>
+<p>CLI는 <strong>Command Line Interface</strong>입니다.</p>
+<p>우리가 Terminal에서 사용하는:</p>
+<pre><code class="language-bash">docker
+</code></pre>
+<p>Command가 여기에 해당합니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<pre><code class="language-bash">docker run nginx
+</code></pre>
+<pre><code class="language-bash">docker logs nginx
+</code></pre>
+<p>같은 명령을 입력합니다.</p>
+<p>CLI는 사용자의 요청을 Docker daemon에 전달합니다.</p>
+<hr />
+<h1 id="23-docker-daemon">23. Docker daemon</h1>
+<p>Docker daemon은 Background에서 실행되며 Docker Resource를 관리합니다.</p>
+<p>Daemon Process의 이름은 일반적으로:</p>
+<pre><code class="language-text">dockerd
+</code></pre>
+<p>입니다.</p>
+<p>Linux에서 Docker Service를 확인한다면:</p>
+<pre><code class="language-bash">systemctl status docker
+</code></pre>
+<p>를 사용할 수 있습니다.</p>
+<p>여기서 Born2beroot에서 배웠던 개념이 다시 등장합니다.</p>
+<pre><code class="language-text">systemd
+   ↓
+docker.service
+   ↓
+dockerd
+</code></pre>
+<p>즉 Docker도 결국 Linux 위에서 실행되는 Software입니다.</p>
+<hr />
+<h1 id="24-docker">24. Docker를 간단히 확인해보자</h1>
+<p>Docker가 설치되어 있다면:</p>
+<pre><code class="language-bash">docker version
+</code></pre>
+<p>으로 Client와 Server 정보를 확인할 수 있습니다.</p>
+<p>좀 더 자세한 Docker 환경 정보는:</p>
+<pre><code class="language-bash">docker info
+</code></pre>
+<p>로 볼 수 있습니다.</p>
+<p>지금은 모든 출력 내용을 이해할 필요는 없습니다.</p>
+<p>목적은 단순합니다.</p>
+<pre><code class="language-text">docker CLI
+    ↓
+Docker daemon과 통신
+    ↓
+Docker 환경 정보 반환
+</code></pre>
+<p>이라는 구조를 확인하는 것입니다.</p>
+<hr />
+<h1 id="25-container">25. 첫 Container 실행</h1>
+<p>이제 실제 Container를 하나 실행해봅시다.</p>
+<pre><code class="language-bash">docker run -it debian:bookworm bash
+</code></pre>
+<p>하나씩 보면:</p>
+<pre><code class="language-text">docker
+→ Docker CLI
+
+run
+→ 새로운 Container를 생성하고 실행
+
+-it
+→ 현재 Terminal에서 직접 조작할 수 있게 연결
+
+debian:bookworm
+→ 사용할 Image
+
+bash
+→ Container에서 실행할 Process
+</code></pre>
+<p>성공하면 Debian 환경 안에서 Shell을 사용할 수 있습니다.</p>
+<hr />
+<h1 id="26-container">26. Container 안을 관찰해보자</h1>
+<p>Container 안에서:</p>
+<pre><code class="language-bash">hostname
+</code></pre>
+<p>을 실행해봅니다.</p>
+<p>그리고:</p>
+<pre><code class="language-bash">ps
+</code></pre>
+<p>도 실행해봅니다.</p>
+<p>Host와 다른 환경처럼 보일 것입니다.</p>
+<p>이것은 실제 Computer가 새로 생겼기 때문이 아닙니다.</p>
+<p>앞에서 배운 Namespace 등의 격리 기능 때문에 <strong>Process가 제한된 System View를 보고 있기 때문</strong>입니다.</p>
+<p>Container에서 나오려면:</p>
+<pre><code class="language-bash">exit
+</code></pre>
+<p>을 입력합니다.</p>
+<p>Main Process였던 <code>bash</code>가 종료됩니다.</p>
+<p>그러면 Container도 종료됩니다.</p>
+<p>왜 그런지 이제 설명할 수 있습니다.</p>
+<pre><code class="language-text">bash
+→ Container의 Main Process
+
+exit
+→ bash 종료
+
+Main Process 종료
+→ Container 종료
+</code></pre>
+<hr />
+<h1 id="27-container">27. Container 상태 확인</h1>
+<p>실행 중인 Container:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>종료된 Container까지 모두 보고 싶다면:</p>
+<pre><code class="language-bash">docker ps -a
+</code></pre>
+<p><code>-a</code>는 <code>all</code>이라고 생각하면 됩니다.</p>
+<p>방금 <code>exit</code>한 Debian Container가 <code>Exited</code> 상태로 남아 있는 것을 볼 수 있습니다.</p>
+<p>이것은 중요한 구분입니다.</p>
+<pre><code class="language-text">Image
+Container
+Running Container
+Stopped Container
+</code></pre>
+<p>이 네 개는 같은 것이 아닙니다.</p>
+<hr />
+<h1 id="28-debianbookworm">28. 그런데 <code>debian:bookworm</code>은 어디에서 왔을까?</h1>
+<p>우리는:</p>
+<pre><code class="language-bash">docker run -it debian:bookworm bash
+</code></pre>
+<p>라고 했습니다.</p>
+<p>그런데 Container를 만들려면 어떤 Filesystem과 Program을 사용할지 알아야 합니다.</p>
+<p>예를 들어 Debian Container라면 최소한 Debian User Space 환경이 필요합니다.</p>
+<p>Docker는 이 실행 환경의 원본을 <strong>Image</strong>라는 형태로 관리합니다.</p>
+<hr />
+<h1 id="29-image">29. Image</h1>
+<p>Image는 Container를 만들기 위한 <strong>Read-only Template</strong>이라고 이해할 수 있습니다.</p>
+<p>예를 들어 NGINX를 실행하려면:</p>
+<pre><code class="language-text">Filesystem
+NGINX Program
+필요한 Library
+기본 Configuration
+</code></pre>
+<p>등이 필요합니다.</p>
+<p>이 환경을 미리 Packaging한 것이 Image입니다.</p>
+<pre><code class="language-text">NGINX Image
+
+├── Filesystem
+├── nginx
+├── Libraries
+└── 기본 File들
+</code></pre>
+<p>그리고 Image에서 Container를 만듭니다.</p>
+<pre><code class="language-text">              ┌── Container A
+              │
+NGINX Image ──┼── Container B
+              │
+              └── Container C
+</code></pre>
+<p>같은 Image에서 여러 Container를 만들 수 있습니다.</p>
+<hr />
+<h1 id="30-image-container">30. Image와 Container</h1>
+<p>가장 중요한 구분 중 하나입니다.</p>
+<pre><code class="language-text">Image
+→ 실행 환경의 원본
+
+Container
+→ Image를 기반으로 실제 실행된 Instance
+</code></pre>
+<p>흐름으로 보면:</p>
+<pre><code class="language-text">Image
+  │
+  │ docker run
+  ▼
+Container
+  │
+  ▼
+Process 실행
+</code></pre>
+<p>Image 자체가 실행되는 것은 아닙니다.</p>
+<p>Image를 기반으로 Container를 만들고 그 안에서 Process가 실행됩니다.</p>
+<hr />
+<h1 id="31-image">31. Image 확인</h1>
+<p>현재 Local Machine에 있는 Image를 확인합니다.</p>
+<pre><code class="language-bash">docker image ls
+</code></pre>
+<p>또는:</p>
+<pre><code class="language-bash">docker images
+</code></pre>
+<p>예:</p>
+<pre><code class="language-text">REPOSITORY   TAG        IMAGE ID
+debian       bookworm   ...
+nginx        latest     ...
+</code></pre>
+<p>여기서:</p>
+<pre><code class="language-text">debian
+→ Repository / Image 이름
+
+bookworm
+→ Tag
+</code></pre>
+<p>라고 볼 수 있습니다.</p>
+<hr />
+<h1 id="32-registry">32. Registry</h1>
+<p>Image를 모든 사람이 자기 Computer에서 처음부터 만들 필요는 없습니다.</p>
+<p>Image를 저장하고 배포하는 Server가 있습니다.</p>
+<p>이를 <strong>Container Registry</strong>라고 합니다.</p>
+<pre><code class="language-text">Developer
+    │
+    │ push
+    ▼
+Registry
+    │
+    │ pull
+    ▼
+Server
+</code></pre>
+<p>대표적인 Public Registry 중 하나가 Docker Hub입니다.</p>
+<p>Image를 내려받을 때:</p>
+<pre><code class="language-bash">docker pull debian:bookworm
+</code></pre>
+<p>을 사용할 수 있습니다.</p>
+<p>그리고:</p>
+<pre><code class="language-bash">docker run debian:bookworm
+</code></pre>
+<p>을 실행했는데 Local에 Image가 없다면 Docker가 필요한 Image를 Registry에서 가져올 수도 있습니다.</p>
+<hr />
+<h1 id="33-image-file">33. 그런데 Image는 하나의 거대한 File일까?</h1>
+<p>개념적으로 Image를 하나의 Template이라고 설명했지만 실제 구조를 이해하려면 <strong>Layer</strong>를 알아야 합니다.</p>
+<p>Docker Image는 여러 Layer가 쌓인 형태로 구성됩니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Layer 4
+NGINX Config
+
+Layer 3
+NGINX 설치
+
+Layer 2
+Package 변경
+
+Layer 1
+Debian Base
+</code></pre>
+<p>이것을 겹쳐서 하나의 Filesystem처럼 사용합니다.</p>
+<pre><code class="language-text">┌──────────────────┐
+│ NGINX Config     │
+├──────────────────┤
+│ NGINX            │
+├──────────────────┤
+│ Packages         │
+├──────────────────┤
+│ Debian Base      │
+└──────────────────┘
+
+       Image
+</code></pre>
+<hr />
+<h1 id="34-layer">34. 왜 Layer를 사용할까?</h1>
+<p>여러 Image가 공통 부분을 재사용할 수 있기 때문입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Image A
+
+App A
+NGINX
+Debian
+
+
+Image B
+
+App B
+NGINX
+Debian
+</code></pre>
+<p>모든 내용을 매번 완전히 복사하는 대신 공통 Layer를 재사용할 수 있습니다.</p>
+<pre><code class="language-text">        App A Layer
+             │
+NGINX Layer ─┤
+             │
+Debian Layer ┤
+             │
+        App B Layer
+</code></pre>
+<p>이런 Layer 구조는 Image Build와 배포를 효율적으로 만드는 데 도움을 줍니다.</p>
+<hr />
+<h1 id="35-image-read-only">35. Image는 왜 Read-only일까?</h1>
+<p>Image는 Container를 만들기 위한 <strong>원본</strong>입니다.</p>
+<p>Container 하나에서 File을 수정했다고 원본 Image까지 바뀌면 문제가 생깁니다.</p>
+<p>예를 들어 같은 Image에서 두 Container를 만들었다고 생각해봅시다.</p>
+<pre><code class="language-text">Image
+ │
+ ├── Container A
+ └── Container B
+</code></pre>
+<p>Container A의 변경 때문에 Image 자체가 바뀌어 Container B까지 영향을 받으면 독립적인 실행 환경을 만들기 어렵습니다.</p>
+<p>그래서 Image Layer는 기본적으로 Read-only로 취급됩니다.</p>
+<hr />
+<h1 id="36-container-file">36. 그럼 Container 안에서는 File을 어떻게 수정할까?</h1>
+<p>Container는 실행될 때 Image 위에 <strong>Writable Layer</strong>를 추가합니다.</p>
+<pre><code class="language-text">┌────────────────────┐
+│ Container Writable │ ← 쓰기 가능
+├────────────────────┤
+│ Image Layer        │
+├────────────────────┤
+│ Image Layer        │
+├────────────────────┤
+│ Base Layer         │
+└────────────────────┘
+</code></pre>
+<p>Container에서 새로운 File을 만들거나 기존 File을 변경하면 그 변경사항은 Container의 Writable Layer에 기록됩니다.</p>
+<p>그래서 같은 Image에서 만든 Container라도 서로 다른 변경사항을 가질 수 있습니다.</p>
+<pre><code class="language-text">            Image
+              │
+      ┌───────┴───────┐
+      │               │
+Container A       Container B
+Writable A        Writable B
+</code></pre>
+<hr />
+<h1 id="37-container-data">37. Container를 삭제하면 왜 Data가 사라질까?</h1>
+<p>이제 이유를 이해할 수 있습니다.</p>
+<pre><code class="language-text">Image
+  +
+Container Writable Layer
+</code></pre>
+<p>에서 Container를 삭제하면 Container에 속해 있던 Writable Layer도 함께 제거됩니다.</p>
+<pre><code class="language-text">Container 삭제
+      ↓
+Writable Layer 삭제
+      ↓
+그 안에만 있던 Data도 삭제
+</code></pre>
+<p>단순한 Web Server라면 다시 만들면 될 수도 있습니다.</p>
+<p>하지만 Database라면 문제가 큽니다.</p>
+<pre><code class="language-text">MariaDB Container
+
+Users
+Posts
+Passwords
+Application Data
+</code></pre>
+<p>이 Data가 Container 삭제와 함께 사라져서는 안 됩니다.</p>
+<p>그래서 새로운 문제가 생깁니다.</p>
+<blockquote>
+<p><strong>Application의 생명주기와 Data의 생명주기를 분리할 수 없을까?</strong></p>
+</blockquote>
+<p>이 문제를 해결하기 위해 <strong>Volume</strong>을 사용합니다.</p>
+<hr />
+<h1 id="38-volume">38. Volume</h1>
+<p>Volume은 Container와 독립적으로 Data를 보존하기 위한 Storage입니다.</p>
+<p>기본적인 그림은:</p>
+<pre><code class="language-text">Container
+    │
+    │ Mount
+    ▼
+ Volume
+    │
+    ▼
+Persistent Data
+</code></pre>
+<p>입니다.</p>
+<p>Container가 Volume의 특정 위치를 자신의 Filesystem 안의 Directory처럼 사용합니다.</p>
+<hr />
+<h1 id="39-mariadb-volume">39. MariaDB와 Volume</h1>
+<p>MariaDB는 Database File을 Disk에 저장해야 합니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">MariaDB Container
+       │
+       │ Database File 저장
+       ▼
+/var/lib/mysql
+</code></pre>
+<p>이라고 생각해봅시다.</p>
+<p>이 Directory가 Container Writable Layer에만 있다면 Container를 삭제할 때 Data도 잃을 수 있습니다.</p>
+<p>그래서 Volume을 연결합니다.</p>
+<pre><code class="language-text">MariaDB Container
+       │
+       │ /var/lib/mysql
+       ▼
+┌─────────────────┐
+│ MariaDB Volume  │
+└─────────────────┘
+</code></pre>
+<p>이제 Container를 새로 만들어도 같은 Volume을 다시 연결할 수 있습니다.</p>
+<pre><code class="language-text">Old MariaDB Container
+          X
+          │
+          │ 삭제
+          │
+     MariaDB Volume
+          │
+          │ 연결
+          ▼
+New MariaDB Container
+</code></pre>
+<p>Application은 교체할 수 있지만 Data는 유지할 수 있습니다.</p>
+<hr />
+<h1 id="40-volume">40. Volume을 간단히 조작해보자</h1>
+<p>Volume 생성:</p>
+<pre><code class="language-bash">docker volume create my-data
+</code></pre>
+<p>현재 Volume 확인:</p>
+<pre><code class="language-bash">docker volume ls
+</code></pre>
+<p>특정 Volume 정보:</p>
+<pre><code class="language-bash">docker volume inspect my-data
+</code></pre>
+<p>삭제:</p>
+<pre><code class="language-bash">docker volume rm my-data
+</code></pre>
+<p>Volume에는 실제 중요한 Data가 들어 있을 수 있으므로 삭제할 때는 Container보다 더 주의해야 합니다.</p>
+<hr />
+<h1 id="41-bind-mount-volume">41. Bind Mount와 Volume</h1>
+<p>Host의 특정 Directory를 Container에 직접 연결하는 방법도 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">Host Directory
+/home/user/data
+       │
+       │ Mount
+       ▼
+Container
+/data
+</code></pre>
+<p>이것을 <strong>Bind Mount</strong>라고 합니다.</p>
+<p>반면 Named Volume은 Docker가 관리하는 Storage입니다.</p>
+<pre><code class="language-text">Bind Mount
+→ Host의 특정 Path를 직접 연결
+
+Named Volume
+→ Docker가 관리하는 Storage 영역 사용
+</code></pre>
+<p>둘 다 Container 밖에 Data를 둘 수 있지만 관리 방식이 다릅니다.</p>
+<p>Inception에서는 과제의 Storage 요구사항을 이해하고 그에 맞는 방식으로 Persistent Data를 구성해야 합니다.</p>
+<hr />
+<h1 id="42-image">42. Image를 직접 만들고 싶다</h1>
+<p>지금까지는 이미 존재하는 Image를 사용했습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-bash">docker run debian:bookworm
+</code></pre>
+<p>하지만 Inception에서는 우리가 원하는 Software와 Configuration이 들어 있는 Image를 직접 만들어야 합니다.</p>
+<p>예를 들어 NGINX Image가 필요하다면:</p>
+<pre><code class="language-text">Debian
+  ↓
+NGINX 설치
+  ↓
+TLS Certificate 준비
+  ↓
+NGINX Configuration
+  ↓
+우리의 NGINX Image
+</code></pre>
+<p>가 필요합니다.</p>
+<p>이 과정을 사람이 매번 직접 수행하면 다시 재현성 문제가 생깁니다.</p>
+<p>그래서:</p>
+<blockquote>
+<p><strong>Image를 만드는 방법 자체를 File로 기록하자.</strong></p>
+</blockquote>
+<p>라는 아이디어가 등장합니다.</p>
+<p>그 File이 <strong>Dockerfile</strong>입니다.</p>
+<hr />
+<h1 id="43-dockerfile">43. Dockerfile</h1>
+<p>Dockerfile은 <strong>Docker Image를 어떻게 만들 것인지 설명하는 Build Recipe</strong>입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-dockerfile">FROM debian:bookworm
+
+RUN apt-get update \
+    &amp;&amp; apt-get install -y nginx
+
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+
+CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<p>라고 작성할 수 있습니다.</p>
+<p>흐름은:</p>
+<pre><code class="language-text">Dockerfile
+    │
+    │ docker build
+    ▼
+  Image
+    │
+    │ docker run
+    ▼
+Container
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="44-from">44. FROM</h1>
+<pre><code class="language-dockerfile">FROM debian:bookworm
+</code></pre>
+<p>어떤 Base Image에서 시작할지 지정합니다.</p>
+<pre><code class="language-text">Debian Image
+     ↓
+우리의 변경사항
+     ↓
+새 Image
+</code></pre>
+<p>처음부터 Filesystem 전체를 만드는 대신 기존 Base Image 위에 필요한 것을 추가할 수 있습니다.</p>
+<hr />
+<h1 id="45-run">45. RUN</h1>
+<pre><code class="language-dockerfile">RUN apt-get update \
+    &amp;&amp; apt-get install -y nginx
+</code></pre>
+<p>Image를 <strong>Build하는 동안</strong> Command를 실행합니다.</p>
+<p>여기서 중요한 구분이 있습니다.</p>
+<pre><code class="language-text">RUN
+→ Image Build 시 실행
+
+CMD
+→ Container 시작 시 기본 실행
+</code></pre>
+<p>예를 들어:</p>
+<pre><code class="language-dockerfile">RUN apt-get install -y nginx
+</code></pre>
+<p>는 Image에 NGINX를 설치하기 위한 것입니다.</p>
+<p>Container를 시작할 때마다 NGINX를 다시 설치하는 것이 아닙니다.</p>
+<hr />
+<h1 id="46-copy">46. COPY</h1>
+<pre><code class="language-dockerfile">COPY conf/nginx.conf /etc/nginx/nginx.conf
+</code></pre>
+<p>Build Context의 File을 Image 안으로 복사합니다.</p>
+<pre><code class="language-text">Project
+
+conf/nginx.conf
+      │
+      │ COPY
+      ▼
+Image
+
+/etc/nginx/nginx.conf
+</code></pre>
+<p>이렇게 우리가 만든 Configuration을 Image에 포함할 수 있습니다.</p>
+<hr />
+<h1 id="47-cmd">47. CMD</h1>
+<pre><code class="language-dockerfile">CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<p>Container가 시작될 때 기본으로 실행할 Command를 지정합니다.</p>
+<p>앞에서 배운 내용을 연결해봅시다.</p>
+<pre><code class="language-text">docker run
+    ↓
+Container 생성
+    ↓
+CMD 실행
+    ↓
+nginx 실행
+    ↓
+Main Process 유지
+    ↓
+Container Running
+</code></pre>
+<p>그래서 Dockerfile의 <code>CMD</code>는 Container Lifecycle과 직접 연결됩니다.</p>
+<hr />
+<h1 id="48-image-build">48. Image Build</h1>
+<p>Dockerfile을 작성했다면 Image를 만들 수 있습니다.</p>
+<pre><code class="language-bash">docker build -t my-nginx .
+</code></pre>
+<p>하나씩 보면:</p>
+<pre><code class="language-text">docker build
+→ Dockerfile을 이용해 Image Build
+
+-t my-nginx
+→ 만들어진 Image에 이름 지정
+
+.
+→ 현재 Directory를 Build Context로 사용
+</code></pre>
+<p>완성된 Image는:</p>
+<pre><code class="language-bash">docker image ls
+</code></pre>
+<p>로 확인할 수 있습니다.</p>
+<hr />
+<h1 id="49-build-context">49. Build Context</h1>
+<p>마지막의 <code>.</code>은 단순히 문법 장식이 아닙니다.</p>
+<pre><code class="language-bash">docker build .
+</code></pre>
+<p>Docker에게:</p>
+<blockquote>
+<p>현재 Directory를 Build에 사용할 Context로 제공하겠다.</p>
+</blockquote>
+<p>라는 의미입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">project/
+├── Dockerfile
+└── conf/
+    └── nginx.conf
+</code></pre>
+<p>가 있고 Dockerfile에서:</p>
+<pre><code class="language-dockerfile">COPY conf/nginx.conf /etc/nginx/nginx.conf
+</code></pre>
+<p>를 사용한다면 Docker는 Build Context 안에서 <code>conf/nginx.conf</code>를 찾습니다.</p>
+<hr />
+<h1 id="50">50. 여기까지의 흐름</h1>
+<p>지금까지 배운 것을 연결해봅시다.</p>
+<pre><code class="language-text">Linux Server
+     ↓
+Application을 분리하고 싶다
+     ↓
+Process
+     ↓
+Namespace
+     ↓
+cgroup
+     ↓
+Container
+     ↓
+Container를 쉽게 관리하고 싶다
+     ↓
+Docker
+     ↓
+Container 실행 환경의 원본이 필요하다
+     ↓
+Image
+     ↓
+Image를 재현 가능하게 만들고 싶다
+     ↓
+Dockerfile
+     ↓
+Container Data를 영구 보존하고 싶다
+     ↓
+Volume
+</code></pre>
+<p>이제 각각의 Application을 Container로 분리할 수 있습니다.</p>
+<pre><code class="language-text">┌─────────────┐
+│    NGINX    │
+└─────────────┘
+
+┌─────────────┐
+│  WordPress  │
+└─────────────┘
+
+┌─────────────┐
+│   MariaDB   │
+└─────────────┘
+</code></pre>
+<p>그런데 새로운 문제가 생깁니다.</p>
+<p>서로 완전히 분리해놓았는데...</p>
+<blockquote>
+<p><strong>NGINX, WordPress, MariaDB는 어떻게 서로 통신할까?</strong></p>
+</blockquote>
+<p>다음은 <strong>Container Network</strong>입니다.</p>
+<h1 id="51-container-network">51. Container Network</h1>
+<p>앞에서 우리는 Application을 Container로 분리했습니다.</p>
+<pre><code class="language-text">┌─────────────┐
+│    NGINX    │
+└─────────────┘
+
+┌─────────────┐
+│  WordPress  │
+└─────────────┘
+
+┌─────────────┐
+│   MariaDB   │
+└─────────────┘
+</code></pre>
+<p>격리는 잘 되었습니다.</p>
+<p>하지만 Application은 서로 통신해야 합니다.</p>
+<pre><code class="language-text">NGINX
+  ↓
+WordPress / PHP-FPM
+  ↓
+MariaDB
+</code></pre>
+<p>즉 새로운 문제가 생깁니다.</p>
+<blockquote>
+<p><strong>서로 분리된 Container는 어떻게 통신할까?</strong></p>
+</blockquote>
+<p>이 문제를 해결하기 위해 Docker Network를 사용합니다.</p>
+<hr />
+<h1 id="52-network-ip-port">52. Network를 이해하기 전에: IP와 Port</h1>
+<p>Network Communication을 이해하려면 먼저 IP와 Port를 구분해야 합니다.</p>
+<p>IP Address는 Network에서 <strong>어떤 Host인가</strong>를 식별하는 데 사용됩니다.</p>
+<p>Port는 그 Host 안에서 <strong>어떤 Service인가</strong>를 구분하는 데 사용됩니다.</p>
+<pre><code class="language-text">192.168.1.10:443
+│             │
+│             └── Port
+└──────────────── IP Address
+</code></pre>
+<p>예를 들어 한 Server에서:</p>
+<pre><code class="language-text">22
+→ SSH
+
+80
+→ HTTP
+
+443
+→ HTTPS
+
+3306
+→ MariaDB
+</code></pre>
+<p>처럼 여러 Service가 서로 다른 Port를 사용할 수 있습니다.</p>
+<p>Born2beroot에서 Firewall과 SSH를 공부할 때 보았던 Port 개념이 여기서 다시 등장합니다.</p>
+<hr />
+<h1 id="53-network-namespace">53. Network Namespace</h1>
+<p>앞에서 Namespace는 Process가 보는 System 환경을 분리한다고 했습니다.</p>
+<p>Network Namespace는 Process가 보는 Network 환경을 분리합니다.</p>
+<p>예를 들어 Container마다:</p>
+<pre><code class="language-text">Network Interface
+IP Address
+Routing Table
+Port
+</code></pre>
+<p>등이 독립적으로 존재하는 것처럼 보일 수 있습니다.</p>
+<pre><code class="language-text">Container A
+eth0
+172.18.0.2
+
+Container B
+eth0
+172.18.0.3
+</code></pre>
+<p>같은 Host 위에 있지만 각 Container는 자기 Network 환경을 갖는 것처럼 동작합니다.</p>
+<hr />
+<h1 id="54-localhost">54. localhost란?</h1>
+<p><code>localhost</code>는 특별한 Hostname입니다.</p>
+<p>일반적으로 현재 Machine 자신을 의미합니다.</p>
+<p>대표적인 Loopback Address는:</p>
+<pre><code class="language-text">127.0.0.1
+</code></pre>
+<p>입니다.</p>
+<p>예를 들어 Host Computer에서:</p>
+<pre><code class="language-bash">curl http://localhost
+</code></pre>
+<p>라고 하면 현재 Host 안에서 실행 중인 Web Service를 찾습니다.</p>
+<hr />
+<h1 id="55-container-localhost">55. Container 안의 localhost는 누구인가?</h1>
+<p>여기서 아주 중요한 개념이 나옵니다.</p>
+<p>WordPress Container 안에서:</p>
+<pre><code class="language-text">localhost
+</code></pre>
+<p>는 Host Computer가 아닙니다.</p>
+<p>MariaDB Container도 아닙니다.</p>
+<p><strong>현재 WordPress Container 자신</strong>입니다.</p>
+<pre><code class="language-text">Host
+
+├── NGINX Container
+│   └── localhost = NGINX Container
+│
+├── WordPress Container
+│   └── localhost = WordPress Container
+│
+└── MariaDB Container
+    └── localhost = MariaDB Container
+</code></pre>
+<p>즉 WordPress Container에서 Database에 연결할 때:</p>
+<pre><code class="language-text">localhost:3306
+</code></pre>
+<p>이라고 하면 MariaDB를 찾는 것이 아닙니다.</p>
+<p>WordPress Container 자기 자신 안의 3306 Port를 찾게 됩니다.</p>
+<hr />
+<h1 id="56-container">56. 서로 다른 Container를 어떻게 찾을까?</h1>
+<p>Docker는 여러 Container를 하나의 Docker Network에 연결할 수 있습니다.</p>
+<pre><code class="language-text">Docker Network
+
+┌───────────┐
+│   NGINX   │
+└─────┬─────┘
+      │
+      │
+┌─────▼─────┐
+│ WordPress │
+└─────┬─────┘
+      │
+      │
+┌─────▼─────┐
+│  MariaDB  │
+└───────────┘
+</code></pre>
+<p>같은 Network에 연결되면 서로 통신할 수 있습니다.</p>
+<hr />
+<h1 id="57-docker-network">57. Docker Network 생성</h1>
+<p>간단한 Network를 직접 만들어봅시다.</p>
+<pre><code class="language-bash">docker network create inception-net
+</code></pre>
+<p>현재 Docker Network 확인:</p>
+<pre><code class="language-bash">docker network ls
+</code></pre>
+<p>특정 Network 정보:</p>
+<pre><code class="language-bash">docker network inspect inception-net
+</code></pre>
+<p>지금은 출력의 모든 내용을 이해할 필요는 없습니다.</p>
+<p>핵심은:</p>
+<pre><code class="language-text">Docker Network
+→ Container를 서로 연결하는 Logical Network
+</code></pre>
+<p>라는 점입니다.</p>
+<hr />
+<h1 id="58-container-network">58. Container를 Network에 연결</h1>
+<p>Container를 실행할 때 Network를 지정할 수 있습니다.</p>
+<pre><code class="language-bash">docker run \
+  --name database \
+  --network inception-net \
+  mariadb
+</code></pre>
+<p>다른 Container도 같은 Network에 연결할 수 있습니다.</p>
+<pre><code class="language-bash">docker run \
+  --name app \
+  --network inception-net \
+  some-image
+</code></pre>
+<p>그러면 두 Container는 같은 Docker Network 안에 존재합니다.</p>
+<hr />
+<h1 id="59-container-ip">59. Container IP를 직접 사용해야 할까?</h1>
+<p>Container도 내부적으로 IP Address를 가질 수 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">WordPress
+172.18.0.2
+
+MariaDB
+172.18.0.3
+</code></pre>
+<p>하지만 이 IP를 Configuration에 직접 Hard Coding하는 것은 좋지 않습니다.</p>
+<p>Container는 재생성될 수 있기 때문입니다.</p>
+<pre><code class="language-text">Old MariaDB
+172.18.0.3
+
+삭제
+
+New MariaDB
+172.18.0.7
+</code></pre>
+<p>IP가 바뀔 수 있습니다.</p>
+<p>그래서 Docker에서는 보통 <strong>이름을 이용해서 서로를 찾습니다.</strong></p>
+<hr />
+<h1 id="60-docker-dns">60. Docker DNS</h1>
+<p>같은 Docker Network 안에서는 Container 또는 Compose Service 이름을 Hostname처럼 사용할 수 있습니다.</p>
+<p>예를 들어 MariaDB Service 이름이:</p>
+<pre><code class="language-text">mariadb
+</code></pre>
+<p>라면 WordPress에서:</p>
+<pre><code class="language-text">mariadb:3306
+</code></pre>
+<p>으로 접근할 수 있습니다.</p>
+<p>Docker가 내부적으로 이름을 IP로 해석합니다.</p>
+<pre><code class="language-text">wordpress
+   │
+   │ &quot;mariadb가 어디 있지?&quot;
+   ▼
+Docker DNS
+   │
+   ▼
+MariaDB Container IP
+</code></pre>
+<p>이것은 매우 중요한 개념입니다.</p>
+<p>그래서 Inception Configuration에서는 흔히:</p>
+<pre><code class="language-text">DB_HOST=mariadb
+</code></pre>
+<p>같은 구조를 볼 수 있습니다.</p>
+<hr />
+<h1 id="61-service-name">61. Service Name이 중요한 이유</h1>
+<p>Container IP를 기억할 필요 없이 Logical Name으로 Service를 찾을 수 있습니다.</p>
+<pre><code class="language-text">nginx
+wordpress
+mariadb
+</code></pre>
+<p>이 이름들이 Application Architecture 자체를 표현하게 됩니다.</p>
+<pre><code class="language-text">nginx
+  ↓
+wordpress:9000
+  ↓
+mariadb:3306
+</code></pre>
+<p>Container가 재생성되어 IP가 바뀌어도 Service Name을 통해 다시 찾을 수 있습니다.</p>
+<hr />
+<h1 id="62-bridge-network">62. Bridge Network</h1>
+<p>Docker에서 흔히 사용하는 Network 방식 중 하나가 Bridge Network입니다.</p>
+<p>개념적으로 Host 안에 작은 Virtual Network를 하나 만든다고 생각하면 됩니다.</p>
+<pre><code class="language-text">Host
+
+        Docker Bridge Network
+     ┌────────────────────────┐
+     │                        │
+     │  nginx      wordpress  │
+     │    │             │     │
+     │    └──────┬──────┘     │
+     │           │            │
+     │        mariadb         │
+     │                        │
+     └────────────────────────┘
+</code></pre>
+<p>Container들은 이 Network를 통해 서로 통신합니다.</p>
+<p>중요한 것은 Bridge의 내부 구현을 모두 외우는 것이 아니라:</p>
+<blockquote>
+<p><strong>Container들이 Host 내부의 별도 Network를 통해 서로 연결될 수 있다.</strong></p>
+</blockquote>
+<p>라고 이해하는 것입니다.</p>
+<hr />
+<h1 id="63-network-network">63. 내부 Network와 외부 Network</h1>
+<p>Container끼리 통신하는 것과 외부 Client가 Container에 접근하는 것은 다른 문제입니다.</p>
+<pre><code class="language-text">Container 내부 통신
+
+NGINX
+  ↓
+WordPress
+  ↓
+MariaDB
+</code></pre>
+<p>이것은 Docker Network 안에서 해결할 수 있습니다.</p>
+<p>하지만 Browser는 Docker Network 밖에 있습니다.</p>
+<pre><code class="language-text">Browser
+   │
+   │ ???
+   ▼
+Docker Host
+   │
+   ▼
+NGINX Container
+</code></pre>
+<p>외부 Traffic을 Container 안으로 전달해야 합니다.</p>
+<p>여기서 <strong>Port Mapping</strong>이 등장합니다.</p>
+<hr />
+<h1 id="64-port-mapping">64. Port Mapping</h1>
+<p>Docker Host의 Port와 Container의 Port를 연결할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-bash">docker run -p 8080:80 nginx
+</code></pre>
+<p>의미:</p>
+<pre><code class="language-text">Host Port 8080
+      │
+      │ Mapping
+      ▼
+Container Port 80
+</code></pre>
+<p>Browser에서:</p>
+<pre><code class="language-text">http://HOST_IP:8080
+</code></pre>
+<p>으로 접근하면 Container 안의 80 Port로 Traffic이 전달됩니다.</p>
+<hr />
+<h1 id="65-expose-port-mapping">65. EXPOSE와 Port Mapping은 같은 것인가?</h1>
+<p>아닙니다.</p>
+<p>Dockerfile에서:</p>
+<pre><code class="language-dockerfile">EXPOSE 443
+</code></pre>
+<p>을 볼 수 있습니다.</p>
+<p><code>EXPOSE</code>는:</p>
+<blockquote>
+<p>이 Image의 Application이 이 Port를 사용할 예정이라고 표현하는 정보</p>
+</blockquote>
+<p>에 가깝습니다.</p>
+<p>Host에 실제 Port를 공개하려면:</p>
+<pre><code class="language-bash">docker run -p ...
+</code></pre>
+<p>또는 Docker Compose의:</p>
+<pre><code class="language-yaml">ports:
+</code></pre>
+<p>가 필요합니다.</p>
+<hr />
+<h1 id="66-nginx">66. 왜 NGINX만 외부에 공개할까?</h1>
+<p>Inception의 구조를 다시 봅시다.</p>
+<pre><code class="language-text">Browser
+   ↓
+NGINX
+   ↓
+WordPress
+   ↓
+MariaDB
+</code></pre>
+<p>외부 사용자가 직접 MariaDB에 접근할 이유는 없습니다.</p>
+<p>WordPress도 일반적으로 Browser와 직접 통신하는 Front Door가 아닙니다.</p>
+<p>외부에서 필요한 것은 NGINX입니다.</p>
+<p>그래서 구조적으로:</p>
+<pre><code class="language-text">Internet
+   │
+   │ 443
+   ▼
+NGINX
+   │
+   │ internal network
+   ▼
+WordPress
+   │
+   │ internal network
+   ▼
+MariaDB
+</code></pre>
+<p>처럼 만들 수 있습니다.</p>
+<p>이것은 Security 관점에서도 중요합니다.</p>
+<p>필요한 Service만 외부에 노출하는 것이 좋습니다.</p>
+<hr />
+<h1 id="67-inception-application">67. 이제 Inception의 Application들을 이해해보자</h1>
+<p>Container와 Docker의 기본 구조를 이해했습니다.</p>
+<p>이제 실제 Inception에서 사용하는 세 Application을 살펴봅시다.</p>
+<pre><code class="language-text">NGINX
+WordPress + PHP-FPM
+MariaDB
+</code></pre>
+<p>이 세 가지가 왜 필요한지 이해해야 전체 Architecture가 보입니다.</p>
+<hr />
+<h1 id="68-website">68. Website는 어떻게 동작할까?</h1>
+<p>사용자가 Browser에 URL을 입력한다고 생각해봅시다.</p>
+<pre><code class="language-text">https://example.com
+</code></pre>
+<p>Browser는 해당 Server에 Request를 보냅니다.</p>
+<pre><code class="language-text">Browser
+   │
+   │ Request
+   ▼
+Web Server
+   │
+   │ Response
+   ▼
+Browser
+</code></pre>
+<p>예:</p>
+<pre><code class="language-text">Request
+GET /
+
+Response
+HTML
+</code></pre>
+<p>이 Request와 Response를 위한 대표적인 Protocol이 HTTP입니다.</p>
+<hr />
+<h1 id="69-http">69. HTTP</h1>
+<p>HTTP는 <strong>Hypertext Transfer Protocol</strong>입니다.</p>
+<p>Web에서 Client와 Server가 Request와 Response를 주고받는 규칙입니다.</p>
+<p>예를 들어 Browser가:</p>
+<pre><code class="language-text">GET /index.html
+</code></pre>
+<p>을 요청하면 Server는:</p>
+<pre><code class="language-text">200 OK
+HTML Content
+</code></pre>
+<p>를 반환할 수 있습니다.</p>
+<p>구조:</p>
+<pre><code class="language-text">Client
+  │
+  │ HTTP Request
+  ▼
+Server
+  │
+  │ HTTP Response
+  ▼
+Client
+</code></pre>
+<hr />
+<h1 id="70-web-server">70. Web Server</h1>
+<p>Web Server는 HTTP Request를 받아 Response를 반환하는 Server Software입니다.</p>
+<p>대표적인 예:</p>
+<pre><code class="language-text">NGINX
+Apache HTTP Server
+</code></pre>
+<p>Inception에서는 NGINX를 사용합니다.</p>
+<hr />
+<h1 id="71-nginx">71. NGINX</h1>
+<p>NGINX는 Web Server이자 Reverse Proxy 등 여러 역할을 수행할 수 있는 Server Software입니다.</p>
+<p>Inception에서는 특히 다음 역할이 중요합니다.</p>
+<pre><code class="language-text">HTTPS Connection 수신
+        ↓
+TLS 처리
+        ↓
+HTTP Request 확인
+        ↓
+Static File 처리 또는
+PHP Request를 PHP-FPM에 전달
+</code></pre>
+<p>즉 NGINX는 Application 앞에 서 있는 <strong>Entry Point</strong>입니다.</p>
+<hr />
+<h1 id="72-static-content-dynamic-content">72. Static Content와 Dynamic Content</h1>
+<p>Web Content는 아주 단순하게 두 종류로 생각할 수 있습니다.</p>
+<h2 id="static-content">Static Content</h2>
+<p>이미 존재하는 File을 그대로 반환합니다.</p>
+<p>예:</p>
+<pre><code class="language-text">HTML
+CSS
+Image
+JavaScript File
+</code></pre>
+<pre><code class="language-text">Browser
+   ↓
+NGINX
+   ↓
+File
+   ↓
+Browser
+</code></pre>
+<hr />
+<h2 id="dynamic-content">Dynamic Content</h2>
+<p>Request에 따라 Server에서 Code를 실행해서 결과를 만듭니다.</p>
+<p>WordPress가 대표적입니다.</p>
+<p>예:</p>
+<pre><code class="language-text">사용자 로그인
+글 목록 조회
+댓글 작성
+관리자 페이지
+</code></pre>
+<p>이런 기능은 Database를 조회하고 PHP Code를 실행해야 합니다.</p>
+<hr />
+<h1 id="73-wordpress">73. WordPress</h1>
+<p>WordPress는 Website를 만들고 관리하기 위한 Web Application입니다.</p>
+<p>다음과 같은 Data를 다룹니다.</p>
+<pre><code class="language-text">Users
+Posts
+Pages
+Comments
+Settings
+Plugins
+Metadata
+</code></pre>
+<p>WordPress 자체는 PHP로 작성되어 있습니다.</p>
+<p>즉 <code>.php</code> File을 실행할 수 있는 환경이 필요합니다.</p>
+<hr />
+<h1 id="74-php">74. PHP란?</h1>
+<p>PHP는 Server-side Programming Language입니다.</p>
+<p>Browser가 PHP Source Code를 직접 실행하는 것이 아닙니다.</p>
+<p>예를 들어 Server에:</p>
+<pre><code class="language-php">&lt;?php
+echo &quot;Hello&quot;;
+?&gt;
+</code></pre>
+<p>가 있어도 Browser가 이것을 직접 실행하는 것이 아니라 Server 쪽에서 PHP Interpreter가 실행합니다.</p>
+<pre><code class="language-text">PHP Code
+   ↓
+PHP Runtime
+   ↓
+실행 결과
+   ↓
+HTML 등
+</code></pre>
+<hr />
+<h1 id="75-nginx-php">75. NGINX는 PHP를 실행할 수 있을까?</h1>
+<p>NGINX는 기본적으로 PHP Interpreter가 아닙니다.</p>
+<p>NGINX의 역할은 Web Request를 처리하는 것입니다.</p>
+<p>PHP Code 실행은 PHP Runtime이 담당합니다.</p>
+<p>그래서 역할을 분리합니다.</p>
+<pre><code class="language-text">NGINX
+→ HTTP 요청 처리
+
+PHP
+→ PHP Code 실행
+</code></pre>
+<p>이 둘을 연결하기 위한 방법이 필요합니다.</p>
+<hr />
+<h1 id="76-php-fpm">76. PHP-FPM</h1>
+<p>PHP-FPM은:</p>
+<p><strong>PHP FastCGI Process Manager</strong></p>
+<p>입니다.</p>
+<p>PHP 요청을 처리하기 위한 Process를 관리합니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">NGINX
+   │
+   │ PHP 실행 요청
+   ▼
+PHP-FPM
+   │
+   ▼
+PHP Script 실행
+   │
+   ▼
+Result
+</code></pre>
+<p>WordPress Container 안에서 PHP-FPM이 실행되는 구조를 생각할 수 있습니다.</p>
+<hr />
+<h1 id="77-php-php-fpm">77. 왜 그냥 PHP를 실행하지 않고 PHP-FPM을 사용할까?</h1>
+<p>Web Server는 동시에 많은 Request를 받을 수 있습니다.</p>
+<p>그때마다 PHP 실행 환경을 효율적으로 관리해야 합니다.</p>
+<p>PHP-FPM은 PHP Worker Process들을 관리하는 역할을 합니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">PHP-FPM
+   │
+   ├── PHP Worker
+   ├── PHP Worker
+   └── PHP Worker
+</code></pre>
+<p>Web Server는 PHP-FPM에 요청을 전달하고,
+PHP-FPM이 적절한 Process를 통해 PHP Code를 실행합니다.</p>
+<hr />
+<h1 id="78-fastcgi">78. FastCGI</h1>
+<p>NGINX와 PHP-FPM은 HTTP로 통신하는 것이 아니라 FastCGI Protocol을 사용할 수 있습니다.</p>
+<pre><code class="language-text">Browser
+   │
+   │ HTTP / HTTPS
+   ▼
+NGINX
+   │
+   │ FastCGI
+   ▼
+PHP-FPM
+</code></pre>
+<p>FastCGI는 Web Server와 Application Runtime 사이에서 Request 정보를 전달하기 위한 Protocol입니다.</p>
+<p>즉:</p>
+<pre><code class="language-text">HTTP
+→ Browser ↔ NGINX
+
+FastCGI
+→ NGINX ↔ PHP-FPM
+</code></pre>
+<p>라고 구분하면 됩니다.</p>
+<hr />
+<h1 id="79-nginx-wordpress">79. 왜 NGINX가 WordPress에 바로 보내는 게 아닐까?</h1>
+<p>WordPress는 PHP File들의 집합인 Application입니다.</p>
+<p>실제로 Code를 실행하는 것은 PHP Runtime입니다.</p>
+<p>따라서 더 정확한 흐름은:</p>
+<pre><code class="language-text">NGINX
+   ↓
+PHP-FPM
+   ↓
+WordPress PHP Code
+</code></pre>
+<p>입니다.</p>
+<p>보통 설명할 때:</p>
+<pre><code class="language-text">NGINX
+→ WordPress
+</code></pre>
+<p>라고 단순화하지만 실제로는 PHP-FPM이 중간에서 PHP Code를 실행합니다.</p>
+<hr />
+<h1 id="80-nginx-configuration-fastcgi_pass">80. NGINX Configuration에서 fastcgi_pass</h1>
+<p>NGINX Configuration에서는 다음과 같은 설정을 볼 수 있습니다.</p>
+<pre><code class="language-nginx">fastcgi_pass wordpress:9000;
+</code></pre>
+<p>이것을 앞에서 배운 개념과 연결해봅시다.</p>
+<pre><code class="language-text">wordpress
+→ Docker Network에서 WordPress Service 이름
+
+9000
+→ PHP-FPM이 Listen하는 Port
+</code></pre>
+<p>즉:</p>
+<pre><code class="language-text">NGINX
+   │
+   │ wordpress:9000
+   ▼
+WordPress Container
+   │
+   ▼
+PHP-FPM
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="81-mariadb">81. MariaDB</h1>
+<p>WordPress는 Data를 영구적으로 저장해야 합니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">User Account
+Post
+Comment
+WordPress Setting
+Plugin Data
+</code></pre>
+<p>이런 Data를 File만으로 직접 관리하는 대신 Database Management System을 사용합니다.</p>
+<p>Inception에서는 MariaDB를 사용합니다.</p>
+<hr />
+<h1 id="82-database">82. Database란?</h1>
+<p>Database는 구조화된 Data를 저장하고 조회하기 위한 System입니다.</p>
+<p>예를 들어 User 정보를 생각해봅시다.</p>
+<pre><code class="language-text">users
+
+id | username | email
+---|----------|------
+1  | kim      | ...
+2  | lee      | ...
+</code></pre>
+<p>Application은 Database에 Query를 보내 Data를 저장하거나 가져옵니다.</p>
+<hr />
+<h1 id="83-dbms">83. DBMS</h1>
+<p>Database를 실제로 관리하는 Software를 DBMS라고 합니다.</p>
+<p><strong>Database Management System</strong></p>
+<p>대표적인 예:</p>
+<pre><code class="language-text">MariaDB
+MySQL
+PostgreSQL
+</code></pre>
+<p>Inception에서는 MariaDB Server가 실행됩니다.</p>
+<hr />
+<h1 id="84-wordpress-mariadb">84. WordPress와 MariaDB</h1>
+<p>WordPress는 MariaDB에 연결해서 Data를 읽고 씁니다.</p>
+<pre><code class="language-text">WordPress
+   │
+   │ SQL
+   ▼
+MariaDB
+</code></pre>
+<p>예를 들어 사용자가 글을 열면:</p>
+<pre><code class="language-text">Browser
+   ↓
+NGINX
+   ↓
+PHP-FPM
+   ↓
+WordPress
+   ↓
+MariaDB에서 Post 조회
+   ↓
+WordPress가 HTML 생성
+   ↓
+NGINX
+   ↓
+Browser
+</code></pre>
+<p>와 같은 흐름이 만들어질 수 있습니다.</p>
+<hr />
+<h1 id="85-sql">85. SQL</h1>
+<p>SQL은 Relational Database와 Communication하기 위해 사용하는 Query Language입니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-sql">SELECT * FROM users;
+</code></pre>
+<p>는 <code>users</code> Table의 Data를 조회하는 Query입니다.</p>
+<p>Inception의 목표는 SQL 자체를 깊게 배우는 것이 아니지만:</p>
+<pre><code class="language-text">WordPress
+→ SQL Query
+→ MariaDB
+</code></pre>
+<p>라는 관계는 이해해야 합니다.</p>
+<hr />
+<h1 id="86-mariadb-port-3306">86. MariaDB Port 3306</h1>
+<p>MariaDB는 일반적으로 TCP Port 3306을 사용할 수 있습니다.</p>
+<pre><code class="language-text">WordPress
+     │
+     │ mariadb:3306
+     ▼
+MariaDB
+</code></pre>
+<p>여기서 다시 Docker DNS 개념이 연결됩니다.</p>
+<pre><code class="language-text">mariadb
+→ Service Name
+
+3306
+→ Database Service Port
+</code></pre>
+<hr />
+<h1 id="87-mariadb-internet">87. MariaDB를 Internet에 공개해야 할까?</h1>
+<p>일반적으로 Inception Architecture에서는 그럴 필요가 없습니다.</p>
+<pre><code class="language-text">Internet
+   │
+   ▼
+NGINX
+</code></pre>
+<p>외부 Request는 NGINX만 받습니다.</p>
+<p>MariaDB는 Docker Internal Network에서 WordPress와 통신하면 됩니다.</p>
+<pre><code class="language-text">Internet
+   │
+   ▼
+NGINX
+   │
+   ▼
+WordPress
+   │
+   ▼
+MariaDB
+</code></pre>
+<p>따라서 Database Port를 Host에 불필요하게 Publish하지 않아도 됩니다.</p>
+<hr />
+<h1 id="88-application">88. 전체 Application 구조</h1>
+<p>이제 세 Service의 역할을 연결할 수 있습니다.</p>
+<pre><code class="language-text">NGINX
+→ Web Server / Entry Point / TLS
+
+WordPress
+→ Web Application
+
+PHP-FPM
+→ PHP 실행 환경
+
+MariaDB
+→ Persistent Application Data
+</code></pre>
+<p>전체 Flow:</p>
+<pre><code class="language-text">Browser
+   │
+   │ HTTPS
+   ▼
+NGINX
+   │
+   │ FastCGI
+   ▼
+PHP-FPM
+   │
+   │ PHP 실행
+   ▼
+WordPress
+   │
+   │ SQL
+   ▼
+MariaDB
+</code></pre>
+<hr />
+<h1 id="89-https">89. 그런데 HTTPS는 무엇인가?</h1>
+<p>지금까지 HTTP Request를 이야기했습니다.</p>
+<p>하지만 Inception에서는 HTTPS를 사용합니다.</p>
+<p>HTTPS는 HTTP를 TLS 위에서 사용하는 방식입니다.</p>
+<pre><code class="language-text">HTTP
+→ Web Request / Response Protocol
+
+TLS
+→ Communication을 암호화하고 상대 Identity를 확인하는 Protocol
+
+HTTPS
+→ HTTP over TLS
+</code></pre>
+<hr />
+<h1 id="90-http">90. HTTP의 문제</h1>
+<p>Plain HTTP Traffic은 암호화되지 않을 수 있습니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">Client
+   │
+   │ Plain HTTP
+   ▼
+Server
+</code></pre>
+<p>Network 중간에서 Traffic을 관찰할 수 있는 환경이라면 Content가 노출될 위험이 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Password
+Cookie
+Form Data
+</code></pre>
+<p>같은 정보가 보호되어야 합니다.</p>
+<p>그래서 TLS를 사용합니다.</p>
+<hr />
+<h1 id="91-tls">91. TLS</h1>
+<p>TLS는 <strong>Transport Layer Security</strong>입니다.</p>
+<p>Client와 Server 사이의 Communication을 보호합니다.</p>
+<p>주요 목적은 크게 다음과 같이 생각할 수 있습니다.</p>
+<pre><code class="language-text">Confidentiality
+→ 내용을 암호화
+
+Integrity
+→ 내용이 중간에서 변경되지 않았는지 보호
+
+Authentication
+→ 상대 Server의 Identity 확인
+</code></pre>
+<hr />
+<h1 id="92-https-connection">92. HTTPS Connection</h1>
+<p>HTTPS Request는 대략 다음 흐름을 가집니다.</p>
+<pre><code class="language-text">Browser
+   │
+   │ TLS Connection
+   ▼
+NGINX
+   │
+   │ TLS 처리
+   ▼
+HTTP Request
+</code></pre>
+<p>즉 NGINX가 TLS를 종료하고 내부 Request를 처리하는 Entry Point 역할을 할 수 있습니다.</p>
+<hr />
+<h1 id="93-certificate">93. Certificate</h1>
+<p>TLS Server는 Certificate를 사용합니다.</p>
+<p>Certificate에는 Server의 Public Identity와 관련된 정보가 들어 있습니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">Certificate
+→ &quot;이 Public Key는 이 Server와 관련 있다.&quot;
+</code></pre>
+<p>라고 생각할 수 있습니다.</p>
+<p>Browser는 Certificate를 이용해 Server Identity를 검증합니다.</p>
+<hr />
+<h1 id="94-private-key">94. Private Key</h1>
+<p>Certificate와 함께 Private Key가 사용됩니다.</p>
+<pre><code class="language-text">Certificate
+→ 공개 가능
+
+Private Key
+→ Server만 비밀로 보관
+</code></pre>
+<p>Private Key가 유출되면 Security에 큰 문제가 생길 수 있으므로 안전하게 관리해야 합니다.</p>
+<hr />
+<h1 id="95-self-signed-certificate">95. Self-signed Certificate</h1>
+<p>실제 Public Website에서는 일반적으로 신뢰할 수 있는 Certificate Authority가 발급한 Certificate를 사용합니다.</p>
+<p>하지만 학습 환경에서는 Self-signed Certificate를 만들 수도 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-bash">openssl req -x509 -nodes \
+  -newkey rsa:2048 \
+  -keyout server.key \
+  -out server.crt \
+  -days 365
+</code></pre>
+<p>이 Command를 외울 필요는 없습니다.</p>
+<p>핵심은:</p>
+<pre><code class="language-text">server.key
+→ Private Key
+
+server.crt
+→ Certificate
+</code></pre>
+<p>라는 점입니다.</p>
+<hr />
+<h1 id="96-browser-self-signed-certificate">96. 왜 Browser가 Self-signed Certificate를 경고할까?</h1>
+<p>Self-signed Certificate는 우리가 직접 서명한 Certificate입니다.</p>
+<p>Browser가 기본적으로 신뢰하는 Certificate Authority가 서명한 것이 아닙니다.</p>
+<p>따라서 Browser 입장에서는:</p>
+<pre><code class="language-text">&quot;암호화는 가능하지만,
+이 Certificate를 누가 믿을 수 있다고 보증하지?&quot;
+</code></pre>
+<p>라는 문제가 생깁니다.</p>
+<p>그래서 경고가 표시될 수 있습니다.</p>
+<hr />
+<h1 id="97-nginx-tls">97. NGINX에서 TLS 설정</h1>
+<p>예:</p>
+<pre><code class="language-nginx">server {
+    listen 443 ssl;
+
+    ssl_certificate     /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
+}
+</code></pre>
+<p>개념적으로:</p>
+<pre><code class="language-text">listen 443 ssl
+→ 443 Port에서 TLS Connection 수신
+
+ssl_certificate
+→ Certificate 위치
+
+ssl_certificate_key
+→ Private Key 위치
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="98">98. 이제 요청 하나를 끝까지 따라가보자</h1>
+<p>사용자가 Browser에:</p>
+<pre><code class="language-text">https://example.com
+</code></pre>
+<p>을 입력합니다.</p>
+<hr />
+<h2 id="step-1-client-server">Step 1. Client가 Server에 연결</h2>
+<pre><code class="language-text">Browser
+   │
+   │ TCP / 443
+   ▼
+Server
+</code></pre>
+<p>NGINX Container가 Host의 443 Port를 통해 Request를 받도록 구성되어 있습니다.</p>
+<hr />
+<h2 id="step-2-tls">Step 2. TLS</h2>
+<pre><code class="language-text">Browser
+   │
+   │ TLS
+   ▼
+NGINX
+</code></pre>
+<p>NGINX는 Certificate와 Private Key를 사용하여 HTTPS Connection을 처리합니다.</p>
+<hr />
+<h2 id="step-3-http-request">Step 3. HTTP Request</h2>
+<p>TLS Connection 안에서 HTTP Request가 전달됩니다.</p>
+<p>예:</p>
+<pre><code class="language-text">GET /
+</code></pre>
+<hr />
+<h2 id="step-4-nginx">Step 4. NGINX</h2>
+<p>NGINX는 Request를 확인합니다.</p>
+<p>Static File이라면 직접 반환할 수도 있습니다.</p>
+<p>PHP Request라면 PHP-FPM에 전달합니다.</p>
+<pre><code class="language-text">NGINX
+   │
+   │ FastCGI
+   ▼
+wordpress:9000
+</code></pre>
+<hr />
+<h2 id="step-5-php-fpm">Step 5. PHP-FPM</h2>
+<p>PHP-FPM은 WordPress의 PHP Code를 실행합니다.</p>
+<pre><code class="language-text">PHP-FPM
+   ↓
+WordPress PHP
+</code></pre>
+<hr />
+<h2 id="step-6-database">Step 6. Database</h2>
+<p>WordPress가 Data를 필요로 한다면 MariaDB에 Query를 보냅니다.</p>
+<pre><code class="language-text">WordPress
+   │
+   │ mariadb:3306
+   ▼
+MariaDB
+</code></pre>
+<hr />
+<h2 id="step-7">Step 7. 결과 생성</h2>
+<p>MariaDB가 Data를 반환합니다.</p>
+<pre><code class="language-text">MariaDB
+   ↓
+WordPress
+   ↓
+PHP-FPM
+</code></pre>
+<p>WordPress는 필요한 HTML 등을 생성합니다.</p>
+<hr />
+<h2 id="step-8-response">Step 8. Response</h2>
+<pre><code class="language-text">PHP-FPM
+   ↓
+NGINX
+   ↓
+HTTPS Response
+   ↓
+Browser
+</code></pre>
+<p>사용자는 최종 Website를 보게 됩니다.</p>
+<hr />
+<h1 id="99-container">99. 이 구조에서 Container는 무엇을 분리했을까?</h1>
+<p>각 역할은 서로 다른 Container에 있습니다.</p>
+<pre><code class="language-text">NGINX Container
+→ HTTP / TLS
+
+WordPress Container
+→ Application / PHP-FPM
+
+MariaDB Container
+→ Database
+</code></pre>
+<p>각 Container는 서로 다른 Process 환경과 Filesystem을 가집니다.</p>
+<p>하지만 Docker Network를 통해 필요한 Communication은 허용됩니다.</p>
+<hr />
+<h1 id="100-environment-variable">100. Environment Variable</h1>
+<p>Application Configuration 중에는 Image 안에 고정하면 안 되는 값들이 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">Database Name
+Database User
+Domain Name
+Environment-specific Setting
+</code></pre>
+<p>이런 값을 Environment Variable로 전달할 수 있습니다.</p>
+<p>Shell에서는:</p>
+<pre><code class="language-bash">export DB_NAME=wordpress
+</code></pre>
+<p>확인:</p>
+<pre><code class="language-bash">echo &quot;$DB_NAME&quot;
+</code></pre>
+<hr />
+<h1 id="101-container-environment-variable">101. Container에 Environment Variable 전달</h1>
+<p>예:</p>
+<pre><code class="language-bash">docker run \
+  -e DB_NAME=wordpress \
+  some-image
+</code></pre>
+<p>여기서:</p>
+<pre><code class="language-text">-e
+→ Environment Variable 전달
+</code></pre>
+<p>입니다.</p>
+<p>Application은 실행 중 이 값을 읽을 수 있습니다.</p>
+<hr />
+<h1 id="102-configuration-image">102. 왜 Configuration을 Image와 분리할까?</h1>
+<p>Image 안에 모든 값을 Hard Coding하면 같은 Image를 다른 환경에서 재사용하기 어렵습니다.</p>
+<pre><code class="language-text">Development
+DB_NAME=dev
+
+Production
+DB_NAME=prod
+</code></pre>
+<p>같은 Image를 사용하면서 실행 Configuration만 다르게 전달할 수 있으면 더 유연합니다.</p>
+<pre><code class="language-text">Image
+  │
+  ├── Environment A
+  └── Environment B
+</code></pre>
+<hr />
+<h1 id="103-password-environment-variable">103. Password도 Environment Variable에 넣으면 끝일까?</h1>
+<p>아닙니다.</p>
+<p>Environment Variable은 Configuration 전달 방법이지 자동으로 안전한 Secret Storage가 되는 것은 아닙니다.</p>
+<p>Password나 Key 같은 민감한 정보는 별도로 주의해서 관리해야 합니다.</p>
+<p>특히 Git Repository에 Plain Text Password를 Commit하는 것은 피해야 합니다.</p>
+<hr />
+<h1 id="104-env-file">104. .env File</h1>
+<p>Docker Compose에서는 반복되는 값을 <code>.env</code> File에서 읽어 사용할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-dotenv">DOMAIN_NAME=example.local
+MYSQL_DATABASE=wordpress
+MYSQL_USER=wpuser
+</code></pre>
+<p>Compose에서는:</p>
+<pre><code class="language-yaml">environment:
+  MYSQL_DATABASE: ${MYSQL_DATABASE}
+  MYSQL_USER: ${MYSQL_USER}
+</code></pre>
+<p>처럼 사용할 수 있습니다.</p>
+<p>핵심은:</p>
+<pre><code class="language-text">Image
+→ Application 실행 환경
+
+Environment Variable
+→ 실행 시 달라질 수 있는 Configuration
+</code></pre>
+<p>이라는 분리입니다.</p>
+<hr />
+<h1 id="105-container">105. Container가 세 개면 명령어도 세 배가 된다</h1>
+<p>지금까지 배운 것만으로도 Inception을 수동으로 실행할 수 있습니다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Network 생성
+Volume 생성
+MariaDB 실행
+WordPress 실행
+NGINX 실행
+Port 설정
+Environment Variable 전달
+Restart Policy 설정
+</code></pre>
+<p>해야 합니다.</p>
+<p>CLI만 사용하면 대략 이런 느낌입니다.</p>
+<pre><code class="language-bash">docker network create inception
+
+docker volume create mariadb-data
+docker volume create wordpress-data
+
+docker run ...
+docker run ...
+docker run ...
+</code></pre>
+<p>Service가 많아질수록 Command도 복잡해집니다.</p>
+<hr />
+<h1 id="106-application">106. 새로운 문제: Application 전체를 어떻게 재현할까?</h1>
+<p>Dockerfile 덕분에 <strong>Image 하나</strong>를 재현할 수 있게 되었습니다.</p>
+<pre><code class="language-text">Dockerfile
+→ Image
+</code></pre>
+<p>그런데 Inception은 Image 하나가 아닙니다.</p>
+<pre><code class="language-text">NGINX
+WordPress
+MariaDB
+Network
+Volumes
+Ports
+Environment
+</code></pre>
+<p>모두 함께 구성되어야 합니다.</p>
+<p>그래서 다음 질문이 생깁니다.</p>
+<blockquote>
+<p><strong>Multi-Container Application 전체 구조를 File 하나에 선언할 수 없을까?</strong></p>
+</blockquote>
+<p>그 역할을 하는 것이 Docker Compose입니다.</p>
+<hr />
+<h1 id="107-docker-compose">107. Docker Compose</h1>
+<p>Docker Compose는 여러 Container로 이루어진 Application의 실행 Configuration을 YAML File에 정의할 수 있게 합니다.</p>
+<p>일반적으로:</p>
+<pre><code class="language-text">compose.yaml
+</code></pre>
+<p>또는:</p>
+<pre><code class="language-text">docker-compose.yml
+</code></pre>
+<p>형태의 File을 사용합니다.</p>
+<hr />
+<h1 id="108-dockerfile-compose">108. Dockerfile과 Compose의 차이</h1>
+<p>이 구분은 반드시 이해해야 합니다.</p>
+<h2 id="dockerfile">Dockerfile</h2>
+<pre><code class="language-text">Image를 어떻게 만들 것인가?
+</code></pre>
+<p>예:</p>
+<pre><code class="language-text">Debian에서 시작
+NGINX 설치
+Config 복사
+</code></pre>
+<hr />
+<h2 id="docker-compose">Docker Compose</h2>
+<pre><code class="language-text">만들어진 Service들을 어떻게 실행하고 연결할 것인가?
+</code></pre>
+<p>예:</p>
+<pre><code class="language-text">NGINX 실행
+WordPress 실행
+MariaDB 실행
+Network 연결
+Volume 연결
+Port 공개
+</code></pre>
+<p>즉:</p>
+<pre><code class="language-text">Dockerfile
+→ Build
+
+Compose
+→ Runtime Architecture
+</code></pre>
+<p>라고 생각하면 좋습니다.</p>
+<hr />
+<h1 id="109-compose">109. Compose 기본 구조</h1>
+<p>간단한 예:</p>
+<pre><code class="language-yaml">services:
+  nginx:
+    build: ./nginx
+
+  wordpress:
+    build: ./wordpress
+
+  mariadb:
+    build: ./mariadb
+</code></pre>
+<p><code>services</code> 아래에 Application을 구성하는 Service들을 정의합니다.</p>
+<hr />
+<h1 id="110-service">110. Service란?</h1>
+<p>Compose에서 Service는 Application을 구성하는 Logical Component입니다.</p>
+<p>예:</p>
+<pre><code class="language-text">nginx
+wordpress
+mariadb
+</code></pre>
+<p>각 Service는 Image, Network, Volume, Environment 등을 정의할 수 있습니다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">Service Definition
+      ↓
+Container 실행
+</code></pre>
+<p>이라고 볼 수 있습니다.</p>
+<hr />
+<h1 id="111-compose-build">111. Compose의 build</h1>
+<p>예:</p>
+<pre><code class="language-yaml">services:
+  nginx:
+    build: ./requirements/nginx
+</code></pre>
+<p>의미:</p>
+<pre><code class="language-text">./requirements/nginx
+       ↓
+Dockerfile
+       ↓
+Image Build
+       ↓
+NGINX Service 실행
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="112-compose-ports">112. Compose의 ports</h1>
+<p>예:</p>
+<pre><code class="language-yaml">services:
+  nginx:
+    ports:
+      - &quot;443:443&quot;
+</code></pre>
+<p>의미:</p>
+<pre><code class="language-text">Host 443
+   ↓
+NGINX Container 443
+</code></pre>
+<p>외부 Browser가 NGINX에 접근할 수 있습니다.</p>
+<hr />
+<h1 id="113-compose-networks">113. Compose의 networks</h1>
+<p>예:</p>
+<pre><code class="language-yaml">services:
+  nginx:
+    networks:
+      - inception
+
+  wordpress:
+    networks:
+      - inception
+
+  mariadb:
+    networks:
+      - inception
+</code></pre>
+<p>그리고:</p>
+<pre><code class="language-yaml">networks:
+  inception:
+</code></pre>
+<p>를 정의할 수 있습니다.</p>
+<p>세 Service는 같은 Network를 공유합니다.</p>
+<pre><code class="language-text">inception Network
+
+nginx
+  │
+wordpress
+  │
+mariadb
+</code></pre>
+<hr />
+<h1 id="114-compose-volumes">114. Compose의 volumes</h1>
+<p>예:</p>
+<pre><code class="language-yaml">services:
+  mariadb:
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:
+</code></pre>
+<p>의미:</p>
+<pre><code class="language-text">MariaDB Container
+     │
+     │ /var/lib/mysql
+     ▼
+mariadb-data Volume
+</code></pre>
+<p>Container와 Database Data의 Lifecycle을 분리합니다.</p>
+<hr />
+<h1 id="115-depends_on">115. depends_on</h1>
+<p>Compose에서는 Service 간 시작 순서를 표현할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-yaml">depends_on:
+  - mariadb
+</code></pre>
+<p>하지만 매우 중요한 점이 있습니다.</p>
+<blockquote>
+<p>Container가 시작되었다고 Application이 Ready 상태라는 뜻은 아닙니다.</p>
+</blockquote>
+<p>예를 들어 MariaDB Process가 시작된 직후 내부 Initialization이 아직 끝나지 않았을 수 있습니다.</p>
+<pre><code class="language-text">Container Running
+≠
+Application Ready
+</code></pre>
+<p>이 차이는 실제 Service 운영에서 매우 중요합니다.</p>
+<hr />
+<h1 id="116-restart-policy">116. restart policy</h1>
+<p>Server Application은 Crash할 수 있습니다.</p>
+<p>Docker는 Restart Policy를 통해 Container를 다시 시작하도록 설정할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-yaml">restart: unless-stopped
+</code></pre>
+<p>개념적으로:</p>
+<pre><code class="language-text">Process 종료
+    ↓
+Container 종료
+    ↓
+Restart Policy
+    ↓
+Container 다시 시작
+</code></pre>
+<p>입니다.</p>
+<p>앞에서 배운 Container Lifecycle과 연결됩니다.</p>
+<hr />
+<h1 id="117-compose">117. Compose 실행</h1>
+<p>Application 전체를 실행:</p>
+<pre><code class="language-bash">docker compose up
+</code></pre>
+<p>Background에서 실행:</p>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<p>여기서:</p>
+<pre><code class="language-text">up
+→ Compose Application 실행
+
+-d
+→ Detached Mode
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="118-compose">118. Compose 상태 확인</h1>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<p>각 Service 상태를 확인할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">nginx       running
+wordpress   running
+mariadb     running
+</code></pre>
+<p>이것은 Inception Debugging에서 가장 먼저 확인하기 좋은 명령 중 하나입니다.</p>
+<hr />
+<h1 id="119-compose-logs">119. Compose Logs</h1>
+<p>전체 Log:</p>
+<pre><code class="language-bash">docker compose logs
+</code></pre>
+<p>특정 Service:</p>
+<pre><code class="language-bash">docker compose logs nginx
+</code></pre>
+<p>실시간:</p>
+<pre><code class="language-bash">docker compose logs -f
+</code></pre>
+<p>문제가 생겼을 때 가장 먼저 확인해야 할 정보 중 하나입니다.</p>
+<hr />
+<h1 id="120-compose-container">120. Compose Container 안에 들어가기</h1>
+<p>예:</p>
+<pre><code class="language-bash">docker compose exec nginx sh
+</code></pre>
+<p>WordPress:</p>
+<pre><code class="language-bash">docker compose exec wordpress sh
+</code></pre>
+<p>MariaDB:</p>
+<pre><code class="language-bash">docker compose exec mariadb sh
+</code></pre>
+<p>Container 내부 Filesystem, Process, Configuration 등을 확인할 때 사용합니다.</p>
+<hr />
+<h1 id="121-compose">121. Compose 종료</h1>
+<pre><code class="language-bash">docker compose down
+</code></pre>
+<p>Compose로 실행된 Container와 Network 등을 종료하고 정리합니다.</p>
+<p>Volume까지 제거:</p>
+<pre><code class="language-bash">docker compose down -v
+</code></pre>
+<p>하지만 이것은 주의해야 합니다.</p>
+<pre><code class="language-text">-v
+→ Volume 삭제 가능
+→ Persistent Data 손실 가능
+</code></pre>
+<p>Database Data를 유지해야 한다면 무심코 사용하면 안 됩니다.</p>
+<hr />
+<h1 id="122-compose">122. 이제 전체 구조를 Compose 관점에서 보자</h1>
+<pre><code class="language-text">compose.yaml
+     │
+     ├── nginx service
+     │      ├── Dockerfile
+     │      ├── Port 443
+     │      └── Network
+     │
+     ├── wordpress service
+     │      ├── Dockerfile
+     │      ├── PHP-FPM
+     │      └── Network
+     │
+     └── mariadb service
+            ├── Dockerfile
+            ├── Volume
+            └── Network
+</code></pre>
+<p>Compose는 세 Container를 단순히 동시에 실행하는 것이 아니라,
+<strong>Application 전체 Architecture를 선언</strong>합니다.</p>
+<hr />
+<h1 id="123-inception">123. Inception 전체 요청 흐름</h1>
+<p>이제 처음부터 끝까지 한 번에 연결해봅시다.</p>
+<pre><code class="language-text">User
+ │
+ │ Browser
+ ▼
+HTTPS Request
+ │
+ ▼
+Host :443
+ │
+ │ Port Mapping
+ ▼
+NGINX Container
+ │
+ │ TLS Termination
+ │
+ │ HTTP Request 처리
+ │
+ │ FastCGI
+ ▼
+WordPress Container
+ │
+ │ PHP-FPM
+ │
+ │ WordPress PHP 실행
+ │
+ │ SQL
+ ▼
+MariaDB Container
+ │
+ │
+ ▼
+Database Volume
+</code></pre>
+<p>Response는 반대 방향으로 돌아옵니다.</p>
+<pre><code class="language-text">Database
+   ↓
+WordPress
+   ↓
+PHP-FPM
+   ↓
+NGINX
+   ↓
+HTTPS
+   ↓
+Browser
+</code></pre>
+<hr />
+<h1 id="124-data">124. Data 흐름</h1>
+<p>Application Request와 Persistent Data는 다른 흐름을 가집니다.</p>
+<h2 id="request-flow">Request Flow</h2>
+<pre><code class="language-text">Browser
+→ NGINX
+→ PHP-FPM
+→ WordPress
+→ MariaDB
+</code></pre>
+<h2 id="persistent-storage">Persistent Storage</h2>
+<pre><code class="language-text">WordPress Files
+→ WordPress Volume
+
+Database Files
+→ MariaDB Volume
+</code></pre>
+<p>즉 Network와 Storage는 서로 다른 문제를 해결합니다.</p>
+<pre><code class="language-text">Network
+→ Service끼리 어떻게 통신하는가?
+
+Volume
+→ Data를 어디에 지속적으로 저장하는가?
+</code></pre>
+<hr />
+<h1 id="125-docker-object">125. Docker의 핵심 Object 정리</h1>
+<p>Docker를 이해할 때 다음 다섯 개를 구분하면 좋습니다.</p>
+<pre><code class="language-text">Image
+→ Container 실행 환경의 원본
+
+Container
+→ Image를 기반으로 실행되는 격리된 Process 환경
+
+Network
+→ Container 간 Communication
+
+Volume
+→ Persistent Data Storage
+
+Dockerfile
+→ Image Build 방법
+
+Compose
+→ 여러 Service의 실행 Architecture
+</code></pre>
+<hr />
+<h1 id="126-container">126. Container를 다시 정확하게 정의해보자</h1>
+<p>문서 시작에서는 Container를 단순하게:</p>
+<blockquote>
+<p>Application을 격리된 환경에서 실행하는 방법</p>
+</blockquote>
+<p>이라고 봤습니다.</p>
+<p>이제 더 정확하게 설명할 수 있습니다.</p>
+<pre><code class="language-text">Container
+
+Linux Process
++
+Namespaces
++
+cgroups
++
+Isolated Filesystem View
++
+Network Environment
+</code></pre>
+<p>그리고 Docker는 이것을 쉽게 만들고 관리합니다.</p>
+<hr />
+<h1 id="127-container-vm">127. 왜 Container는 VM이 아닌가?</h1>
+<p>다시 한번 확인합니다.</p>
+<pre><code class="language-text">VM
+→ Virtual Machine
+→ Guest Kernel 존재
+
+Container
+→ Isolated Process Environment
+→ Host Kernel 공유
+</code></pre>
+<p>그래서 Container 안에 Debian Filesystem이 있다고 해서 Debian Kernel이 하나 더 실행되는 것은 아닙니다.</p>
+<p>Host Linux Kernel을 공유합니다.</p>
+<p>이 차이를 이해하면 Container 개념의 절반 이상을 이해한 것입니다.</p>
+<hr />
+<h1 id="128-container-process">128. 왜 Container의 Process가 중요할까?</h1>
+<p>Container는 Application Package를 보관하는 Box가 아닙니다.</p>
+<p>실행 관점에서는 Process가 핵심입니다.</p>
+<pre><code class="language-text">docker run
+   ↓
+Container Environment 준비
+   ↓
+Main Process 실행
+   ↓
+Running
+</code></pre>
+<p>Main Process 종료:</p>
+<pre><code class="language-text">Main Process Exit
+   ↓
+Container Exit
+</code></pre>
+<p>그래서:</p>
+<pre><code class="language-text">PID 1
+foreground
+daemon off
+signal
+restart policy
+</code></pre>
+<p>같은 개념들이 모두 연결됩니다.</p>
+<hr />
+<h1 id="129-signal">129. Signal</h1>
+<p>Linux에서는 Process에 Signal을 보내 특정 동작을 요청할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">SIGTERM
+→ 정상 종료 요청
+
+SIGKILL
+→ 강제 종료
+</code></pre>
+<p>Docker에서:</p>
+<pre><code class="language-bash">docker stop nginx
+</code></pre>
+<p>을 실행하면 Docker는 Container의 Main Process가 정상적으로 종료할 기회를 주는 방식으로 Signal을 전달합니다.</p>
+<p>그래서 Container Application은 Signal을 올바르게 처리하는 것이 중요합니다.</p>
+<hr />
+<h1 id="130-docker-stop-docker-kill">130. <code>docker stop</code>과 <code>docker kill</code></h1>
+<p>개념적으로:</p>
+<pre><code class="language-bash">docker stop container
+</code></pre>
+<p>은 정상 종료를 시도합니다.</p>
+<p>반면:</p>
+<pre><code class="language-bash">docker kill container
+</code></pre>
+<p>은 더 즉각적인 종료에 사용할 수 있습니다.</p>
+<p>보통은 <code>stop</code>을 우선 사용하는 것이 자연스럽습니다.</p>
+<hr />
+<h1 id="131-zombie-process-pid-1">131. Zombie Process와 PID 1</h1>
+<p>Linux에서 Child Process가 종료되면 Parent Process가 그 종료 상태를 회수해야 합니다.</p>
+<p>그렇지 않으면 Zombie Process가 남을 수 있습니다.</p>
+<p>일반 Linux System에서는 init 계열 Process가 고아 Process 처리에 관여합니다.</p>
+<p>Container에서는 Application 자체가 PID 1이 될 수 있기 때문에 Process를 많이 Spawn하는 Application에서는 PID 1의 Process 관리 역할도 중요해질 수 있습니다.</p>
+<p>Inception 수준에서는 다음 정도를 기억하면 충분합니다.</p>
+<blockquote>
+<p>Container의 PID 1은 단순한 숫자 1이 아니라 Container Lifecycle과 Process 관리에서 특별한 위치를 가진다.</p>
+</blockquote>
+<hr />
+<h1 id="132-image-layer-cache">132. Image Layer와 Cache</h1>
+<p>Dockerfile의 Instruction은 Image Layer 생성과 Build Cache에 영향을 줄 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-dockerfile">FROM debian:bookworm
+
+RUN apt-get update &amp;&amp; apt-get install -y nginx
+
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+</code></pre>
+<p>개념적으로:</p>
+<pre><code class="language-text">Base Layer
+   ↓
+Package Layer
+   ↓
+Config Layer
+</code></pre>
+<p>Docker는 변경되지 않은 Build Step을 Cache에서 재사용할 수 있습니다.</p>
+<p>그래서 Dockerfile의 구조가 Build 효율에도 영향을 줍니다.</p>
+<hr />
+<h1 id="133-container-writable-layer-storage">133. Container Writable Layer는 영구 Storage가 아니다</h1>
+<p>Container 안에서:</p>
+<pre><code class="language-bash">touch hello.txt
+</code></pre>
+<p>를 실행하면 File을 만들 수 있습니다.</p>
+<p>하지만 그 File이 Container Writable Layer에만 있다면 Container 삭제 시 함께 사라질 수 있습니다.</p>
+<p>그래서:</p>
+<pre><code class="language-text">Temporary Runtime Change
+→ Container Writable Layer
+
+Persistent Application Data
+→ Volume
+</code></pre>
+<p>이라고 구분하는 것이 좋습니다.</p>
+<hr />
+<h1 id="134-container">134. Container를 자주 다시 만드는 이유</h1>
+<p>전통적인 Server 관리에서는 하나의 Server를 오랫동안 유지하면서 내부를 계속 수정하는 방식이 흔했습니다.</p>
+<p>Container 환경에서는 Image를 새로 Build하고 Container를 교체하는 방식이 자연스럽습니다.</p>
+<pre><code class="language-text">Old Image
+   ↓
+Old Container
+
+Dockerfile 수정
+
+New Image
+   ↓
+New Container
+</code></pre>
+<p>이런 방식은 실행 환경을 재현 가능하게 유지하는 데 도움을 줍니다.</p>
+<hr />
+<h1 id="135-immutable-infrastructure">135. Immutable Infrastructure라는 생각</h1>
+<p>Container 환경에서는 실행 중인 Server 내부를 계속 손으로 수정하기보다:</p>
+<pre><code class="language-text">Configuration 수정
+   ↓
+Dockerfile 수정
+   ↓
+Image 다시 Build
+   ↓
+Container 교체
+</code></pre>
+<p>하는 방식을 선호할 수 있습니다.</p>
+<p>이를 더 넓은 Infrastructure 개념에서는 Immutable Infrastructure와 연결해서 이해할 수 있습니다.</p>
+<p>Inception에서는 이 철학을 완전히 구현하는 것이 목표라기보다,
+<strong>재현 가능한 Image와 Container 운영 방식</strong>을 경험한다고 생각하면 됩니다.</p>
+<hr />
+<h1 id="136-debugging">136. 기본 Debugging: 먼저 상태를 본다</h1>
+<p>Container가 동작하지 않을 때 무작정 Configuration부터 수정하지 않습니다.</p>
+<p>먼저:</p>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<p>를 봅니다.</p>
+<p>질문은:</p>
+<blockquote>
+<p>Container가 Running 상태인가?</p>
+</blockquote>
+<p>입니다.</p>
+<hr />
+<h1 id="137-logs">137. 종료되어 있다면 Logs를 본다</h1>
+<pre><code class="language-bash">docker compose logs nginx
+</code></pre>
+<p>또는:</p>
+<pre><code class="language-bash">docker compose logs mariadb
+</code></pre>
+<p>를 사용합니다.</p>
+<p>질문:</p>
+<blockquote>
+<p>Application이 왜 종료되었는가?</p>
+</blockquote>
+<p>입니다.</p>
+<hr />
+<h1 id="138">138. 살아 있는데 이상하다면 내부를 본다</h1>
+<pre><code class="language-bash">docker compose exec nginx sh
+</code></pre>
+<p>Container 안에서:</p>
+<pre><code class="language-bash">ps
+</code></pre>
+<pre><code class="language-bash">ls
+</code></pre>
+<pre><code class="language-bash">cat &lt;configuration-file&gt;
+</code></pre>
+<p>등으로 실제 상태를 확인할 수 있습니다.</p>
+<hr />
+<h1 id="139-nginx">139. NGINX 설정 확인</h1>
+<p>NGINX Configuration Syntax를 확인할 때:</p>
+<pre><code class="language-bash">nginx -t
+</code></pre>
+<p>를 사용할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-text">syntax is ok
+test is successful
+</code></pre>
+<p>같은 결과를 볼 수 있습니다.</p>
+<p>이 Command는:</p>
+<blockquote>
+<p>NGINX가 안 되는데 Docker 문제인가, NGINX Configuration 문제인가?</p>
+</blockquote>
+<p>를 구분하는 데 도움이 됩니다.</p>
+<hr />
+<h1 id="140-port">140. 어느 Port를 듣고 있는지 확인</h1>
+<p>Linux에서는 다음과 같은 명령을 사용할 수 있습니다.</p>
+<pre><code class="language-bash">ss -tlnp
+</code></pre>
+<p>옵션을 단순하게 보면:</p>
+<pre><code class="language-text">-t
+→ TCP
+
+-l
+→ Listening
+
+-n
+→ 숫자로 표시
+
+-p
+→ Process 정보
+</code></pre>
+<p>Container 안에서 실제 Application이 예상 Port를 Listen하고 있는지 확인하는 데 도움을 줍니다.</p>
+<hr />
+<h1 id="141-dns">141. DNS 확인</h1>
+<p>WordPress Container가 MariaDB를 찾지 못한다면 Service Name Resolution을 확인할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-bash">getent hosts mariadb
+</code></pre>
+<p>성공하면 <code>mariadb</code> 이름이 어떤 IP로 해석되는지 확인할 수 있습니다.</p>
+<p>질문:</p>
+<blockquote>
+<p>같은 Docker Network에서 Service 이름을 찾을 수 있는가?</p>
+</blockquote>
+<p>입니다.</p>
+<hr />
+<h1 id="142-network">142. Network 확인</h1>
+<pre><code class="language-bash">docker network ls
+</code></pre>
+<p>특정 Network:</p>
+<pre><code class="language-bash">docker network inspect &lt;network-name&gt;
+</code></pre>
+<p>를 통해 어떤 Container들이 연결되어 있는지 확인할 수 있습니다.</p>
+<hr />
+<h1 id="143-volume">143. Volume 확인</h1>
+<pre><code class="language-bash">docker volume ls
+</code></pre>
+<p>특정 Volume:</p>
+<pre><code class="language-bash">docker volume inspect &lt;volume-name&gt;
+</code></pre>
+<p>질문:</p>
+<blockquote>
+<p>Persistent Data가 어떤 Volume에 연결되어 있는가?</p>
+</blockquote>
+<p>입니다.</p>
+<hr />
+<h1 id="144-http-request">144. HTTP Request 확인</h1>
+<p>NGINX까지 Request가 도달하는지 확인할 때 <code>curl</code>을 사용할 수 있습니다.</p>
+<p>예:</p>
+<pre><code class="language-bash">curl -v https://example.local
+</code></pre>
+<p><code>-v</code>는 Verbose Output을 보여줍니다.</p>
+<p>TLS Verification을 건너뛰는 학습용 Debugging에서는:</p>
+<pre><code class="language-bash">curl -k https://example.local
+</code></pre>
+<p>를 볼 수 있습니다.</p>
+<p>하지만 <code>-k</code>는 Certificate Verification을 생략하므로 실제 운영에서 무심코 사용하는 습관은 좋지 않습니다.</p>
+<hr />
+<h1 id="145-docker-inspect">145. <code>docker inspect</code></h1>
+<p>Docker Object의 상세 Configuration을 보고 싶다면:</p>
+<pre><code class="language-bash">docker inspect &lt;container&gt;
+</code></pre>
+<p>를 사용할 수 있습니다.</p>
+<p>출력이 매우 길 수 있습니다.</p>
+<p>처음부터 모두 읽기보다 다음과 같은 질문을 가지고 보는 것이 좋습니다.</p>
+<pre><code class="language-text">어떤 Image에서 만들어졌나?
+어떤 Network에 연결됐나?
+어떤 Mount가 있나?
+어떤 Environment Variable이 있나?
+</code></pre>
+<hr />
+<h1 id="146-debugging">146. Debugging의 핵심은 계층을 나누는 것</h1>
+<p>Inception 문제가 생겼을 때 모든 것을 한 번에 보면 복잡합니다.</p>
+<p>계층별로 나눕니다.</p>
+<pre><code class="language-text">1. Container
+   ↓
+살아 있는가?
+
+2. Process
+   ↓
+Application이 실행 중인가?
+
+3. Configuration
+   ↓
+설정이 올바른가?
+
+4. Network
+   ↓
+상대 Service를 찾을 수 있는가?
+
+5. Port
+   ↓
+예상 Port를 Listen하는가?
+
+6. Storage
+   ↓
+Volume이 제대로 연결됐는가?
+
+7. Application
+   ↓
+실제 Request를 정상 처리하는가?
+</code></pre>
+<hr />
+<h1 id="147">147. 질문 → 도구</h1>
+<pre><code class="language-text">&quot;Container가 살아 있나?&quot;
+→ docker compose ps
+
+&quot;왜 죽었지?&quot;
+→ docker compose logs
+
+&quot;Container 안에서는 무슨 일이 일어나지?&quot;
+→ docker compose exec
+
+&quot;NGINX 설정이 맞나?&quot;
+→ nginx -t
+
+&quot;어느 Port를 듣고 있지?&quot;
+→ ss -tlnp
+
+&quot;Service 이름을 찾을 수 있나?&quot;
+→ getent hosts
+
+&quot;Network에 누가 연결되어 있지?&quot;
+→ docker network inspect
+
+&quot;Volume은 어디에 연결됐지?&quot;
+→ docker volume inspect
+
+&quot;HTTP/TLS 요청은 되나?&quot;
+→ curl -v
+</code></pre>
+<p>명령어를 외우기보다 <strong>질문에 맞는 도구를 고르는 것</strong>이 더 중요합니다.</p>
+<hr />
+<h1 id="148-1-image-vs-container">148. 자주 헷갈리는 개념 1: Image vs Container</h1>
+<pre><code class="language-text">Image
+→ 실행 환경의 원본
+
+Container
+→ Image에서 만들어진 실행 Instance
+</code></pre>
+<p>예:</p>
+<pre><code class="language-text">debian:bookworm
+→ Image
+
+그 Image를 docker run으로 실행
+→ Container
+</code></pre>
+<hr />
+<h1 id="149-2-dockerfile-vs-compose">149. 자주 헷갈리는 개념 2: Dockerfile vs Compose</h1>
+<pre><code class="language-text">Dockerfile
+→ Image를 어떻게 만들까?
+
+Compose
+→ 여러 Service를 어떻게 실행하고 연결할까?
+</code></pre>
+<hr />
+<h1 id="150-3-container-vs-vm">150. 자주 헷갈리는 개념 3: Container vs VM</h1>
+<pre><code class="language-text">VM
+→ Guest Kernel 존재
+
+Container
+→ Host Kernel 공유
+</code></pre>
+<p>Container를 작은 VM이라고만 외우면 Process와 Namespace 개념이 보이지 않습니다.</p>
+<hr />
+<h1 id="151-4-expose-vs-ports">151. 자주 헷갈리는 개념 4: EXPOSE vs ports</h1>
+<pre><code class="language-text">EXPOSE
+→ Image가 사용하는 Port에 대한 정보
+
+ports
+→ Host와 Container Port를 실제로 연결
+</code></pre>
+<hr />
+<h1 id="152-5-localhost">152. 자주 헷갈리는 개념 5: localhost</h1>
+<pre><code class="language-text">Host의 localhost
+→ Host 자신
+
+NGINX Container의 localhost
+→ NGINX Container 자신
+
+WordPress Container의 localhost
+→ WordPress Container 자신
+</code></pre>
+<p>다른 Container는 Service Name으로 찾습니다.</p>
+<hr />
+<h1 id="153-6-network-vs-port-mapping">153. 자주 헷갈리는 개념 6: Network vs Port Mapping</h1>
+<pre><code class="language-text">Docker Network
+→ Container ↔ Container
+
+Port Mapping
+→ Host / External Client ↔ Container
+</code></pre>
+<hr />
+<h1 id="154-7-volume-vs-container-filesystem">154. 자주 헷갈리는 개념 7: Volume vs Container Filesystem</h1>
+<pre><code class="language-text">Container Writable Layer
+→ Container Lifecycle에 종속
+
+Volume
+→ Container Lifecycle과 분리된 Storage
+</code></pre>
+<hr />
+<h1 id="155-8-http-vs-fastcgi">155. 자주 헷갈리는 개념 8: HTTP vs FastCGI</h1>
+<pre><code class="language-text">Browser
+   │
+   │ HTTP / HTTPS
+   ▼
+NGINX
+
+NGINX
+   │
+   │ FastCGI
+   ▼
+PHP-FPM
+</code></pre>
+<p>FastCGI는 Browser가 사용하는 Protocol이 아닙니다.</p>
+<hr />
+<h1 id="156-9-wordpress-php-fpm">156. 자주 헷갈리는 개념 9: WordPress와 PHP-FPM</h1>
+<p>WordPress는 Application입니다.</p>
+<p>PHP-FPM은 PHP Code를 실행하는 Runtime/Process Manager입니다.</p>
+<pre><code class="language-text">WordPress
+→ 무엇을 실행할 것인가
+
+PHP-FPM
+→ PHP Code를 어떻게 실행할 것인가
+</code></pre>
+<hr />
+<h1 id="157-10-mariadb-volume">157. 자주 헷갈리는 개념 10: MariaDB와 Volume</h1>
+<p>MariaDB는 Database Server Process입니다.</p>
+<p>Volume은 Database File을 저장하는 Persistent Storage입니다.</p>
+<pre><code class="language-text">MariaDB
+→ Data를 관리하는 Software
+
+Volume
+→ Data File이 살아남는 Storage
+</code></pre>
+<hr />
+<h1 id="158-inception">158. Inception을 구현할 때 생각하는 순서</h1>
+<p>무작정 세 Container를 동시에 만들면 Debugging이 어렵습니다.</p>
+<p>개념적으로 하나씩 연결하는 것이 좋습니다.</p>
+<pre><code class="language-text">1. MariaDB
+   ↓
+Database가 정상 실행되는가?
+
+2. WordPress / PHP-FPM
+   ↓
+Database에 연결되는가?
+
+3. NGINX
+   ↓
+PHP-FPM에 Request를 전달하는가?
+
+4. TLS
+   ↓
+HTTPS로 접근되는가?
+
+5. Volume
+   ↓
+재시작 / 재생성 후 Data가 유지되는가?
+
+6. Compose
+   ↓
+전체 Application을 한 번에 재현할 수 있는가?
+</code></pre>
+<hr />
+<h1 id="159-mariadb">159. MariaDB 먼저</h1>
+<p>MariaDB는 Application의 가장 아래쪽 Dependency입니다.</p>
+<pre><code class="language-text">NGINX
+   ↓
+WordPress
+   ↓
+MariaDB
+</code></pre>
+<p>WordPress가 정상 동작하려면 Database가 필요합니다.</p>
+<p>따라서 먼저 MariaDB Container가 정상적으로 실행되는지 확인합니다.</p>
+<hr />
+<h1 id="160-wordpress">160. 그다음 WordPress</h1>
+<p>WordPress는 MariaDB에 연결해야 합니다.</p>
+<p>질문:</p>
+<pre><code class="language-text">MariaDB Service Name이 맞는가?
+Port가 맞는가?
+Database가 존재하는가?
+User가 존재하는가?
+Credential이 맞는가?
+</code></pre>
+<p>를 확인합니다.</p>
+<hr />
+<h1 id="161-nginx">161. 그다음 NGINX</h1>
+<p>WordPress/PHP-FPM이 정상적이라면 NGINX를 연결합니다.</p>
+<p>질문:</p>
+<pre><code class="language-text">NGINX가 443을 Listen하는가?
+TLS Certificate를 읽을 수 있는가?
+WordPress Service Name을 찾는가?
+PHP-FPM 9000으로 연결되는가?
+</code></pre>
+<p>를 확인합니다.</p>
+<hr />
+<h1 id="162-request">162. 마지막으로 외부 Request</h1>
+<p>모든 내부 Service가 정상이라면 외부 Browser에서 요청합니다.</p>
+<pre><code class="language-text">Browser
+   ↓
+Host Port
+   ↓
+NGINX
+   ↓
+WordPress
+   ↓
+MariaDB
+</code></pre>
+<p>문제가 생기면 어느 구간에서 끊겼는지 찾습니다.</p>
+<hr />
+<h1 id="163-inception">163. Inception에서 진짜 배우는 것</h1>
+<p>겉으로 보면 WordPress Website를 Docker로 실행하는 과제입니다.</p>
+<p>하지만 실제로 배우는 핵심은 더 넓습니다.</p>
+<pre><code class="language-text">Application Isolation
+Container Lifecycle
+Image Build
+Persistent Storage
+Service Networking
+Configuration
+TLS
+Multi-Service Architecture
+Infrastructure Reproducibility
+</code></pre>
+<p>입니다.</p>
+<hr />
+<h1 id="164-born2beroot-inception">164. Born2beroot와 Inception의 연결</h1>
+<p>Born2beroot에서는 <strong>Server 자체</strong>를 배웠습니다.</p>
+<pre><code class="language-text">Hardware / VM
+   ↓
+Linux
+   ↓
+User
+   ↓
+Permission
+   ↓
+Process
+   ↓
+Service
+   ↓
+Network
+   ↓
+Storage
+</code></pre>
+<p>Inception에서는 그 Server 위에서 <strong>Application 실행 환경</strong>을 다룹니다.</p>
+<pre><code class="language-text">Linux
+   ↓
+Process
+   ↓
+Isolation
+   ↓
+Container
+   ↓
+Application
+</code></pre>
+<p>즉 두 프로젝트는 분리된 이야기가 아닙니다.</p>
+<hr />
+<h1 id="165-born2beroot-process-inception-container">165. Born2beroot의 Process가 Inception에서 Container가 된다</h1>
+<p>Born2beroot:</p>
+<pre><code class="language-text">systemd
+  ↓
+Service
+  ↓
+Process
+</code></pre>
+<p>Inception:</p>
+<pre><code class="language-text">Docker
+  ↓
+Container
+  ↓
+Isolated Process
+</code></pre>
+<p>Process 개념이 Container 이해의 기반이 됩니다.</p>
+<hr />
+<h1 id="166-born2beroot-network-inception">166. Born2beroot의 Network가 Inception에서 확장된다</h1>
+<p>Born2beroot:</p>
+<pre><code class="language-text">IP
+Port
+SSH
+Firewall
+</code></pre>
+<p>Inception:</p>
+<pre><code class="language-text">Network Namespace
+Docker Network
+Service DNS
+Port Mapping
+</code></pre>
+<p>Host Network만 보던 단계에서 Application Network까지 확장됩니다.</p>
+<hr />
+<h1 id="167-born2beroot-storage-inception">167. Born2beroot의 Storage가 Inception에서 확장된다</h1>
+<p>Born2beroot:</p>
+<pre><code class="language-text">Disk
+Partition
+Filesystem
+LVM
+</code></pre>
+<p>Inception:</p>
+<pre><code class="language-text">Container Writable Layer
+Volume
+Bind Mount
+Persistent Data
+</code></pre>
+<p>Storage 자체에서 <strong>Application Data Lifecycle</strong> 문제로 확장됩니다.</p>
+<hr />
+<h1 id="168-inception">168. Inception 이후에는 어떤 문제가 생길까?</h1>
+<p>Inception에서는 하나의 Server 안에서 몇 개의 Container를 관리합니다.</p>
+<pre><code class="language-text">One Server
+
+Docker Compose
+   │
+   ├── NGINX
+   ├── WordPress
+   └── MariaDB
+</code></pre>
+<p>이 정도 규모에서는 Docker Compose가 매우 편리합니다.</p>
+<p>그런데 Container가 수십 개, 수백 개라면 어떨까요?</p>
+<hr />
+<h1 id="169-container">169. Container가 많아지면</h1>
+<p>다음과 같은 문제가 생깁니다.</p>
+<pre><code class="language-text">어느 Server에 Container를 배치하지?
+
+Container가 죽으면 누가 다시 실행하지?
+
+Traffic이 늘어나면 Container를 몇 개 더 만들지?
+
+여러 Server 사이 Network는 어떻게 연결하지?
+
+새 Version을 어떻게 배포하지?
+
+원하는 개수의 Container가 계속 살아 있는지 누가 확인하지?
+</code></pre>
+<p>Docker 하나만의 문제가 아니라 <strong>Cluster 운영 문제</strong>가 됩니다.</p>
+<hr />
+<h1 id="170-orchestration">170. Orchestration</h1>
+<p>여러 Container의 배치와 Lifecycle을 자동으로 관리하는 것을 Container Orchestration이라고 합니다.</p>
+<p>예를 들어 시스템에:</p>
+<pre><code class="language-text">&quot;Web Application을 항상 3개 실행해줘.&quot;
+</code></pre>
+<p>라고 선언합니다.</p>
+<p>Orchestrator는 실제 상태를 확인합니다.</p>
+<pre><code class="language-text">Desired State
+3 Containers
+
+Actual State
+2 Containers
+</code></pre>
+<p>그러면 하나를 추가로 실행할 수 있습니다.</p>
+<pre><code class="language-text">Actual State
+3 Containers
+</code></pre>
+<hr />
+<h1 id="171-kubernetes">171. Kubernetes</h1>
+<p>대표적인 Container Orchestration Platform이 Kubernetes입니다.</p>
+<pre><code class="language-text">Docker / Container
+       ↓
+Container가 많아짐
+       ↓
+Orchestration 필요
+       ↓
+Kubernetes
+</code></pre>
+<p>Kubernetes는 여러 Machine에 걸쳐 Containerized Application을 운영하는 문제를 다룹니다.</p>
+<hr />
+<h1 id="172-inception-of-things">172. Inception of Things로 연결</h1>
+<p>42의 흐름을 연결하면 아주 자연스럽습니다.</p>
+<pre><code class="language-text">Born2beroot
+    ↓
+Linux Server 한 대를 이해한다
+
+Inception
+    ↓
+그 Server 위에서
+Containerized Application을 운영한다
+
+Inception of Things
+    ↓
+여러 Node에서
+Containerized Application을
+Orchestrate한다
+</code></pre>
+<p>즉:</p>
+<pre><code class="language-text">Server
+   ↓
+Container
+   ↓
+Cluster
+</code></pre>
+<p>로 확장됩니다.</p>
+<hr />
+<h1 id="173-concept-map">173. 전체 Concept Map</h1>
+<pre><code class="language-text">Application을 운영하고 싶다
+        ↓
+Linux Server
+        ↓
+Application 환경이 섞인다
+        ↓
+Isolation이 필요하다
+        ↓
+Process
+        ↓
+Namespace
+        ↓
+cgroup
+        ↓
+Container
+        ↓
+Container를 쉽게 관리하고 싶다
+        ↓
+Docker
+        ↓
+실행 환경을 저장하고 싶다
+        ↓
+Image
+        ↓
+Image 생성 과정을 기록한다
+        ↓
+Dockerfile
+        ↓
+Container File 변경은 임시적이다
+        ↓
+Persistent Data가 필요하다
+        ↓
+Volume
+        ↓
+Container를 여러 개 분리했다
+        ↓
+서로 통신해야 한다
+        ↓
+Docker Network
+        ↓
+Service Name / DNS
+        ↓
+외부에서도 접근해야 한다
+        ↓
+Port Mapping
+        ↓
+Web Request를 받는다
+        ↓
+NGINX
+        ↓
+Communication을 보호한다
+        ↓
+TLS / HTTPS
+        ↓
+PHP Code를 실행해야 한다
+        ↓
+PHP-FPM
+        ↓
+NGINX와 PHP Runtime을 연결한다
+        ↓
+FastCGI
+        ↓
+Application
+        ↓
+WordPress
+        ↓
+Persistent Business Data
+        ↓
+MariaDB
+        ↓
+여러 Container 설정을 한꺼번에 관리한다
+        ↓
+Docker Compose
+        ↓
+Container가 너무 많아진다
+        ↓
+Orchestration
+        ↓
+Kubernetes
+</code></pre>
+<hr />
+<h1 id="174-docker">174. 최소 Docker 명령어 정리</h1>
+<p>이 문서의 목표는 Docker Command를 모두 외우는 것이 아닙니다.</p>
+<p>다음 정도를 이해하고 사용할 수 있으면 기본 조작에는 충분합니다.</p>
+<hr />
+<h2 id="container_1">Container 실행</h2>
+<pre><code class="language-bash">docker run &lt;image&gt;
+</code></pre>
+<p>예:</p>
+<pre><code class="language-bash">docker run nginx
+</code></pre>
+<p>의미:</p>
+<pre><code class="language-text">Image
+→ Container 생성
+→ Main Process 실행
+</code></pre>
+<hr />
+<h2 id="container_2">실행 중 Container 확인</h2>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>모두 확인:</p>
+<pre><code class="language-bash">docker ps -a
+</code></pre>
+<hr />
+<h2 id="logs">Logs 확인</h2>
+<pre><code class="language-bash">docker logs &lt;container&gt;
+</code></pre>
+<hr />
+<h2 id="container-command">Container 내부에서 Command 실행</h2>
+<pre><code class="language-bash">docker exec -it &lt;container&gt; sh
+</code></pre>
+<hr />
+<h2 id="image">Image 확인</h2>
+<pre><code class="language-bash">docker image ls
+</code></pre>
+<hr />
+<h2 id="image-build">Image Build</h2>
+<pre><code class="language-bash">docker build -t &lt;name&gt; .
+</code></pre>
+<hr />
+<h2 id="network">Network 확인</h2>
+<pre><code class="language-bash">docker network ls
+</code></pre>
+<hr />
+<h2 id="volume">Volume 확인</h2>
+<pre><code class="language-bash">docker volume ls
+</code></pre>
+<hr />
+<h2 id="compose">Compose 실행</h2>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<hr />
+<h2 id="compose_1">Compose 상태</h2>
+<pre><code class="language-bash">docker compose ps
+</code></pre>
+<hr />
+<h2 id="compose-logs">Compose Logs</h2>
+<pre><code class="language-bash">docker compose logs
+</code></pre>
+<hr />
+<h2 id="compose_2">Compose 종료</h2>
+<pre><code class="language-bash">docker compose down
+</code></pre>
+<hr />
+<h1 id="175">175. 명령어를 외우지 말고 질문을 기억하자</h1>
+<pre><code class="language-text">&quot;실행 중인가?&quot;
+→ docker ps
+
+&quot;왜 안 되지?&quot;
+→ docker logs
+
+&quot;안에서는 무슨 일이 일어나지?&quot;
+→ docker exec
+
+&quot;Image가 있나?&quot;
+→ docker image ls
+
+&quot;Network가 있나?&quot;
+→ docker network ls
+
+&quot;Data는 어디에 있지?&quot;
+→ docker volume ls
+
+&quot;전체 Application 상태는?&quot;
+→ docker compose ps
+</code></pre>
+<hr />
+<h1 id="176">176. 마지막으로</h1>
+<p>Inception에서 가장 중요한 것은 Docker Command를 많이 아는 것이 아닙니다.</p>
+<p>다음 질문들에 자기 말로 답할 수 있는지가 더 중요합니다.</p>
+<pre><code class="language-text">Container는 VM과 무엇이 다른가?
+
+Container가 왜 Process라고 하는가?
+
+왜 Container 안에서 PID 1이 다시 보일 수 있는가?
+
+Namespace는 무엇을 격리하는가?
+
+cgroup은 Namespace와 무엇이 다른가?
+
+Image와 Container의 차이는 무엇인가?
+
+왜 Image는 Layer 구조를 사용하는가?
+
+왜 Container를 삭제하면 Data가 사라질 수 있는가?
+
+Volume은 어떤 문제를 해결하는가?
+
+Container의 localhost는 왜 Host가 아닌가?
+
+Docker Network는 왜 필요한가?
+
+왜 Container IP 대신 Service Name을 사용하는가?
+
+왜 NGINX만 외부 Port를 열면 되는가?
+
+NGINX는 무엇을 하는가?
+
+PHP-FPM은 왜 필요한가?
+
+FastCGI는 어디에서 사용되는가?
+
+WordPress와 MariaDB는 어떻게 연결되는가?
+
+Dockerfile과 Docker Compose의 차이는 무엇인가?
+
+왜 Docker Compose 다음에 Kubernetes가 등장하는가?
+</code></pre>
+<p>이 질문들을 설명할 수 있다면 Inception의 핵심 구조를 이해한 것입니다.</p>
+<hr />
+<h1 id="177">177. 한 문장으로 정리</h1>
+<blockquote>
+<p><strong>Born2beroot가 Linux Server를 이해하는 프로젝트라면, Inception은 그 Server 위에서 Application을 Container라는 격리된 실행 환경으로 나누고, Network와 Storage를 통해 다시 하나의 Service로 연결하는 방법을 이해하는 프로젝트다.</strong></p>
+</blockquote>
+<p>그리고 이 다음 단계에서는:</p>
+<blockquote>
+<p><strong>그 Container들을 여러 Server에 걸쳐 자동으로 운영하려면 어떻게 해야 하는가?</strong></p>
+</blockquote>
+<p>라는 질문을 만나게 됩니다.</p>
+<p>그 질문이 Kubernetes와 Inception of Things로 이어집니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../born2beroot/" class="btn btn-neutral float-left" title="Born2beroot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../iot/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../born2beroot/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../iot/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
