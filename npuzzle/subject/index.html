@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Project Guide - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Project Guide";
+        var mkdocs_page_input_path = "npuzzle/subject.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inception of Things</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" >Preview</a>
+    <ul>
+                <li class="toctree-l2"><a class="" href="../../preview/born2beroot.md">Born2beroot</a>
+                </li>
+                <li class="toctree-l2"><a class="" href="../../preview/inception.md">Inception</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/subject/">Project Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part1/">Part 1 — K3s & Vagrant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part2/">Part 2 — K3s & Applications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/part3/">Part 3 — K3d & Argo CD</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../iot/bonus/">Bonus — GitLab</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../review/index.md">Review</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">N-puzzle</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Project Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">프로젝트의 목표</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../puzzle/">Puzzle Representation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../search/">Search Algorithms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../heuristics/">Heuristics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../review/">Review</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">N-puzzle</li>
+      <li class="breadcrumb-item active">Project Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="project-guide">Project Guide</h1>
+<h2 id="_1">프로젝트의 목표</h2>
+<p>N-puzzle 프로젝트의 목표는 주어진 퍼즐의 초기 상태에서 시작하여
+<strong>Snail Solution 형태의 목표 상태까지 도달하는 이동 경로를 프로그램으로 찾는 것</strong>이다.</p>
+<p>이를 위해 <strong>A* (A-star) Search Algorithm 또는 그 변형</strong>을 구현해야 한다.</p>
+<p>퍼즐은 <code>N × N</code> 크기의 정사각형 보드이며,</p>
+<ul>
+<li>하나의 빈 공간</li>
+<li><code>1</code>부터 시작하는 서로 다른 숫자 타일</li>
+</ul>
+<p>로 구성된다.</p>
+<p>가능한 이동은 단 하나다.</p>
+<blockquote>
+<p>빈 공간과 상하좌우로 인접한 타일 하나를 서로 교환한다.</p>
+</blockquote>
+<p>대각선 이동은 허용되지 않는다.</p>
+<p>즉 프로그램이 해결해야 하는 문제는 다음과 같다.</p>
+<pre><code class="language-text">Initial State
+      │
+      ▼
+Valid Moves
+      │
+      ▼
+Search
+      │
+      ▼
+Snail Goal
+</code></pre>
+<p>Subject에서는 작은 <code>3 × 3</code> 퍼즐조차 해결하는 데 수 초씩 걸리는 구현은
+합리적인 성능으로 보지 않는다.</p>
+<hr />
+<h1 id="1">1. 전체 요구사항</h1>
+<p>프로그램은 크게 다음 기능을 제공해야 한다.</p>
+<pre><code class="language-text">Input
+  │
+  ├── Puzzle File
+  │
+  └── Random Puzzle
+  │
+  ▼
+Parsing
+  │
+  ▼
+Validation
+  │
+  ▼
+Solvability Check
+  │
+  ├── Unsolvable ──► 사용자에게 알리고 종료
+  │
+  ▼
+Goal Generation
+  │
+  ▼
+A* Search
+  │
+  ├── Heuristic 1
+  ├── Heuristic 2
+  └── Heuristic 3+
+  │
+  ▼
+Solution
+  │
+  ├── Complexity in Time
+  ├── Complexity in Size
+  ├── Number of Moves
+  └── Ordered Sequence of States
+</code></pre>
+<hr />
+<h1 id="2">2. 언어 선택</h1>
+<p>구현 언어와 컴파일러는 자유롭게 선택할 수 있다.</p>
+<p>단, Subject는 언어에 따라 시간 및 공간 효율이 달라질 수 있으며,
+이 선택이 프로그램의 성능에 영향을 줄 수 있다는 점을 명시하고 있다.</p>
+<p>또한 일반적인 rule을 가진 <code>Makefile</code>을 제공해야 한다.</p>
+<p>따라서 이 과제에서는 단순히 정답을 찾는 것뿐 아니라
+<strong>탐색 과정에서 시간과 메모리를 어떻게 사용하는지도 중요하다.</strong></p>
+<hr />
+<h1 id="3-puzzle">3. 다양한 크기의 Puzzle</h1>
+<p>프로그램은 <code>3 × 3</code>에만 맞춰 작성하면 안 된다.</p>
+<p>Subject에서는 예시로 다음과 같은 크기를 언급한다.</p>
+<pre><code class="language-text">3
+4
+5
+17
+...
+</code></pre>
+<p>즉 다음과 같은 하드코딩은 피해야 한다.</p>
+<pre><code class="language-python">goal = [
+    [1, 2, 3],
+    [8, 0, 4],
+    [7, 6, 5]
+]
+</code></pre>
+<p>대신 Puzzle의 크기 <code>N</code>을 기준으로 보드와 Goal State를 처리할 수 있어야 한다.</p>
+<pre><code class="language-text">N
+│
+├── N × N Board
+│
+├── N에 따른 Snail Goal
+│
+└── N에 따른 Search State
+</code></pre>
+<p>큰 Puzzle을 어디까지 현실적으로 해결할 수 있는지는
+Search Algorithm, Heuristic, State 표현 및 자료구조의 효율에 영향을 받는다.</p>
+<hr />
+<h1 id="4-input">4. Input</h1>
+<p>프로그램은 두 종류의 시작 상태를 처리해야 한다.</p>
+<h2 id="puzzle-file">Puzzle File</h2>
+<p>Subject Appendix에서는 다음과 같은 입력을 예시로 제공한다.</p>
+<pre><code class="language-text"># this is a comment
+3
+
+3 2 6 # another comment
+1 4 0
+8 7 5
+</code></pre>
+<p>첫 번째 유효한 값:</p>
+<pre><code class="language-text">3
+</code></pre>
+<p>은 Puzzle의 크기다.</p>
+<p>그 다음 <code>3</code>개의 행이 실제 보드를 나타낸다.</p>
+<pre><code class="language-text">3 2 6
+1 4 0
+8 7 5
+</code></pre>
+<p>여기서:</p>
+<pre><code class="language-text">0
+</code></pre>
+<p>은 빈 공간을 의미한다.</p>
+<hr />
+<h2 id="comment">Comment</h2>
+<p><code>#</code> 뒤의 내용은 Comment로 취급할 수 있다.</p>
+<p>따라서 다음 두 형태 모두 처리할 수 있어야 한다.</p>
+<pre><code class="language-text"># comment
+
+3
+
+3 2 6
+1 4 0
+8 7 5
+</code></pre>
+<p>그리고:</p>
+<pre><code class="language-text">3
+3 2 6 # comment
+1 4 0
+8 7 5
+</code></pre>
+<p>또한 Subject의 입력 예시는 숫자가 정렬되어 있지 않아도 허용되어야 함을 보여준다.</p>
+<pre><code class="language-text">0 10 5 7
+11 14 4 8
+1 2 6 13
+12 3 15 9
+</code></pre>
+<p>즉 Parser는 시각적인 정렬에 의존해서는 안 된다.</p>
+<hr />
+<h1 id="5-random-puzzle">5. Random Puzzle</h1>
+<p>파일 입력뿐 아니라 프로그램이 직접 생성한
+<strong>Random State</strong>도 처리해야 한다.</p>
+<p>따라서 전체 구조를 다음처럼 생각할 수 있다.</p>
+<pre><code class="language-text">               ┌── File Parser
+Input State ───┤
+               └── Random Generator
+                       │
+                       ▼
+                  Puzzle State
+</code></pre>
+<p>어떤 방식으로 들어온 Puzzle이든 이후 Search에서는 동일한 State 표현으로
+처리할 수 있도록 설계하는 것이 자연스럽다.</p>
+<hr />
+<h1 id="6-puzzle-validation">6. Puzzle Validation</h1>
+<p>Subject는 입력 파일의 예시는 제공하지만,
+모든 잘못된 입력 사례를 하나씩 정의하지는 않는다.</p>
+<p>따라서 구현에서는 최소한 Puzzle State로 사용할 수 있는 입력인지 검증할 필요가 있다.</p>
+<p>예를 들어 <code>N × N</code> 퍼즐이라면 다음과 같은 조건을 확인할 수 있다.</p>
+<pre><code class="language-text">Board 크기 = N × N
+
+필요한 값:
+0 ... N² - 1
+</code></pre>
+<p>따라서 Parser / Validator에서는 일반적으로 다음과 같은 상황을 검사하게 된다.</p>
+<pre><code class="language-text">잘못된 size
+행 개수 오류
+각 행의 길이 오류
+숫자가 아닌 값
+범위를 벗어난 값
+중복된 숫자
+필요한 숫자의 누락
+</code></pre>
+<p>여기서 중요한 것은 두 종류의 검사를 구분하는 것이다.</p>
+<pre><code class="language-text">Valid
+  │
+  │ 입력 형식과 Puzzle 구성이 올바른가?
+  ▼
+Solvable
+  │
+  │ Goal까지 실제로 도달 가능한가?
+  ▼
+Search
+</code></pre>
+<p><strong>Valid Puzzle이라고 해서 반드시 Solvable Puzzle인 것은 아니다.</strong></p>
+<hr />
+<h1 id="7-goal-state-snail-solution">7. Goal State — Snail Solution</h1>
+<p>이 프로젝트의 Goal은 일반적인 오름차순 Goal이 아니라
+<strong>Snail Solution</strong>이다.</p>
+<p><code>3 × 3</code>의 경우:</p>
+<pre><code class="language-text">1 2 3
+8 0 4
+7 6 5
+</code></pre>
+<p>숫자가 바깥쪽에서 시작하여 시계 방향으로 안쪽으로 들어가는 형태다.</p>
+<p>크기가 커지면 같은 규칙을 반복한다.</p>
+<p>개념적으로:</p>
+<pre><code class="language-text">→ → → ↓
+↑     ↓
+↑     ↓
+← ← ← ↓
+</code></pre>
+<p>와 같은 방향으로 숫자를 채워 나간다.</p>
+<p>따라서 Goal State 역시 <code>N</code>에 따라 생성할 수 있어야 한다.</p>
+<pre><code class="language-text">N
+│
+▼
+Snail Goal Generator
+│
+▼
+Goal State
+</code></pre>
+<hr />
+<h1 id="8-solvability">8. Solvability</h1>
+<p>입력된 Puzzle은 풀 수 없는 상태일 수도 있다.</p>
+<p>Subject에서는 이러한 경우:</p>
+<blockquote>
+<p>사용자에게 Puzzle이 풀 수 없다는 사실을 알리고 종료</p>
+</blockquote>
+<p>하도록 요구한다.</p>
+<p>따라서 Search를 무조건 실행하는 구조보다는 다음과 같은 흐름이 필요하다.</p>
+<pre><code class="language-text">Puzzle
+   │
+   ▼
+Valid?
+   │
+   ▼
+Solvable?
+   │
+   ├── NO ──► Inform User ──► Exit
+   │
+   └── YES
+        │
+        ▼
+      Search
+</code></pre>
+<p>Solvability를 어떤 원리로 판단하는지는 별도의 Puzzle Representation 페이지에서 자세히 다룬다.</p>
+<hr />
+<h1 id="9-search-algorithm">9. Search Algorithm</h1>
+<p>Mandatory Part에서는 <strong>A* Search Algorithm 또는 그 변형</strong>을 구현해야 한다.</p>
+<p>A*의 기본적인 평가 구조는 다음과 같다.</p>
+<pre><code class="language-text">f(n) = g(n) + h(n)
+</code></pre>
+<p>각 이동의 Transition Cost는 Subject에서 항상 <code>1</code>로 정의되어 있다.</p>
+<p>따라서 한 번 이동할 때마다:</p>
+<pre><code class="language-text">g(next) = g(current) + 1
+</code></pre>
+<p>이 된다.</p>
+<p>Search Algorithm의 구체적인 동작과 <code>opened</code>, <code>closed</code> 등의 구조는
+Search Algorithms 페이지에서 자세히 다룬다.</p>
+<hr />
+<h1 id="10-heuristic">10. Heuristic</h1>
+<p>사용자는 최소 <strong>3개의 관련성 있는 Heuristic Function</strong> 중 하나를 선택할 수 있어야 한다.</p>
+<p>그중 하나는 반드시:</p>
+<p><strong>Manhattan Distance</strong></p>
+<p>여야 한다.</p>
+<p>나머지 두 개 이상은 자유롭게 선택할 수 있다.</p>
+<p>하지만 Subject에는 중요한 조건이 있다.</p>
+<blockquote>
+<p>Heuristic은 admissible해야 한다.</p>
+</blockquote>
+<p>즉 단순히 아무 숫자나 반환하는 함수는 Heuristic으로 인정되지 않는다.</p>
+<p>전체적으로는 다음과 같은 구조가 가능하다.</p>
+<pre><code class="language-text">                 ┌── Manhattan Distance
+                 │
+User Selection ──┼── Heuristic 2
+                 │
+                 └── Heuristic 3
+                         │
+                         ▼
+                       A*
+</code></pre>
+<p>각 Heuristic의 계산 방법과 <strong>왜 admissible한지</strong>는
+Heuristics 페이지에서 별도로 다룬다.</p>
+<hr />
+<h1 id="11-search">11. Search 결과</h1>
+<p>Goal을 찾았다고 프로그램이 바로 끝나면 안 된다.</p>
+<p>Subject에서는 Search 종료 후 여러 정보를 출력하도록 요구한다.</p>
+<h2 id="complexity-in-time">Complexity in Time</h2>
+<p>Search 과정에서 <code>opened</code> set으로부터 선택된 State의 총 개수.</p>
+<p>즉 대략적으로:</p>
+<pre><code class="language-text">Search가 실제로 얼마나 많은 State를 선택하여 탐색했는가?
+</code></pre>
+<p>를 나타낸다.</p>
+<hr />
+<h2 id="complexity-in-size">Complexity in Size</h2>
+<p>Search 중 <strong>동시에 메모리에 표현되어 있던 State의 최대 개수</strong>.</p>
+<p>즉:</p>
+<pre><code class="language-text">Search 과정에서 최대 어느 정도의 State를 메모리에 유지했는가?
+</code></pre>
+<p>를 나타낸다.</p>
+<hr />
+<h2 id="number-of-moves">Number of Moves</h2>
+<p>Initial State에서 Goal State까지 도달하는 데 필요한 이동 횟수를 출력해야 한다.</p>
+<p>예:</p>
+<pre><code class="language-text">Number of moves: 14
+</code></pre>
+<hr />
+<h2 id="solution-path">Solution Path</h2>
+<p>최종적으로 찾은 State들을 순서대로 출력해야 한다.</p>
+<p>예를 들어:</p>
+<pre><code class="language-text">Initial
+   │
+   ▼
+State 1
+   │
+   ▼
+State 2
+   │
+   ▼
+State 3
+   │
+   ▼
+Goal
+</code></pre>
+<p>따라서 Search 과정에서는 Goal을 발견하는 것뿐 아니라
+<strong>어떤 State를 통해 현재 State에 도달했는지 추적할 수 있어야 한다.</strong></p>
+<hr />
+<h1 id="12-mandatory">12. Mandatory 요구사항 정리</h1>
+<p>최소 구현 범위를 정리하면 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>필수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>다양한 N 크기 처리</td>
+<td>O</td>
+</tr>
+<tr>
+<td>File Input</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Random State</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Snail Goal</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Solvability 판단</td>
+<td>O</td>
+</tr>
+<tr>
+<td>A* 또는 변형</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Transition Cost = 1</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Manhattan Distance</td>
+<td>O</td>
+</tr>
+<tr>
+<td>추가 Heuristic 최소 2개</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Admissible Heuristic</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Complexity in Time 출력</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Complexity in Size 출력</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Move Count 출력</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Solution State Sequence 출력</td>
+<td>O</td>
+</tr>
+<tr>
+<td>Makefile</td>
+<td>O</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="13-bonus">13. Bonus</h1>
+<p>Mandatory Part가 완벽하게 동작하는 경우에만 Bonus가 평가된다.</p>
+<p>Bonus에서는 <code>g(x)</code>와 <code>h(x)</code>를 조절하여 같은 프로그램을:</p>
+<pre><code class="language-text">Uniform-cost Search
+
+Greedy Search
+</code></pre>
+<p>방식으로 실행할 수 있도록 한다.</p>
+<p>A*가:</p>
+<pre><code class="language-text">f(n) = g(n) + h(n)
+</code></pre>
+<p>이라면 <code>g</code>와 <code>h</code>의 사용 방식을 변경하면서 서로 다른 Search Strategy를 구성할 수 있다는 것이 핵심이다.</p>
+<p>이 부분은 단순한 기능 추가라기보다,</p>
+<blockquote>
+<p>A*, Uniform-cost, Greedy Search가 무엇을 기준으로 다음 State를 선택하는가?</p>
+</blockquote>
+<p>를 비교하기 위한 Bonus라고 볼 수 있다.</p>
+<hr />
+<h1 id="14">14. 평가에서 설명해야 하는 것</h1>
+<p>Subject는 Defense에서 단순히 프로그램 실행만 보는 것이 아니라
+<strong>구현 선택을 설명할 수 있어야 한다고 명시한다.</strong></p>
+<p>특히 다음 항목을 준비해야 한다.</p>
+<h3 id="search-algorithm">Search Algorithm</h3>
+<p>어떤 A* Variant를 구현했는가?</p>
+<p>왜 그 방식을 선택했는가?</p>
+<hr />
+<h3 id="heuristic">Heuristic</h3>
+<p>어떤 Heuristic을 선택했는가?</p>
+<p>왜 해당 Heuristic이 <strong>admissible</strong>한가?</p>
+<hr />
+<h3 id="data-structure">Data Structure</h3>
+<p>왜 해당 자료구조를 선택했는가?</p>
+<p>예를 들어 Search 구현에서는 다음과 같은 선택이 생길 수 있다.</p>
+<pre><code class="language-text">Open Set
+Closed Set
+Priority Queue
+State Representation
+Parent Tracking
+</code></pre>
+<p>각 구조가 Search의 시간 및 메모리 사용에 어떤 영향을 주는지 설명할 수 있어야 한다.</p>
+<hr />
+<h3 id="puzzle">다양한 크기의 Puzzle</h3>
+<p>평가 시 하나의 <code>3 × 3</code> 예제만 보여주는 것이 아니라
+여러 크기의 Puzzle에서 프로그램이 정상적으로 동작하는 예제를 준비해야 한다.</p>
+<hr />
+<h1 id="_2">구현 관점에서 다시 보기</h1>
+<p>Subject 전체를 실제 개발 작업으로 바꾸면 다음과 같이 나눌 수 있다.</p>
+<pre><code class="language-text">1. Parser
+      │
+      ▼
+2. Validation
+      │
+      ▼
+3. Puzzle Representation
+      │
+      ▼
+4. Snail Goal Generator
+      │
+      ▼
+5. Move Generation
+      │
+      ▼
+6. Solvability
+      │
+      ▼
+7. Heuristics
+      │
+      ▼
+8. A* Search
+      │
+      ▼
+9. Path Reconstruction
+      │
+      ▼
+10. Complexity Measurement
+      │
+      ▼
+11. Output
+</code></pre>
+<p>즉 이 과제에서 최종적으로 만드는 것은 단순한 Puzzle UI가 아니다.</p>
+<p>핵심은:</p>
+<blockquote>
+<p><strong>N-puzzle을 State-space Search 문제로 표현하고, admissible heuristic을 사용하는 A* 계열 알고리즘으로 해결한 뒤 그 탐색 비용과 Solution Path를 보여주는 Solver를 구현하는 것</strong></p>
+</blockquote>
+<p>이다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../puzzle/" class="btn btn-neutral float-right" title="Puzzle Representation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../puzzle/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
