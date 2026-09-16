@@ -7,20 +7,26 @@ theme:
 nav:
   - Home: index.md
 
-  - Preview:
-      - Born2beroot: preview/born2beroot.md
-      - Inception: preview/inception.md
-
   - Inception of Things:
+      - Preview:
+          - Born2beroot: preview/born2beroot.md
+          - Inception: preview/inception.md
       - Overview: iot/index.md
       - Project Guide: iot/subject.md
       - Part 1 — K3s & Vagrant: iot/part1.md
       - Part 2 — K3s & Applications: iot/part2.md
       - Part 3 — K3d & Argo CD: iot/part3.md
       - Bonus — GitLab: iot/bonus.md
-
-  - Review:
       - Review: review/index.md
+
+  - N-puzzle:
+      - Overview: npuzzle/index.md
+      - Project Guide: npuzzle/subject.md
+      - Puzzle Representation: npuzzle/puzzle.md
+      - Search Algorithms: npuzzle/search.md
+      - Heuristics: npuzzle/heuristics.md
+      - Implementation: npuzzle/implementation.md
+      - Review: npuzzle/review.md
 
 markdown_extensions:
   - tables
