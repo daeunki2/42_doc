@@ -20,14 +20,23 @@ nav:
       - Review: review/index.md
 
   - N-puzzle:
-      - Overview: npuzzle/index.md
-      - Project Guide: npuzzle/subject.md
-      - Puzzle Representation: npuzzle/puzzle.md
-      - Search Algorithms: npuzzle/search.md
-      - Heuristics: npuzzle/heuristics.md
-      - Implementation: npuzzle/implementation.md
-      - Review: npuzzle/review.md
+    - Overview: npuzzle/index.md
+    - Project Guide: npuzzle/subject.md
+    - Puzzle Representation: npuzzle/puzzle.md
+    - Search Algorithms: npuzzle/search.md
+    - Heuristics: npuzzle/heuristics.md
 
+    - Implementation:
+        - Overview: npuzzle/implementation/index.md
+        - Parsing & Validation: npuzzle/implementation/parser.md
+        - Snail Goal: npuzzle/implementation/goal.md
+        - Movement: npuzzle/implementation/movement.md
+        - Solvability: npuzzle/implementation/solvability.md
+        - A* Solver: npuzzle/implementation/astar.md
+        - GUI: npuzzle/implementation/gui.md
+
+    - Review: npuzzle/review.md
+    
 markdown_extensions:
   - tables
   - fenced_code
