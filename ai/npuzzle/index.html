@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Overview - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "ai/npuzzle/index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >N-puzzle</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Overview</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#n-puzzle_1">N-puzzle이란?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_1">단순한 퍼즐이 아니라 탐색 문제다</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#state">State란 무엇인가?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_2">모든 경우를 확인하면 안 될까?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#search-algorithm">Search Algorithm</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_3">아직 풀지도 않았는데 남은 거리를 어떻게 알까?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">모든 퍼즐이 풀리는 것은 아니다</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#goal-state">Goal State</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_5">전체 프로젝트의 흐름</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_6">이 프로젝트에서 배우는 것</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">AI / Algorithms</li>
+          <li class="breadcrumb-item">N-puzzle</li>
+      <li class="breadcrumb-item active">Overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="n-puzzle">N-puzzle</h1>
+<h2 id="n-puzzle_1">N-puzzle이란?</h2>
+<p>N-puzzle은 숫자가 적힌 타일과 하나의 빈 공간으로 이루어진 <strong>슬라이딩 퍼즐(Sliding Puzzle)</strong>이다.</p>
+<p>빈 공간과 인접한 타일을 움직여 타일의 위치를 변경할 수 있다.</p>
+<p>예를 들어 다음과 같은 <code>3 × 3</code> 퍼즐이 있다고 하자.</p>
+<pre><code class="language-text">1 2 3
+8   4
+7 6 5
+</code></pre>
+<p>목표는 간단하다.</p>
+<blockquote>
+<p>주어진 초기 상태(Initial State)에서 타일을 이동하여 목표 상태(Goal State)를 만드는 것이다.</p>
+</blockquote>
+<p><code>3 × 3</code> 퍼즐은 숫자 타일 8개와 빈 공간 하나를 가지기 때문에 일반적으로 <strong>8-puzzle</strong>이라고 부른다.</p>
+<p>마찬가지로 <code>4 × 4</code> 퍼즐은 15개의 숫자 타일을 가지며 <strong>15-puzzle</strong>이라고 부른다.</p>
+<p>N-puzzle은 이러한 퍼즐을 특정 크기에 한정하지 않고 일반화한 문제라고 볼 수 있다.</p>
+<hr />
+<h2 id="_1">단순한 퍼즐이 아니라 탐색 문제다</h2>
+<p>겉으로 보면 N-puzzle은 단순히 숫자를 움직이는 게임처럼 보인다.</p>
+<p>하지만 컴퓨터 과학에서 중요한 문제는 타일을 화면에 표시하거나 움직이는 것 자체가 아니다.</p>
+<p>핵심은 다음 질문이다.</p>
+<blockquote>
+<p><strong>컴퓨터는 초기 상태에서 목표 상태까지 도달하는 이동 순서를 어떻게 찾아낼 수 있을까?</strong></p>
+</blockquote>
+<p>하나의 퍼즐 상태에서 빈 공간 주변의 타일을 움직이면 새로운 퍼즐 상태가 만들어진다.</p>
+<pre><code class="language-text">현재 상태
+    │
+    ├── 타일 이동 ──► 새로운 상태 A
+    │
+    ├── 타일 이동 ──► 새로운 상태 B
+    │
+    └── 타일 이동 ──► 새로운 상태 C
+</code></pre>
+<p>그리고 각각의 새로운 상태에서도 다시 여러 개의 이동이 가능하다.</p>
+<p>이를 계속 확장하면 다음과 같은 구조가 만들어진다.</p>
+<pre><code class="language-text">                    초기 상태
+                   /        \
+                  /          \
+              상태 A         상태 B
+              /   \          /   \
+             /     \        /     \
+         상태 C   상태 D  상태 E   상태 F
+            .
+            .
+            .
+                       목표 상태
+</code></pre>
+<p>즉, N-puzzle은 결국 수많은 상태 중에서 목표 상태까지 이어지는 경로를 찾는 문제가 된다.</p>
+<p>이것을 <strong>상태 공간 탐색(State-space Search)</strong> 문제라고 한다.</p>
+<hr />
+<h2 id="state">State란 무엇인가?</h2>
+<p><strong>State(상태)</strong>는 특정 순간의 퍼즐 전체 모습을 의미한다.</p>
+<p>예를 들어,</p>
+<pre><code class="language-text">2 8 3
+1 6 4
+7   5
+</code></pre>
+<p>이 보드 전체가 하나의 State다.</p>
+<p>여기서 숫자 <code>5</code>를 빈 공간으로 이동하면:</p>
+<pre><code class="language-text">2 8 3
+1 6 4
+7 5
+</code></pre>
+<p>새로운 State가 만들어진다.</p>
+<p>따라서 퍼즐을 해결하는 과정은 다음과 같이 생각할 수 있다.</p>
+<pre><code class="language-text">Initial State
+      │
+      │ Move
+      ▼
+    State
+      │
+      │ Move
+      ▼
+    State
+      │
+      ▼
+     ...
+      │
+      ▼
+ Goal State
+</code></pre>
+<p>결국 N-puzzle을 해결한다는 것은 <strong>Initial State에서 Goal State까지 연결되는 State들의 경로를 찾는 것</strong>이다.</p>
+<hr />
+<h2 id="_2">모든 경우를 확인하면 안 될까?</h2>
+<p>가장 단순한 방법은 생각할 수 있는 모든 이동을 하나씩 시도하는 것이다.</p>
+<pre><code class="language-text">현재 상태
+   ↓
+가능한 상태 전부 생성
+   ↓
+그 상태에서 가능한 상태 전부 생성
+   ↓
+다시 전부 생성
+   ↓
+...
+</code></pre>
+<p>작은 퍼즐에서는 이런 방식도 동작할 수 있다.</p>
+<p>하지만 퍼즐의 크기가 커지면 가능한 상태의 수가 매우 빠르게 증가한다.</p>
+<p>그 결과 두 가지 문제가 발생한다.</p>
+<p><strong>Time</strong></p>
+<p>얼마나 많은 상태를 탐색해야 하는가?</p>
+<p><strong>Memory</strong></p>
+<p>탐색하면서 얼마나 많은 상태를 저장해야 하는가?</p>
+<p>따라서 단순히 답을 찾는 것만으로는 충분하지 않다.</p>
+<blockquote>
+<p><strong>가능한 수많은 상태 중 어떤 상태를 먼저 탐색해야 하는가?</strong></p>
+</blockquote>
+<p>이것이 이 프로젝트에서 중요한 문제다.</p>
+<hr />
+<h2 id="search-algorithm">Search Algorithm</h2>
+<p>State Space에서 Goal State를 찾기 위해 <strong>탐색 알고리즘(Search Algorithm)</strong>을 사용한다.</p>
+<p>알고리즘에 따라 State를 탐색하는 방식이 달라진다.</p>
+<p>어떤 알고리즘은 가능한 상태를 순서대로 탐색하고, 어떤 알고리즘은 목표에 가까워 보이는 상태를 우선적으로 탐색한다.</p>
+<p>N-puzzle에서 중요한 탐색 알고리즘 중 하나가 <strong>A* (A-star)</strong>이다.</p>
+<p>A*는 State를 평가할 때 두 가지 정보를 함께 사용한다.</p>
+<pre><code class="language-text">지금까지 사용한 비용
+        +
+앞으로 필요할 것으로 예상되는 비용
+        │
+        ▼
+예상되는 전체 비용
+</code></pre>
+<p>이를 일반적으로 다음과 같이 표현한다.</p>
+<pre><code class="language-text">f(n) = g(n) + h(n)
+</code></pre>
+<p>여기서:</p>
+<ul>
+<li><code>g(n)</code> : 현재 State까지 실제로 이동한 비용</li>
+<li><code>h(n)</code> : 현재 State에서 Goal까지 남은 비용의 추정값</li>
+<li><code>f(n)</code> : 해당 State를 거쳐 Goal까지 가는 전체 비용의 추정값</li>
+</ul>
+<p>A<em>가 실제로 State를 어떻게 선택하고 탐색하는지는 </em><em>Search Algorithms</em>* 페이지에서 자세히 다룬다.</p>
+<hr />
+<h2 id="_3">아직 풀지도 않았는데 남은 거리를 어떻게 알까?</h2>
+<p>여기서 문제가 하나 생긴다.</p>
+<p><code>g(n)</code>은 이미 이동한 횟수이기 때문에 정확히 알 수 있다.</p>
+<p>하지만 <code>h(n)</code>은 다르다.</p>
+<p>아직 Goal까지 가보지도 않았는데 정확히 몇 번 이동해야 하는지 어떻게 알 수 있을까?</p>
+<p>정확한 값을 알 수 없기 때문에 <strong>추정한다.</strong></p>
+<p>이때 사용하는 것이 <strong>Heuristic(휴리스틱)</strong>이다.</p>
+<p>대표적인 방법 중 하나가 <strong>Manhattan Distance</strong>다.</p>
+<p>예를 들어 어떤 타일이 Goal에서 있어야 할 위치로부터 오른쪽으로 2칸, 아래로 1칸 떨어져 있다면:</p>
+<pre><code class="language-text">2 + 1 = 3
+</code></pre>
+<p>처럼 가로와 세로 방향의 거리를 이용하여 Goal까지의 비용을 추정할 수 있다.</p>
+<p>즉 Heuristic은 정답을 알려주는 것이 아니라,</p>
+<blockquote>
+<p><strong>어떤 State가 Goal에 더 가까워 보이는가?</strong></p>
+</blockquote>
+<p>를 Search Algorithm이 판단할 수 있도록 도와준다.</p>
+<p>Heuristic의 종류와 성질은 <strong>Heuristics</strong> 페이지에서 자세히 다룬다.</p>
+<hr />
+<h2 id="_4">모든 퍼즐이 풀리는 것은 아니다</h2>
+<p>N-puzzle에서는 숫자가 올바르게 들어 있다고 해서 반드시 Goal State까지 도달할 수 있는 것은 아니다.</p>
+<p>예를 들어 두 퍼즐 모두 <code>1~8</code>과 빈 공간을 정확히 가지고 있더라도 특정 타일의 배치 관계에 따라 Goal State에 도달할 수 없는 경우가 존재한다.</p>
+<p>즉,</p>
+<pre><code class="language-text">Valid Puzzle
+</code></pre>
+<p>과</p>
+<pre><code class="language-text">Solvable Puzzle
+</code></pre>
+<p>은 서로 다른 개념이다.</p>
+<p>파일 형식과 숫자 구성이 올바르더라도 퍼즐 자체가 풀리지 않을 수 있다.</p>
+<p>따라서 Solver가 무작정 탐색을 시작하기 전에:</p>
+<blockquote>
+<p><strong>이 Initial State에서 Goal State까지 실제로 도달할 수 있는가?</strong></p>
+</blockquote>
+<p>를 판단하는 과정이 필요하다.</p>
+<hr />
+<h2 id="goal-state">Goal State</h2>
+<p>우리가 흔히 생각하는 퍼즐의 Goal은 다음과 같은 형태다.</p>
+<pre><code class="language-text">1 2 3
+4 5 6
+7 8
+</code></pre>
+<p>하지만 Goal State는 반드시 이 형태일 필요는 없다.</p>
+<p>N-puzzle 프로젝트에서는 중요한 형태로 <strong>Snail Solution</strong>이 등장한다.</p>
+<p>숫자가 바깥쪽에서 안쪽으로 달팽이처럼 회전하며 배치되는 방식이다.</p>
+<p><code>3 × 3</code>이라면 다음과 같은 형태가 될 수 있다.</p>
+<pre><code class="language-text">1 2 3
+8   4
+7 6 5
+</code></pre>
+<p>따라서 프로그램은 Goal을 단순히 고정된 배열로 생각하는 것이 아니라 <strong>퍼즐 크기에 따라 Goal State를 생성할 수 있어야 한다.</strong></p>
+<p>Goal State는 이후의 여러 과정에 영향을 준다.</p>
+<pre><code class="language-text">Goal State
+    │
+    ├── 퍼즐 완료 판단
+    ├── Heuristic 계산
+    ├── Solvability 판단
+    └── Search의 최종 목적지
+</code></pre>
+<hr />
+<h2 id="_5">전체 프로젝트의 흐름</h2>
+<p>N-puzzle 프로그램 전체를 하나의 흐름으로 보면 다음과 같다.</p>
+<pre><code class="language-text">Puzzle File
+     │
+     ▼
+   Parsing
+     │
+     ▼
+ Validation
+     │
+     ▼
+Initial State
+     │
+     ├──────────► Solvability Check
+     │
+     ▼
+ Goal State
+     │
+     ▼
+Search Algorithm
+     ▲
+     │
+  Heuristic
+     │
+     ▼
+  Solution
+     │
+     ▼
+Sequence of Moves
+</code></pre>
+<p>각 단계는 서로 다른 질문을 해결한다.</p>
+<p><strong>Parsing</strong></p>
+<blockquote>
+<p>사용자가 어떤 퍼즐을 입력했는가?</p>
+</blockquote>
+<p><strong>Validation</strong></p>
+<blockquote>
+<p>입력된 데이터가 올바른 N-puzzle인가?</p>
+</blockquote>
+<p><strong>Goal Generation</strong></p>
+<blockquote>
+<p>우리가 도달해야 하는 상태는 무엇인가?</p>
+</blockquote>
+<p><strong>Solvability</strong></p>
+<blockquote>
+<p>이 퍼즐은 실제로 Goal까지 도달할 수 있는가?</p>
+</blockquote>
+<p><strong>Search</strong></p>
+<blockquote>
+<p>어떤 이동 순서로 Goal까지 갈 수 있는가?</p>
+</blockquote>
+<p><strong>Heuristic</strong></p>
+<blockquote>
+<p>어떤 State를 먼저 탐색하는 것이 유리한가?</p>
+</blockquote>
+<hr />
+<h2 id="_6">이 프로젝트에서 배우는 것</h2>
+<p>N-puzzle의 목적은 단순히 퍼즐 게임 하나를 만드는 것이 아니다.</p>
+<p>이 프로젝트를 통해 다음과 같은 컴퓨터 과학의 핵심 개념을 경험하게 된다.</p>
+<ul>
+<li>State Representation</li>
+<li>State-space Search</li>
+<li>Graph Search</li>
+<li>Search Algorithm</li>
+<li>Heuristic</li>
+<li>A*</li>
+<li>Cost Function</li>
+<li>Solvability</li>
+<li>Time Complexity</li>
+<li>Space Complexity</li>
+</ul>
+<p>전체적인 흐름을 한 줄로 정리하면 다음과 같다.</p>
+<pre><code class="language-text">Puzzle
+   ↓
+State
+   ↓
+State Space
+   ↓
+Search Problem
+   ↓
+Search Algorithm
+   ↓
+Heuristic
+   ↓
+Solution
+</code></pre>
+<p>즉 N-puzzle을 통해 배우는 핵심 질문은 이것이다.</p>
+<blockquote>
+<p><strong>선택 가능한 경우의 수가 매우 많을 때, 컴퓨터는 어떻게 목표까지 가는 경로를 효율적으로 찾아낼 수 있는가?</strong></p>
+</blockquote>
+<p>이제부터 이 문제를 구성하는 각각의 개념을 하나씩 살펴본다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects/" class="btn btn-neutral float-left" title="Projects"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="subject/" class="btn btn-neutral float-right" title="Project Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../projects/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="subject/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

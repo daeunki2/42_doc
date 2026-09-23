@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Bonus — GitLab - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Bonus \u2014 GitLab";
+        var mkdocs_page_input_path = "infrastructure/inception-of-things/bonus.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Inception of Things</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Bonus — GitLab</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1-mandatory">1. Mandatory와의 관계</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-gitlab-cluster">2. GitLab을 Cluster 안에서 실행하기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-helm">3. Helm을 사용하는 이유</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-bonus">4. Bonus에서 유지되어야 하는 흐름</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5">5. 네트워크에서 확인할 것</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-bonus">6. Bonus를 시작하기 전 조건</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7">7. 검증 체크리스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bonus">Bonus의 핵심 질문</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Infrastructure</li>
+          <li class="breadcrumb-item">Inception of Things</li>
+      <li class="breadcrumb-item active">Bonus — GitLab</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="bonus-local-gitlab">Bonus: Local GitLab</h1>
+<p>Bonus는 Part 3에서 사용한 외부 Git Repository를 Local GitLab으로 바꾸는 과제입니다.</p>
+<p>핵심은 새로운 배포 시스템을 만드는 것이 아니라, <strong>Git Repository의 위치만 바꾸어도 기존 GitOps 흐름이 유지되는지</strong> 확인하는 것입니다.</p>
+<h2 id="1-mandatory">1. Mandatory와의 관계</h2>
+<p>Part 3의 기본 구조는 다음과 같습니다.</p>
+<pre><code class="language-text">GitHub
+    |
+    v
+Argo CD
+    |
+    v
+Kubernetes
+</code></pre>
+<p>Bonus에서는 GitHub가 Local GitLab으로 바뀝니다.</p>
+<pre><code class="language-text">Local GitLab
+    |
+    v
+Argo CD
+    |
+    v
+Kubernetes
+</code></pre>
+<p>Argo CD와 Kubernetes의 역할은 그대로입니다. 달라지는 것은 Argo CD가 Manifest를 가져오는 Git Server가 직접 운영하는 Local GitLab이라는 점입니다.</p>
+<h2 id="2-gitlab-cluster">2. GitLab을 Cluster 안에서 실행하기</h2>
+<p>Bonus의 요구사항에 따라 GitLab은 <code>gitlab</code> Namespace에서 실행됩니다.</p>
+<pre><code class="language-text">Kubernetes Cluster
+        |
+        +-- gitlab Namespace
+        |     +-- GitLab Application
+        |
+        +-- argocd Namespace
+        |     +-- Argo CD
+        |
+        +-- dev Namespace
+                    +-- Target Application
+</code></pre>
+<p>이 구조는 GitLab 자체도 Kubernetes에서 실행되는 Application이라는 점을 보여줍니다. Git Repository를 제공하는 시스템과 그 Repository를 읽는 Argo CD가 같은 Local Infrastructure 안에 있습니다.</p>
+<h2 id="3-helm">3. Helm을 사용하는 이유</h2>
+<p>GitLab처럼 구성요소가 많은 Application은 Deployment, Service, Storage, 설정값 등을 직접 하나씩 작성하면 관리해야 할 설정이 많아집니다.</p>
+<p>Helm은 Kubernetes Manifest를 Template과 Values로 묶어 복잡한 Application을 설치하고 설정하는 도구입니다.</p>
+<pre><code class="language-text">Helm Chart
+    +-- Template
+    +-- Values
+    +-- 설치/업데이트 규칙
+                |
+                v
+Kubernetes Resources
+</code></pre>
+<p>Bonus에서 Helm을 사용할 수 있다는 것은 필수라는 뜻이 아니라, 복잡한 GitLab 설치를 관리하기 위한 선택지가 있다는 의미입니다.</p>
+<h2 id="4-bonus">4. Bonus에서 유지되어야 하는 흐름</h2>
+<p>GitLab을 설치했다고 Bonus가 끝나는 것이 아닙니다. Part 3에서 검증했던 GitOps 흐름이 Local GitLab에서도 동작해야 합니다.</p>
+<pre><code class="language-text">1. Local GitLab에 Repository 생성
+2. Kubernetes Manifest Push
+3. Argo CD가 Local GitLab Repository를 Source로 사용
+4. Argo CD Application 생성
+5. dev Namespace에 Application 배포
+6. Git의 Image Tag 변경
+7. Argo CD가 변경을 감지
+8. Kubernetes Application 업데이트
+</code></pre>
+<p>외부 GitHub를 Local GitLab으로 바꾼 뒤에도 이 흐름이 유지되어야 합니다.</p>
+<h2 id="5">5. 네트워크에서 확인할 것</h2>
+<p>Argo CD가 GitLab Repository에 접근하려면 URL과 인증 정보가 올바르고, Cluster 내부에서 GitLab 주소에 도달할 수 있어야 합니다.</p>
+<pre><code class="language-text">Argo CD
+     |
+     +-- GitLab Service 주소로 접근 가능한가?
+     +-- Repository URL이 정확한가?
+     +-- 인증 정보가 올바른가?
+     +-- 필요한 Port가 열려 있는가?
+     v
+Local GitLab Repository
+</code></pre>
+<p>GitLab Web UI가 브라우저에서 열리는 것과 Argo CD가 Repository를 읽을 수 있는 것은 별개의 검증입니다.</p>
+<h2 id="6-bonus">6. Bonus를 시작하기 전 조건</h2>
+<p>Bonus는 Mandatory Part 1, Part 2, Part 3가 정상적으로 동작한 뒤 진행하는 것이 좋습니다.</p>
+<pre><code class="language-text">Part 1: Cluster 구성 성공
+                ↓
+Part 2: Application 배포 성공
+                ↓
+Part 3: GitHub + Argo CD 동기화 성공
+                ↓
+Bonus: GitHub를 Local GitLab으로 교체
+</code></pre>
+<p>기본 GitOps 흐름이 불안정한 상태에서 GitLab 설치까지 시작하면, 문제가 GitLab인지 Argo CD인지 Kubernetes인지 구분하기 어려워집니다.</p>
+<h2 id="7">7. 검증 체크리스트</h2>
+<ul>
+<li><code>gitlab</code> Namespace가 존재하는가?</li>
+<li>GitLab Pod가 Ready 상태인가?</li>
+<li>GitLab Repository를 생성하고 Push할 수 있는가?</li>
+<li>Cluster 내부에서 GitLab Service에 접근할 수 있는가?</li>
+<li>Argo CD가 Local GitLab Repository를 Source로 등록했는가?</li>
+<li>Argo CD Application이 <code>dev</code> Namespace를 Destination으로 사용하는가?</li>
+<li>Git의 변경이 실제 Application 업데이트로 이어지는가?</li>
+<li>Part 3에서 사용한 기능이 Local GitLab에서도 모두 유지되는가?</li>
+</ul>
+<h2 id="bonus">Bonus의 핵심 질문</h2>
+<ol>
+<li>GitLab은 이번 구조에서 어떤 역할을 하는가?</li>
+<li>GitLab과 Argo CD는 각각 무엇을 담당하는가?</li>
+<li>GitLab이 <code>gitlab</code> Namespace에 있다는 것은 어떤 의미인가?</li>
+<li>GitLab Web UI 접속과 Argo CD의 Repository 접근은 왜 따로 확인해야 하는가?</li>
+<li>GitHub를 GitLab으로 바꾸어도 GitOps의 핵심 개념이 변하지 않는 이유는 무엇인가?</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../part3/" class="btn btn-neutral float-left" title="Part 3 — K3d & Argo CD"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../review/" class="btn btn-neutral float-right" title="Review">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../part3/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../review/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

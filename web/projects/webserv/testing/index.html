@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>Testing and Evaluation - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Testing and Evaluation";
+        var mkdocs_page_input_path = "web/projects/webserv/testing.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Projects</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Webserv</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Testing and Evaluation</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1">1. 테스트 단계</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-build">2. Build와 실행</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-http">3. 가장 작은 HTTP 테스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-telnet">4. telnet으로 직접 보기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-method">5. Method 테스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-host-port">6. Host와 여러 Port</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-error">7. Error 테스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-upload">8. Upload와 파일 상태</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-cgi">9. CGI 테스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10-client">10. 느린 Client 테스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11-client-stress-test">11. 여러 Client와 Stress Test</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#12-nginx">12. NGINX 비교</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#13-event-loop">13. Event Loop 점검</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#14">14. 평가 직전 체크리스트</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#build">Build</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#runtime">Runtime</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_1">제출</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#15">15. 최종 자기 점검 질문</a>
+    </li>
+    </ul>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Web</li>
+          <li class="breadcrumb-item">Webserv</li>
+      <li class="breadcrumb-item active">Testing and Evaluation</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="testing-and-evaluation">Testing and Evaluation</h1>
+<p>Webserv는 “브라우저에서 페이지가 보인다”만으로 완료할 수 없습니다. HTTP 규칙, Non-blocking 제약, 여러 Client, 오류 상황을 각각 확인해야 합니다.</p>
+<h2 id="1">1. 테스트 단계</h2>
+<pre><code class="language-text">Build Test
+    ↓
+Socket Test
+    ↓
+HTTP Parser Test
+    ↓
+Static File Test
+    ↓
+Method/Route Test
+    ↓
+Upload/CGI Test
+    ↓
+Concurrent Client Test
+    ↓
+Stress and Invalid Input Test
+</code></pre>
+<p>기능을 추가할 때마다 이전 테스트를 다시 실행하는 Regression Test 습관을 만듭니다.</p>
+<h2 id="2-build">2. Build와 실행</h2>
+<pre><code class="language-bash">make
+./webserv ./conf/default.conf
+</code></pre>
+<p>확인할 것:</p>
+<ul>
+<li><code>-Wall -Wextra -Werror</code>로 경고 없이 빌드되는가?</li>
+<li><code>-std=c++98</code>을 추가해도 빌드되는가?</li>
+<li>소스 파일이 바뀌지 않았을 때 불필요한 재링크를 하지 않는가?</li>
+<li>잘못된 Configuration에서 설명 가능한 오류를 출력하는가?</li>
+</ul>
+<h2 id="3-http">3. 가장 작은 HTTP 테스트</h2>
+<p>먼저 고정 응답을 보내는 서버부터 확인합니다.</p>
+<pre><code class="language-bash">curl -v http://127.0.0.1:8080/
+</code></pre>
+<p><code>-v</code>는 Request와 Response Header를 보여주므로 Browser 화면보다 학습에 유용합니다.</p>
+<p>확인할 것:</p>
+<ul>
+<li>TCP 연결이 만들어지는가?</li>
+<li>Response Status Line이 올바른가?</li>
+<li>Header와 Body 사이에 빈 줄이 있는가?</li>
+<li><code>Content-Length</code> 또는 Connection 종료 조건이 맞는가?</li>
+<li>응답을 보낸 뒤 서버 전체가 종료되지 않는가?</li>
+</ul>
+<h2 id="4-telnet">4. telnet으로 직접 보기</h2>
+<pre><code class="language-bash">telnet 127.0.0.1 8080
+GET / HTTP/1.1
+Host: localhost
+
+</code></pre>
+<p>빈 줄을 두 번 보내야 Header의 끝을 표현할 수 있습니다. telnet은 Browser가 자동으로 추가하는 정보를 숨기지 않기 때문에 Parser 학습에 좋습니다.</p>
+<p>환경에 telnet이 없다면 <code>nc</code>를 사용할 수 있습니다.</p>
+<pre><code class="language-bash">printf 'GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' | nc 127.0.0.1 8080
+</code></pre>
+<h2 id="5-method">5. Method 테스트</h2>
+<pre><code class="language-bash">curl -i http://127.0.0.1:8080/index.html
+curl -i -X POST -d 'name=value' http://127.0.0.1:8080/upload
+curl -i -X DELETE http://127.0.0.1:8080/file.txt
+</code></pre>
+<p>각 테스트에서 단순히 Status Code만 보지 말고 다음을 기록합니다.</p>
+<pre><code class="language-text">Request Method
+Request Target
+Request Body
+Response Status
+Response Headers
+Response Body
+파일 시스템 변화
+</code></pre>
+<p>Route에서 Method를 허용하지 않으면 <code>405 Method Not Allowed</code>와 적절한 <code>Allow</code> Header를 고려해야 합니다.</p>
+<h2 id="6-host-port">6. Host와 여러 Port</h2>
+<pre><code class="language-bash">curl -i -H 'Host: site-a.local' http://127.0.0.1:8080/
+curl -i -H 'Host: site-b.local' http://127.0.0.1:8081/
+</code></pre>
+<p>과제의 필수 범위는 여러 <code>interface:port</code>를 듣는 것입니다. Host 기반 Virtual Host는 별도 확장으로 생각하되, 설정한 각 Port가 올바른 Content를 제공하는지 확인합니다.</p>
+<h2 id="7-error">7. Error 테스트</h2>
+<p>의도적으로 잘못된 Request를 보내야 합니다.</p>
+<pre><code class="language-bash">curl -i http://127.0.0.1:8080/not-found
+curl -i -X PATCH http://127.0.0.1:8080/
+curl -i http://127.0.0.1:8080/../../etc/passwd
+</code></pre>
+<p>가능한 테스트 목록:</p>
+<ul>
+<li>존재하지 않는 파일</li>
+<li>읽을 수 없는 파일</li>
+<li>디렉토리 Listing 금지</li>
+<li>허용되지 않은 Method</li>
+<li>너무 큰 Body</li>
+<li>잘못된 Request Line</li>
+<li>잘못된 Header</li>
+<li>불완전한 Request</li>
+<li>URL Root 밖으로 나가는 Path</li>
+</ul>
+<p>각 결과가 <code>404</code>, <code>403</code>, <code>405</code>, <code>413</code>, <code>400</code> 중 어떤 것인지 이유를 설명할 수 있어야 합니다.</p>
+<h2 id="8-upload">8. Upload와 파일 상태</h2>
+<pre><code class="language-bash">curl -i -X POST --data-binary '@sample.txt' http://127.0.0.1:8080/upload
+curl -i -F 'file=@sample.txt' http://127.0.0.1:8080/upload
+</code></pre>
+<p>확인할 것:</p>
+<ul>
+<li>Body가 일부만 저장되지 않았는가?</li>
+<li>설정된 Upload Directory에 저장되는가?</li>
+<li>파일 이름을 통해 경로를 탈출할 수 없는가?</li>
+<li>최대 Body 크기를 넘으면 저장을 중단하는가?</li>
+<li>성공과 실패의 상태 코드가 구분되는가?</li>
+</ul>
+<h2 id="9-cgi">9. CGI 테스트</h2>
+<p>하나의 CGI를 선택해 최소한의 동작을 확인합니다.</p>
+<pre><code class="language-text">Request
+   ↓
+Webserv
+   ↓ 환경 변수 + stdin
+CGI Program
+   ↓ stdout
+Webserv
+   ↓
+HTTP Response
+</code></pre>
+<p>확인할 것:</p>
+<ul>
+<li>CGI Process가 실행되는가?</li>
+<li>Working Directory가 올바른가?</li>
+<li>Query String이 전달되는가?</li>
+<li>POST Body가 stdin으로 전달되는가?</li>
+<li>CGI Header와 Body를 구분하는가?</li>
+<li>CGI가 종료되지 않을 때 Server 전체가 멈추지 않는가?</li>
+<li>CGI 종료 후 Zombie Process가 남지 않는가?</li>
+</ul>
+<h2 id="10-client">10. 느린 Client 테스트</h2>
+<p>Header 또는 Body를 여러 번에 나누어 천천히 보내는 Client를 준비합니다.</p>
+<pre><code class="language-text">연결
+  ↓
+Request Header 일부만 전송
+  ↓ 잠시 대기
+나머지 Header 전송
+  ↓
+Body를 작은 조각으로 전송
+</code></pre>
+<p>이 테스트에서 다른 Client의 요청이 정상 처리되는지 확인해야 합니다. 한 Client의 <code>recv()</code>가 완성된 Request를 기다리며 Block되면 설계 문제가 있는 것입니다.</p>
+<h2 id="11-client-stress-test">11. 여러 Client와 Stress Test</h2>
+<p>서버가 동시에 많은 연결을 처리하는지 확인합니다.</p>
+<pre><code class="language-bash">for i in $(seq 1 100); do
+  curl -sS http://127.0.0.1:8080/ &gt; /dev/null &amp;
+done
+wait
+</code></pre>
+<p>더 정교한 테스트는 Python이나 Go로 작성해 다음을 측정합니다.</p>
+<ul>
+<li>성공 응답 비율</li>
+<li>응답 시간</li>
+<li>연결 실패 수</li>
+<li>서버 Process 생존 여부</li>
+<li>File Descriptor 증가 여부</li>
+<li>Memory 증가 여부</li>
+</ul>
+<p>평가 중에는 한 가지 Client만 사용하지 말고 Browser, curl, telnet/nc, 자체 Test Script를 조합합니다.</p>
+<h2 id="12-nginx">12. NGINX 비교</h2>
+<p>같은 파일과 비슷한 설정으로 NGINX와 Webserv에 같은 Request를 보냅니다.</p>
+<pre><code class="language-text">같은 URL
+같은 Method
+같은 Body
+같은 Error 상황
+        ↓
+Status / Header / Body / Connection 동작 비교
+</code></pre>
+<p>NGINX와 다른 모든 동작이 틀린 것은 아닙니다. HTTP Version 차이와 과제에서 선택한 정책을 구분하면서 비교해야 합니다.</p>
+<h2 id="13-event-loop">13. Event Loop 점검</h2>
+<p>코드 리뷰 때 다음 질문을 기준으로 확인합니다.</p>
+<ul>
+<li>모든 Socket이 Non-blocking인가?</li>
+<li>Socket과 Pipe를 하나의 Event Multiplexing 호출로 관리하는가?</li>
+<li>Event 결과를 받기 전에 <code>read</code>, <code>recv</code>, <code>write</code>, <code>send</code>를 호출하는 곳이 없는가?</li>
+<li>Read Buffer와 Write Buffer가 Connection별로 분리되어 있는가?</li>
+<li>Partial Read와 Partial Write를 처리하는가?</li>
+<li><code>POLLHUP</code>, <code>POLLERR</code>, EOF를 처리하는가?</li>
+<li>Client 하나가 다른 Client를 기다리게 만들지 않는가?</li>
+</ul>
+<h2 id="14">14. 평가 직전 체크리스트</h2>
+<h3 id="build">Build</h3>
+<ul>
+<li>Makefile 필수 규칙 확인</li>
+<li>C++98 컴파일 확인</li>
+<li>경고를 Error로 취급해도 성공</li>
+<li>외부 Library와 Boost 미사용</li>
+</ul>
+<h3 id="runtime">Runtime</h3>
+<ul>
+<li>기본 Configuration으로 실행</li>
+<li>여러 Port 수신</li>
+<li>Browser 호환</li>
+<li>GET, POST, DELETE</li>
+<li>Static Website</li>
+<li>Upload</li>
+<li>Error Page</li>
+<li>Directory Listing</li>
+<li>Redirect</li>
+<li>CGI</li>
+<li>큰 Body와 잘못된 Request</li>
+<li>Stress Test</li>
+</ul>
+<h3 id="_1">제출</h3>
+<ul>
+<li>Root README가 영어인가?</li>
+<li>README 첫 줄 형식이 맞는가?</li>
+<li>Configuration과 Test 파일이 Repository에 포함되어 있는가?</li>
+<li>실행에 필요한 기본 파일이 모두 있는가?</li>
+<li>과제 PDF와 Local 환경 파일은 Git에 포함되지 않는가?</li>
+</ul>
+<h2 id="15">15. 최종 자기 점검 질문</h2>
+<ol>
+<li>왜 <code>poll</code> 또는 동등한 API를 한 번만 사용해야 하는가?</li>
+<li>Socket에서 Partial Read와 Partial Write가 발생하면 어떻게 처리하는가?</li>
+<li>Request Body의 끝을 어떻게 판단하는가?</li>
+<li>CGI가 끝났다는 것을 어떻게 판단하는가?</li>
+<li>특정 Client가 멈춰 있을 때 다른 Client는 계속 처리되는가?</li>
+<li>Route Root와 URL Path를 어떻게 안전하게 결합하는가?</li>
+<li>서버가 Crash하지 않는다는 것을 어떤 테스트로 증명할 수 있는가?</li>
+<li>평가자가 설정을 바꾸거나 작은 기능 수정을 요구해도 구조를 설명하고 수정할 수 있는가?</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../implementation/" class="btn btn-neutral float-left" title="Implementation Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../../../data/" class="btn btn-neutral float-right" title="Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../implementation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../../../data/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

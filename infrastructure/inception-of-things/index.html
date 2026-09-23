@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Overview - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "infrastructure/inception-of-things/index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Inception of Things</a>
+    <ul class="current">
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Overview</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#_1">한 문장으로 이해하기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_2">과제의 질문</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_3">전체 구조</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">선행 지식</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_5">공부하는 방법</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_6">문서 읽는 순서</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_7">최종적으로 설명할 수 있어야 하는 것</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../web/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../web/projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Infrastructure</li>
+          <li class="breadcrumb-item">Inception of Things</li>
+      <li class="breadcrumb-item active">Overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="inception-of-things">Inception of Things</h1>
+<p>Inception of Things는 Container를 실행하는 것에서 한 단계 더 나아가, 여러 Container를 <strong>Cluster에서 배포하고 관리하는 방법</strong>을 배우는 과제입니다.</p>
+<p>이 과제는 Kubernetes의 모든 기능을 다루는 프로젝트가 아닙니다. 작은 환경을 직접 만들고, Application을 배포하고, Git의 상태를 기준으로 배포를 자동화하면서 Kubernetes와 GitOps의 핵심 흐름을 경험하는 입문 프로젝트입니다.</p>
+<h2 id="_1">한 문장으로 이해하기</h2>
+<pre><code class="language-text">Vagrant로 환경을 만들고
+K3s/K3d로 Kubernetes를 실행한 뒤
+Application을 배포하고
+Argo CD로 Git과 Cluster를 동기화한다.
+</code></pre>
+<h2 id="_2">과제의 질문</h2>
+<p>각 Part는 서로 다른 질문에 답합니다.</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>핵심 질문</th>
+<th>주요 기술</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Part 1</td>
+<td>Kubernetes가 실행될 환경을 어떻게 만드는가?</td>
+<td>Vagrant, VM, K3s</td>
+</tr>
+<tr>
+<td>Part 2</td>
+<td>Kubernetes는 Application을 어떻게 실행하고 외부에 제공하는가?</td>
+<td>Pod, Deployment, Service, Ingress</td>
+</tr>
+<tr>
+<td>Part 3</td>
+<td>Application의 배포 상태를 어떻게 Git 기준으로 관리하는가?</td>
+<td>K3d, Namespace, Argo CD, GitOps</td>
+</tr>
+<tr>
+<td>Bonus</td>
+<td>Git 저장소까지 직접 운영한다면 어떻게 되는가?</td>
+<td>GitLab, Argo CD</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">전체 구조</h2>
+<pre><code class="language-text">Part 1
+Vagrant -&gt; Virtual Machines -&gt; K3s Cluster
+                          |
+Part 2                                v
+Application -&gt; Deployment -&gt; Pods -&gt; Service -&gt; Ingress
+                          ^
+Part 3                                |
+Git Repository -&gt; Argo CD -&gt; K3d/Kubernetes Cluster
+</code></pre>
+<h2 id="_4">선행 지식</h2>
+<p>처음부터 Kubernetes를 모두 공부할 필요는 없습니다. 다음 개념을 알고 있으면 과제의 설명을 따라가기 쉽습니다.</p>
+<ul>
+<li>Linux: Process, Service, IP, Port, SSH</li>
+<li>Virtual Machine: 하나의 컴퓨터 안에서 독립적인 컴퓨터 환경을 실행하는 개념</li>
+<li>Docker: Image와 Container, Network</li>
+<li>Git: Repository, commit, push, remote</li>
+<li>YAML: 설정을 계층적인 데이터로 표현하는 형식</li>
+</ul>
+<p>앞선 <code>Born2beroot</code>와 <code>Inception</code>에서 배운 VM, Linux, Network, Container 개념은 이 과제의 기반이 됩니다.</p>
+<h2 id="_5">공부하는 방법</h2>
+<p>각 Part를 다음 순서로 진행합니다.</p>
+<pre><code class="language-text">요구사항 읽기
+    ↓
+등장한 개념의 역할 이해하기
+    ↓
+구성요소 사이의 요청 흐름 그리기
+    ↓
+설정 파일 작성하기
+    ↓
+명령어로 실제 상태 확인하기
+    ↓
+문제가 생겼을 때 어느 계층인지 좁히기
+</code></pre>
+<p>설정 파일을 먼저 복사하는 것보다, 그 파일이 선언하는 <strong>원하는 상태</strong>를 먼저 말로 설명할 수 있어야 합니다.</p>
+<h2 id="_6">문서 읽는 순서</h2>
+<ol>
+<li><a href="subject/">Project Guide</a>에서 전체 요구사항과 용어를 확인합니다.</li>
+<li><a href="part1/">Part 1</a>에서 Cluster가 만들어지는 과정을 이해합니다.</li>
+<li><a href="part2/">Part 2</a>에서 Application 요청이 Pod까지 도달하는 흐름을 이해합니다.</li>
+<li><a href="part3/">Part 3</a>에서 Git이 배포의 기준이 되는 과정을 이해합니다.</li>
+<li><a href="bonus/">Bonus</a>에서 GitHub를 Local GitLab으로 바꾸는 의미를 확인합니다.</li>
+</ol>
+<h2 id="_7">최종적으로 설명할 수 있어야 하는 것</h2>
+<pre><code class="language-text">VM과 Container는 무엇이 다른가?
+K3s와 K3d는 어떤 관계인가?
+Pod, Deployment, Service, Ingress는 어떻게 연결되는가?
+Argo CD는 무엇과 무엇의 상태를 비교하는가?
+GitOps에서 Git이 Source of Truth라는 말은 무슨 뜻인가?
+</code></pre>
+<p>이 질문에 자신의 말로 답할 수 있다면, 명령어를 외운 것보다 과제의 구조를 제대로 이해한 것입니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../inception/" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="subject/" class="btn btn-neutral float-right" title="Project Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../inception/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="subject/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

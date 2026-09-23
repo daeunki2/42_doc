@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>HTTP and Networking - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "HTTP and Networking";
+        var mkdocs_page_input_path = "web/projects/webserv/http-networking.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Projects</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Webserv</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">HTTP and Networking</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1-client-server">1. Client와 Server</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-socket">2. Socket 생명주기</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#server">Server 측</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#client">Client 측</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-tcp">3. TCP는 메시지 경계를 보장하지 않는다</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-http-request">4. HTTP Request</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#request-line">Request Line</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#header">Header</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-http-response">5. HTTP Response</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-method">6. 주요 Method</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#get">GET</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#post">POST</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#delete">DELETE</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-status-code">7. 주요 Status Code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-body">8. Body의 길이</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#content-length">Content-Length</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#chunked-transfer">Chunked Transfer</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-url">9. URL과 파일 경로</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10-event-multiplexing">10. Event Multiplexing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11-non-blocking">11. Non-blocking의 의미</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#12-cgi-process">12. CGI와 Process 경계</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#13-nginx">13. NGINX란 무엇인가</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#nginx">NGINX가 하는 일</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#nginx_1">왜 NGINX를 비교 대상으로 사용하는가</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#14-nginx">14. NGINX와 비교할 때의 태도</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#15-nginx">15. NGINX 설정 파일 작성법</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#151">15.1 기본 문법</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#152-http">15.2 가장 작은 HTTP 설정</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#153-block">15.3 주요 Block</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#154-server">15.4 server의 주요 설정</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#155-location-route">15.5 location은 Route 설정이다</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#156-directory">15.6 파일과 Directory 설정</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#157-error-page-redirect">15.7 Error Page와 Redirect</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#158-method">15.8 Method 제한</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#159-cgi">15.9 CGI 설정을 이해하는 방법</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#1510-nginx-webserv">15.10 NGINX 설정을 Webserv 설계로 번역하기</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Web</li>
+          <li class="breadcrumb-item">Webserv</li>
+      <li class="breadcrumb-item active">HTTP and Networking</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="http-and-networking">HTTP and Networking</h1>
+<p>Webserv를 이해하려면 HTTP를 Application Protocol로, TCP Socket을 그 HTTP Byte를 운반하는 통로로 구분해야 합니다.</p>
+<pre><code class="language-text">HTTP: 무엇을 주고받는가
+TCP:  어떻게 연결된 상대에게 Byte를 전달하는가
+Socket: 프로그램이 TCP를 사용하는 운영체제 인터페이스
+</code></pre>
+<h2 id="1-client-server">1. Client와 Server</h2>
+<pre><code class="language-text">Browser / curl
+      |
+      | TCP Connection
+      v
+Webserv
+      |
+      v
+File, CGI, Error Response
+</code></pre>
+<p>Client가 연결을 시작하고 Request를 보내면 Server는 Request를 해석해 Response를 보냅니다. HTTP는 보통 한 연결 위에서 여러 Request를 처리할 수 있지만, 프로젝트에서는 우선 Connection 종료 조건과 Keep-Alive 동작을 명확히 정하는 것이 중요합니다.</p>
+<h2 id="2-socket">2. Socket 생명주기</h2>
+<h3 id="server">Server 측</h3>
+<pre><code class="language-text">socket()
+   ↓
+setsockopt()
+   ↓
+bind()
+   ↓
+listen()
+   ↓
+accept()
+</code></pre>
+<ul>
+<li><code>socket</code>: 통신 Endpoint를 만듭니다.</li>
+<li><code>setsockopt</code>: Socket 옵션을 설정합니다.</li>
+<li><code>bind</code>: Socket에 Local IP와 Port를 연결합니다.</li>
+<li><code>listen</code>: 들어오는 연결을 기다리는 상태로 만듭니다.</li>
+<li><code>accept</code>: 대기 중인 Client 연결을 새로운 Connected Socket으로 꺼냅니다.</li>
+</ul>
+<p>Listen Socket과 Client Socket은 역할이 다릅니다. Listen Socket은 연결을 받고, Client Socket은 Request와 Response Data를 주고받습니다.</p>
+<h3 id="client">Client 측</h3>
+<pre><code class="language-text">socket()
+   ↓
+connect()
+</code></pre>
+<p>Webserv 평가에서는 주로 Browser, <code>curl</code>, <code>telnet</code> 같은 Client가 이 과정을 수행합니다.</p>
+<h2 id="3-tcp">3. TCP는 메시지 경계를 보장하지 않는다</h2>
+<p>HTTP Request가 한 번의 <code>recv()</code>와 정확히 일치한다고 가정하면 안 됩니다.</p>
+<pre><code class="language-text">송신자가 보낸 Header
+  GET /index.html ...\r\nHost: localhost\r\n\r\n
+
+수신자가 받을 수 있는 형태
+  GET /index
+  .html ...\r\nHost:
+  localhost\r\n\r\n
+</code></pre>
+<p>TCP는 Byte Stream이므로 Application이 <code>\r\n\r\n</code>과 Content Length를 기준으로 메시지의 끝을 판단해야 합니다.</p>
+<h2 id="4-http-request">4. HTTP Request</h2>
+<p>Request는 보통 다음 구조를 가집니다.</p>
+<pre><code class="language-http">GET /index.html HTTP/1.1
+Host: localhost:8080
+Connection: close
+
+</code></pre>
+<pre><code class="language-text">Request Line
+Headers
+빈 줄
+Body (선택)
+</code></pre>
+<h3 id="request-line">Request Line</h3>
+<pre><code class="language-text">METHOD TARGET VERSION
+</code></pre>
+<ul>
+<li><code>METHOD</code>: GET, POST, DELETE 등</li>
+<li><code>TARGET</code>: URL Path와 Query String</li>
+<li><code>VERSION</code>: HTTP/1.0 또는 HTTP/1.1</li>
+</ul>
+<h3 id="header">Header</h3>
+<p>Header는 Body의 길이, Encoding, Host, Connection 등 Request의 의미를 설명합니다.</p>
+<pre><code class="language-text">Content-Length: 123
+Content-Type: application/x-www-form-urlencoded
+Transfer-Encoding: chunked
+</code></pre>
+<p>Header 이름은 대소문자 차이를 의미로 사용하지 않도록 처리해야 합니다.</p>
+<h2 id="5-http-response">5. HTTP Response</h2>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 18
+Connection: close
+
+&lt;h1&gt;Hello&lt;/h1&gt;
+</code></pre>
+<pre><code class="language-text">Status Line
+Headers
+빈 줄
+Body
+</code></pre>
+<p>Header와 Body 사이의 빈 줄은 필수 구분자입니다. 이 구분자가 없으면 Browser는 Body를 올바르게 해석하지 못합니다.</p>
+<h2 id="6-method">6. 주요 Method</h2>
+<h3 id="get">GET</h3>
+<p>Resource를 읽습니다. 일반적인 성공은 <code>200 OK</code>이며, 파일이 없으면 <code>404 Not Found</code>입니다.</p>
+<h3 id="post">POST</h3>
+<p>Server에 Data를 전달합니다. Body를 파싱하거나 Upload를 저장하거나 CGI에 전달할 수 있습니다.</p>
+<h3 id="delete">DELETE</h3>
+<p>Resource 삭제를 요청합니다. 실제로 삭제할 수 있는지와 Route가 허용하는지 확인해야 합니다.</p>
+<h2 id="7-status-code">7. 주요 Status Code</h2>
+<p>Status Code는 세 자리 숫자로 결과를 표현합니다.</p>
+<pre><code class="language-text">2xx: 성공
+3xx: 다른 위치 또는 추가 동작
+4xx: Client Request 문제
+5xx: Server 처리 문제
+</code></pre>
+<p>상태 코드는 고정된 “실패” 값이 아니라 상황을 설명하는 계약입니다. 잘못된 Method를 <code>500</code>으로 응답하면 Server 내부 오류와 Client 요청 오류를 구분할 수 없게 됩니다.</p>
+<h2 id="8-body">8. Body의 길이</h2>
+<h3 id="content-length">Content-Length</h3>
+<pre><code class="language-text">Content-Length: N
+</code></pre>
+<p>정확히 N Byte를 Body로 읽어야 합니다. Header가 완성된 뒤에도 N Byte를 모두 받을 때까지 Request는 완성되지 않습니다.</p>
+<h3 id="chunked-transfer">Chunked Transfer</h3>
+<pre><code class="language-http">Transfer-Encoding: chunked
+
+5
+hello
+0
+
+
+</code></pre>
+<p>각 Chunk는 크기와 Data로 구성되고 마지막 <code>0</code> Chunk가 끝을 나타냅니다. 서버는 필요에 따라 이를 합쳐 CGI나 내부 처리에 전달해야 합니다.</p>
+<h2 id="9-url">9. URL과 파일 경로</h2>
+<p>URL Path는 파일 시스템 경로와 같은 문자열이 아닙니다.</p>
+<pre><code class="language-text">URL:  /static/css/main.css
+Root: /var/www
+Path: /var/www/static/css/main.css
+</code></pre>
+<p>다음 항목을 별도로 처리해야 합니다.</p>
+<ul>
+<li>Percent Encoding</li>
+<li>Query String</li>
+<li>Directory Slash</li>
+<li><code>..</code> 경로</li>
+<li>파일과 디렉토리 구분</li>
+<li>Route Root 밖 접근 방지</li>
+</ul>
+<h2 id="10-event-multiplexing">10. Event Multiplexing</h2>
+<p>Blocking 서버는 한 Client의 I/O가 끝날 때까지 다음 Client를 처리하지 못할 수 있습니다. Event Multiplexing은 여러 File Descriptor 중 지금 읽거나 쓸 수 있는 것을 알려줍니다.</p>
+<pre><code class="language-text">fds 등록
+   ↓
+poll/select/kqueue/epoll 대기
+   ↓
+준비된 fd 반환
+   ↓
+해당 fd만 read/write
+</code></pre>
+<p><code>poll</code>을 쓴다면 <code>POLLIN</code>은 읽기 가능, <code>POLLOUT</code>은 쓰기 가능, <code>POLLHUP</code>과 <code>POLLERR</code>는 연결 종료나 오류 신호로 해석할 수 있습니다. 실제 매크로와 세부 의미는 사용하는 API 문서를 확인해야 합니다.</p>
+<h2 id="11-non-blocking">11. Non-blocking의 의미</h2>
+<p>Non-blocking은 호출이 무한히 기다리지 않도록 한다는 뜻입니다. 하지만 Non-blocking으로 설정했다고 해서 무조건 안전한 것은 아닙니다.</p>
+<pre><code class="language-text">이벤트 준비 확인
+      ↓
+read/recv 또는 write/send
+      ↓
+부분 처리
+      ↓
+남은 Buffer를 다음 이벤트에서 처리
+</code></pre>
+<p>과제에서는 준비 확인 없이 Socket이나 Pipe를 읽고 쓰지 않아야 합니다. 이 규칙을 지키려면 모든 Descriptor와 처리 방향을 Event Loop에서 추적해야 합니다.</p>
+<h2 id="12-cgi-process">12. CGI와 Process 경계</h2>
+<p>CGI는 Webserv가 외부 프로그램에 HTTP 관련 정보를 전달하고, 그 결과를 다시 HTTP Response로 만드는 경계입니다.</p>
+<p>주요 환경 변수는 CGI 종류와 구현에 따라 다르지만, Request Method, Query String, Content Length, Content Type, Script Name, Path Info, Server 정보 등을 정확히 전달해야 합니다.</p>
+<pre><code class="language-text">HTTP Request
+   ↓ 변환
+CGI Environment + stdin Body
+   ↓
+CGI stdout
+   ↓ 파싱
+HTTP Response
+</code></pre>
+<p>CGI Output의 Header와 Body 구분을 이해하지 못하면 동적 페이지의 Response를 만들 수 없습니다.</p>
+<h2 id="13-nginx">13. NGINX란 무엇인가</h2>
+<p>NGINX는 실제 Internet에서 널리 사용되는 고성능 Web Server이자 Reverse Proxy입니다. 정적 파일을 전달하고, HTTP 요청을 처리하고, 필요하면 뒤쪽의 Backend Application으로 요청을 전달할 수 있습니다.</p>
+<pre><code class="language-text">Browser
+   ↓
+NGINX
+   ├── 직접 Static File 제공
+   └── Backend / CGI / 다른 Server로 전달
+</code></pre>
+<p>즉 NGINX는 Webserv와 완전히 다른 종류의 프로그램이 아니라, 같은 문제를 훨씬 오랫동안 실전에서 해결해온 대표적인 Web Server입니다.</p>
+<h3 id="nginx">NGINX가 하는 일</h3>
+<ul>
+<li>Client의 TCP 연결을 받습니다.</li>
+<li>HTTP Request를 읽고 해석합니다.</li>
+<li>정적 파일을 제공합니다.</li>
+<li>Status Code와 Header를 포함한 Response를 만듭니다.</li>
+<li>여러 Client를 효율적으로 처리합니다.</li>
+<li>설정 파일에 따라 Port, Route, Error Page, Redirect를 적용합니다.</li>
+<li>필요한 경우 Backend나 CGI에 요청을 전달합니다.</li>
+</ul>
+<p>이 목록은 Webserv 과제의 요구사항과 거의 같은 문제 영역입니다. 그래서 NGINX를 살펴보면 우리가 직접 구현해야 하는 기능이 실제 Server에서는 어떤 형태로 사용되는지 이해할 수 있습니다.</p>
+<h3 id="nginx_1">왜 NGINX를 비교 대상으로 사용하는가</h3>
+<p>Webserv는 HTTP Server를 직접 만드는 과제이지만, HTTP의 모든 RFC와 모든 예외를 처음부터 완벽하게 구현하는 과제는 아닙니다. 이때 “내가 만든 동작이 합리적인가?”를 판단할 실제 기준이 필요합니다.</p>
+<p>NGINX는 다음 이유로 좋은 비교 대상이 됩니다.</p>
+<ol>
+<li>실제로 널리 사용되는 검증된 HTTP Server입니다.</li>
+<li>Browser, <code>curl</code>, <code>telnet</code>으로 직접 요청을 보내 결과를 관찰할 수 있습니다.</li>
+<li>Static File, Error, Redirect, Directory, CGI 같은 과제의 주요 기능을 비교할 수 있습니다.</li>
+<li>HTTP Header와 Status Code가 실제 Server에서 어떻게 구성되는지 볼 수 있습니다.</li>
+<li>Webserv의 구현 결과가 Protocol 문제인지, 단순히 구현 선택의 차이인지 구분하는 데 도움을 줍니다.</li>
+</ol>
+<p>단, NGINX의 결과가 항상 Webserv의 정답이라는 뜻은 아닙니다. NGINX는 많은 기능과 설정을 가진 제품이고, Webserv는 과제에서 정한 HTTP 기능의 일부를 구현합니다. 비교할 때는 먼저 과제 요구사항과 HTTP 의미를 기준으로 삼아야 합니다.</p>
+<h2 id="14-nginx">14. NGINX와 비교할 때의 태도</h2>
+<p>NGINX는 정답 코드를 제공하는 것이 아니라 관찰 가능한 기준입니다.</p>
+<pre><code class="language-text">같은 Request를 NGINX와 Webserv에 보냄
+        ↓
+Status / Header / Body / 종료 동작 비교
+        ↓
+차이가 HTTP 의미인지 구현 선택인지 판단
+</code></pre>
+<p>과제는 전체 RFC 구현을 요구하지 않지만, 비교를 통해 예상 가능한 HTTP 동작과 내 서버의 제한을 구분할 수 있습니다.</p>
+<h2 id="15-nginx">15. NGINX 설정 파일 작성법</h2>
+<p>NGINX는 설정 파일을 읽고 그 내용에 따라 Web Server를 구성합니다. Webserv도 설정 파일을 받아야 하므로, NGINX 설정은 과제의 Configuration을 설계하는 좋은 참고가 됩니다.</p>
+<h3 id="151">15.1 기본 문법</h3>
+<p>NGINX 설정은 Directive와 Block으로 구성됩니다.</p>
+<pre><code class="language-nginx">directive value;
+
+block {
+   directive value;
+}
+</code></pre>
+<ul>
+<li>Directive: 하나의 설정을 지정하는 명령입니다.</li>
+<li>Value: Directive에 전달하는 값입니다.</li>
+<li><code>;</code>: Directive의 끝입니다.</li>
+<li><code>{}</code>: 관련 설정을 하나의 Block으로 묶습니다.</li>
+<li><code>#</code>: 주석의 시작입니다.</li>
+</ul>
+<p>설정은 보통 넓은 범위에서 좁은 범위로 적용됩니다.</p>
+<pre><code class="language-text">전체 설정
+  └── http
+      └── server
+         └── location
+</code></pre>
+<h3 id="152-http">15.2 가장 작은 HTTP 설정</h3>
+<pre><code class="language-nginx">events {}
+
+http {
+   server {
+      listen 8080;
+      server_name localhost;
+
+      location / {
+         root /var/www/html;
+         index index.html;
+      }
+   }
+}
+</code></pre>
+<p>이 설정은 다음 뜻입니다.</p>
+<pre><code class="language-text">8080 Port에서 연결을 받고
+요청이 /로 시작하면
+/var/www/html 아래에서 파일을 찾고
+디렉토리 요청이면 index.html을 제공한다.
+</code></pre>
+<h3 id="153-block">15.3 주요 Block</h3>
+<table>
+<thead>
+<tr>
+<th>Block</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>events</code></td>
+<td>연결과 Event 처리에 관한 설정</td>
+</tr>
+<tr>
+<td><code>http</code></td>
+<td>HTTP 공통 설정과 Server 목록</td>
+</tr>
+<tr>
+<td><code>server</code></td>
+<td>하나의 Website 또는 Listening 정책</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>URL Path별 처리 규칙</td>
+</tr>
+</tbody>
+</table>
+<p>Webserv에서 이 Block들은 각각 Event Loop, Server Configuration, Route 자료구조로 연결해 생각할 수 있습니다.</p>
+<h3 id="154-server">15.4 <code>server</code>의 주요 설정</h3>
+<pre><code class="language-nginx">server {
+   listen 8080;
+   server_name example.local;
+   root /var/www/example;
+   index index.html;
+   client_max_body_size 10m;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Directive</th>
+<th>의미</th>
+<th>Webserv에서의 대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>listen</code></td>
+<td>Interface와 Port</td>
+<td>Listen Socket 목록</td>
+</tr>
+<tr>
+<td><code>server_name</code></td>
+<td>Host 이름</td>
+<td>Host 또는 Server 선택</td>
+</tr>
+<tr>
+<td><code>root</code></td>
+<td>파일 탐색 기준 디렉토리</td>
+<td>Route Root</td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>디렉토리 기본 파일</td>
+<td>Index 설정</td>
+</tr>
+<tr>
+<td><code>client_max_body_size</code></td>
+<td>Request Body 최대 크기</td>
+<td>Body 제한</td>
+</tr>
+</tbody>
+</table>
+<h3 id="155-location-route">15.5 <code>location</code>은 Route 설정이다</h3>
+<pre><code class="language-nginx">server {
+   listen 8080;
+
+   location / {
+      root /var/www/main;
+      index index.html;
+   }
+
+   location /uploads {
+      root /var/www/data;
+   }
+}
+</code></pre>
+<p>요청이 <code>/uploads/image.png</code>라면 <code>/uploads</code> 규칙이 선택되고, 그 규칙의 Root와 Method 정책이 적용됩니다.</p>
+<pre><code class="language-text">Request Path
+   ↓
+가장 적합한 location 선택
+   ↓
+Root, Method, Index, CGI 정책 적용
+</code></pre>
+<p>Webserv의 Route Configuration은 바로 이 문제를 해결합니다.</p>
+<h3 id="156-directory">15.6 파일과 Directory 설정</h3>
+<pre><code class="language-nginx">location / {
+   root /var/www/html;
+   index index.html index.htm;
+   autoindex off;
+}
+</code></pre>
+<ul>
+<li><code>root</code>: URL Path와 결합할 파일 탐색 기준입니다.</li>
+<li><code>index</code>: 요청 대상이 Directory일 때 먼저 찾을 파일입니다.</li>
+<li><code>autoindex on</code>: Directory Listing을 허용합니다.</li>
+<li><code>autoindex off</code>: Directory Listing을 허용하지 않습니다.</li>
+</ul>
+<p>예를 들어 Root가 <code>/var/www</code>이고 URL이 <code>/images/logo.png</code>이면 다음 파일을 찾습니다.</p>
+<pre><code class="language-text">/var/www/images/logo.png
+</code></pre>
+<p>단, <code>/../../etc/passwd</code>처럼 Root 밖으로 나가는 경로는 반드시 차단해야 합니다.</p>
+<h3 id="157-error-page-redirect">15.7 Error Page와 Redirect</h3>
+<pre><code class="language-nginx">server {
+   error_page 404 /404.html;
+
+   location /old {
+      return 301 /new;
+   }
+}
+</code></pre>
+<ul>
+<li><code>error_page</code>: 특정 Error Code에 사용할 페이지입니다.</li>
+<li><code>return 301</code>: Client에게 다른 URL로 이동하라고 알립니다.</li>
+</ul>
+<p>Redirect Response는 다음처럼 만들어집니다.</p>
+<pre><code class="language-http">HTTP/1.1 301 Moved Permanently
+Location: /new
+</code></pre>
+<p>Webserv에서는 <code>Location</code> Header와 올바른 Status Code를 직접 생성해야 합니다.</p>
+<h3 id="158-method">15.8 Method 제한</h3>
+<pre><code class="language-nginx">location /readonly {
+   limit_except GET {
+      deny all;
+   }
+}
+</code></pre>
+<p>이 설정은 <code>/readonly</code>에서 GET 외의 Method를 허용하지 않는다는 뜻입니다. Webserv에서는 다음처럼 Route의 허용 Method 목록으로 표현할 수 있습니다.</p>
+<pre><code class="language-text">Route: /readonly
+Allowed Methods: GET
+</code></pre>
+<p>허용되지 않은 Method는 보통 <code>405 Method Not Allowed</code>로 응답합니다.</p>
+<h3 id="159-cgi">15.9 CGI 설정을 이해하는 방법</h3>
+<p>NGINX는 특정 URL이나 파일 확장자를 Backend 또는 CGI와 연결할 수 있습니다. Webserv에서는 적어도 하나의 CGI를 지원해야 합니다.</p>
+<pre><code class="language-text">CGI Route: /cgi-bin
+Extension: .py
+Program:   Python CGI
+</code></pre>
+<p>이 설정이 실제로 의미하려면 다음 정보가 연결되어야 합니다.</p>
+<ul>
+<li>어떤 URL이 CGI Route인가?</li>
+<li>어떤 확장자를 CGI로 실행하는가?</li>
+<li>Script의 실제 경로는 어디인가?</li>
+<li>Query String과 Body를 어떻게 전달하는가?</li>
+<li>CGI Output을 HTTP Response로 어떻게 바꾸는가?</li>
+</ul>
+<h3 id="1510-nginx-webserv">15.10 NGINX 설정을 Webserv 설계로 번역하기</h3>
+<p>NGINX 문법을 그대로 복사하는 것이 목표는 아닙니다. 각 Directive가 해결하는 문제를 Webserv의 자료구조로 바꾸어 생각합니다.</p>
+<pre><code class="language-text">listen              → Interface/Port 목록
+server              → Server Configuration 객체
+location            → Route 규칙
+root                → 파일 탐색 기준 경로
+index               → Directory 기본 파일
+autoindex           → Directory Listing 여부
+error_page          → Error Code별 Response Body
+limit_except        → 허용 Method 목록
+return              → Redirect Response
+CGI 설정            → CGI 실행 규칙
+</code></pre>
+<p>이렇게 이해하면 NGINX 설정은 외워야 할 문법이 아니라, Web Server의 정책을 코드와 분리해서 관리하는 방법이라는 것을 알 수 있습니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../requirements/" class="btn btn-neutral float-left" title="Requirements"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../implementation/" class="btn btn-neutral float-right" title="Implementation Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../requirements/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../implementation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

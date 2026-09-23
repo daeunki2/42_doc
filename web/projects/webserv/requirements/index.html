@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>Requirements - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Requirements";
+        var mkdocs_page_input_path = "web/projects/webserv/requirements.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Projects</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Webserv</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Requirements</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1">1. 실행 형식</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2">2. 언어와 빌드 제한</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3">3. 사용 가능한 시스템 함수의 의미</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-non-blocking-event-loop">4. Non-blocking과 단일 Event Loop</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-http">5. 필수 HTTP 기능</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#get">GET</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#post">POST</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#delete">DELETE</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-static-website">6. Static Website</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-error-page-status-code">7. Error Page와 Status Code</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-port-website">8. Port와 여러 Website</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-configuration-route">9. Configuration Route 기능</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10-cgi">10. CGI</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11-macos">11. macOS 제한</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#12">12. 안정성</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#13-readme">13. README 요구사항</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#14-bonus">14. Bonus</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Web</li>
+          <li class="breadcrumb-item">Webserv</li>
+      <li class="breadcrumb-item active">Requirements</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="requirements">Requirements</h1>
+<p>이 문서는 Webserv 과제의 지시사항을 “무엇을 해야 하는가”와 “왜 필요한가”로 나누어 읽는 페이지입니다.</p>
+<h2 id="1">1. 실행 형식</h2>
+<p>실행 파일은 설정 파일을 인자로 받아 실행되어야 합니다.</p>
+<pre><code class="language-bash">./webserv [configuration file]
+</code></pre>
+<p>설정 파일은 서버가 어떤 Port에서 듣고, 어떤 URL을 어떤 파일과 연결하며, 어떤 기능을 허용할지 정의합니다. 설정 파일을 코드에 하드코딩하면 안 되는 이유는 같은 서버 프로그램으로 여러 사이트와 정책을 실행할 수 있어야 하기 때문입니다.</p>
+<h2 id="2">2. 언어와 빌드 제한</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>요구사항</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>언어</td>
+<td>C++98</td>
+</tr>
+<tr>
+<td>컴파일러</td>
+<td><code>c++</code></td>
+</tr>
+<tr>
+<td>경고</td>
+<td><code>-Wall -Wextra -Werror</code></td>
+</tr>
+<tr>
+<td>외부 라이브러리</td>
+<td>금지, Boost 포함</td>
+</tr>
+<tr>
+<td>필수 Makefile 규칙</td>
+<td><code>NAME</code>, <code>all</code>, <code>clean</code>, <code>fclean</code>, <code>re</code></td>
+</tr>
+<tr>
+<td>재링크</td>
+<td>불필요한 재링크를 하지 않아야 함</td>
+</tr>
+</tbody>
+</table>
+<p>C++98로 작성해야 하므로 최신 C++ 문법이나 외부 HTTP 라이브러리에 의존하지 않습니다. 이 제한은 Socket, Parser, Process, Resource 관리의 기본을 직접 이해하게 합니다.</p>
+<h2 id="3">3. 사용 가능한 시스템 함수의 의미</h2>
+<p>과제는 운영체제의 저수준 API를 사용해 서버를 구현하도록 합니다.</p>
+<table>
+<thead>
+<tr>
+<th>목적</th>
+<th>대표 함수</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Socket 생성과 연결</td>
+<td><code>socket</code>, <code>bind</code>, <code>listen</code>, <code>accept</code>, <code>connect</code></td>
+</tr>
+<tr>
+<td>주소 변환</td>
+<td><code>getaddrinfo</code>, <code>freeaddrinfo</code>, <code>htons</code>, <code>ntohs</code></td>
+</tr>
+<tr>
+<td>I/O</td>
+<td><code>read</code>, <code>write</code>, <code>recv</code>, <code>send</code>, <code>shutdown</code>, <code>close</code></td>
+</tr>
+<tr>
+<td>Event Multiplexing</td>
+<td><code>poll</code>, <code>select</code>, <code>epoll</code>, <code>kqueue</code></td>
+</tr>
+<tr>
+<td>Non-blocking</td>
+<td><code>fcntl</code>와 허용된 Flag</td>
+</tr>
+<tr>
+<td>CGI Process</td>
+<td><code>fork</code>, <code>execve</code>, <code>pipe</code>, <code>dup2</code>, <code>waitpid</code></td>
+</tr>
+<tr>
+<td>파일과 디렉토리</td>
+<td><code>open</code>, <code>stat</code>, <code>access</code>, <code>opendir</code>, <code>readdir</code>, <code>closedir</code></td>
+</tr>
+<tr>
+<td>오류</td>
+<td><code>errno</code>, <code>strerror</code>, <code>gai_strerror</code></td>
+</tr>
+</tbody>
+</table>
+<p>운영체제 API를 호출하는 것보다 중요한 것은 각 호출이 서버 상태에서 어느 시점에 필요한지 설명하는 것입니다.</p>
+<h2 id="4-non-blocking-event-loop">4. Non-blocking과 단일 Event Loop</h2>
+<p>서버는 항상 Non-blocking으로 동작해야 하며, Client와 Server의 모든 I/O를 하나의 <code>poll</code> 또는 동등한 Event Multiplexing 호출로 관리해야 합니다.</p>
+<pre><code class="language-text">한 번의 Event Wait
+    ├── Listen Socket 읽기 가능
+    ├── Client Socket 읽기 가능
+    ├── Client Socket 쓰기 가능
+    └── CGI Pipe 읽기/쓰기 가능
+</code></pre>
+<p>다음 규칙은 특히 엄격합니다.</p>
+<ul>
+<li><code>poll</code> 또는 동등한 호출 전에 Socket을 읽거나 쓰지 않습니다.</li>
+<li>읽기와 쓰기를 둘 다 감시합니다.</li>
+<li>I/O가 준비되지 않았다고 <code>errno</code>를 확인해 반복하는 방식으로 해결하지 않습니다.</li>
+<li>일반 디스크 파일은 Readiness 감시에서 예외지만, Socket과 Pipe는 반드시 이벤트 기반으로 처리합니다.</li>
+<li>Client 요청이 영원히 멈추지 않도록 Timeout 또는 종료 조건을 설계합니다.</li>
+</ul>
+<p>이 규칙의 목적은 한 Client의 느린 동작이 전체 서버를 막지 못하게 하는 것입니다.</p>
+<h2 id="5-http">5. 필수 HTTP 기능</h2>
+<h3 id="get">GET</h3>
+<p>정적 파일이나 디렉토리 요청을 처리해야 합니다.</p>
+<pre><code class="language-text">GET /index.html HTTP/1.1
+        ↓
+파일 탐색
+        ↓
+200 OK + 파일 내용
+</code></pre>
+<p>파일이 없으면 <code>404 Not Found</code>, 접근 권한이 없으면 상황에 맞는 오류 응답을 반환해야 합니다.</p>
+<h3 id="post">POST</h3>
+<p>Body가 포함된 요청을 처리해야 합니다. Upload나 CGI 실행에 활용할 수 있습니다.</p>
+<p>Body를 읽을 때 <code>Content-Length</code> 또는 <code>Transfer-Encoding</code>을 확인해야 하며, 한 번의 Read가 Body 전체를 준다고 가정하면 안 됩니다.</p>
+<h3 id="delete">DELETE</h3>
+<p>Configuration과 Route 정책이 허용하는 경우 요청된 자원을 삭제해야 합니다. 삭제할 수 없는 파일, 존재하지 않는 경로, 권한 문제를 각각 적절한 상태 코드로 구분해야 합니다.</p>
+<h2 id="6-static-website">6. Static Website</h2>
+<p>서버는 HTML, CSS, JavaScript, 이미지 등을 포함하는 완전한 정적 Website를 제공할 수 있어야 합니다.</p>
+<p>이를 위해 다음 흐름이 필요합니다.</p>
+<pre><code class="language-text">URL Path
+   ↓
+Route Root와 결합
+   ↓
+파일 또는 디렉토리 확인
+   ↓
+권한과 존재 여부 확인
+   ↓
+Content-Type 결정
+   ↓
+HTTP Response 작성
+</code></pre>
+<p>URL 문자열을 파일 경로로 단순히 이어붙이는 것은 위험합니다. <code>..</code>과 같은 경로가 Root 밖으로 빠져나가지 않는지 검증해야 합니다.</p>
+<h2 id="7-error-page-status-code">7. Error Page와 Status Code</h2>
+<p>설정 파일에서 사용자 정의 Error Page를 지정할 수 있어야 하고, 지정되지 않은 경우에도 기본 Error Page를 제공해야 합니다.</p>
+<p>상태 코드는 “무언가 실패했다”가 아니라 실패 원인을 표현해야 합니다.</p>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>예시 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정상 응답</td>
+<td><code>200 OK</code></td>
+</tr>
+<tr>
+<td>새로 생성됨</td>
+<td><code>201 Created</code></td>
+</tr>
+<tr>
+<td>Redirect</td>
+<td><code>301</code>, <code>302</code> 등</td>
+</tr>
+<tr>
+<td>잘못된 Request</td>
+<td><code>400 Bad Request</code></td>
+</tr>
+<tr>
+<td>권한 없음</td>
+<td><code>403 Forbidden</code></td>
+</tr>
+<tr>
+<td>파일 없음</td>
+<td><code>404 Not Found</code></td>
+</tr>
+<tr>
+<td>허용되지 않은 Method</td>
+<td><code>405 Method Not Allowed</code></td>
+</tr>
+<tr>
+<td>Body가 너무 큼</td>
+<td><code>413 Payload Too Large</code></td>
+</tr>
+<tr>
+<td>서버 내부 문제</td>
+<td><code>500 Internal Server Error</code></td>
+</tr>
+<tr>
+<td>CGI Gateway 문제</td>
+<td><code>502 Bad Gateway</code></td>
+</tr>
+<tr>
+<td>실제 사용할 상태 코드는 상황과 HTTP 버전에 맞게 설계하고, NGINX를 비교 기준으로 활용합니다.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-port-website">8. Port와 여러 Website</h2>
+<p>서버는 여러 <code>interface:port</code> 쌍을 듣고 서로 다른 Content를 제공할 수 있어야 합니다.</p>
+<pre><code class="language-text">0.0.0.0:8080 -&gt; Website A
+0.0.0.0:8081 -&gt; Website B
+</code></pre>
+<p>따라서 설정 Parser는 Server Block 또는 그에 해당하는 구조를 읽어야 하고, 각 Listen Socket을 Event Loop에 등록해야 합니다.</p>
+<p>Virtual Host는 과제의 필수 범위를 벗어나지만, 여러 Port를 지원하는 구조는 필수입니다.</p>
+<h2 id="9-configuration-route">9. Configuration Route 기능</h2>
+<p>Configuration 파일에서는 URL Route마다 다음 정책을 지정할 수 있어야 합니다.</p>
+<ul>
+<li>허용할 HTTP Method 목록</li>
+<li>HTTP Redirect</li>
+<li>요청 파일을 찾을 Root 디렉토리</li>
+<li>Directory Listing 활성화 여부</li>
+<li>Directory 요청의 기본 파일</li>
+<li>Upload 허용 여부와 저장 경로</li>
+<li>파일 확장자에 따른 CGI 실행</li>
+</ul>
+<pre><code class="language-text">Request Path: /kapouet/pouic/toto
+Route Root:   /tmp/www
+File Path:    /tmp/www/pouic/toto
+</code></pre>
+<p>Route를 찾는 순서와 가장 적합한 규칙을 선택하는 방식은 구현 전에 명확히 정해야 합니다.</p>
+<h2 id="10-cgi">10. CGI</h2>
+<p>CGI는 Web Server가 외부 프로그램을 실행해 동적인 Response를 얻는 방식입니다.</p>
+<pre><code class="language-text">Client
+  ↓ Request
+Webserv
+  ├── 환경 변수 준비
+  ├── Pipe 생성
+  ├── CGI Process 실행
+  ├── Request Body 전달
+  └── CGI Output을 HTTP Response로 변환
+</code></pre>
+<p>필수 학습 포인트는 다음과 같습니다.</p>
+<ul>
+<li><code>fork</code>는 CGI 실행에만 사용합니다.</li>
+<li><code>execve</code>로 PHP-CGI나 Python 등 하나 이상의 CGI를 실행합니다.</li>
+<li>Request와 Query String 정보를 환경 변수에 전달합니다.</li>
+<li>Chunked Request Body는 CGI에 전달하기 전에 Un-chunk해야 합니다.</li>
+<li>CGI가 <code>Content-Length</code>를 출력하지 않으면 EOF가 출력 끝을 의미할 수 있습니다.</li>
+<li>CGI를 올바른 Working Directory에서 실행해야 상대 경로가 의도대로 동작합니다.</li>
+<li>CGI의 Pipe도 Non-blocking Event Loop 규칙을 따라야 합니다.</li>
+</ul>
+<h2 id="11-macos">11. macOS 제한</h2>
+<p>macOS에서는 <code>write()</code> 동작 차이 때문에 File Descriptor를 Non-blocking으로 설정해야 합니다.</p>
+<p>macOS에서 <code>fcntl()</code> 사용은 다음 Flag로 제한됩니다.</p>
+<pre><code class="language-text">F_SETFL
+O_NONBLOCK
+FD_CLOEXEC
+</code></pre>
+<p>플랫폼별로 허용 함수와 Flag가 다른지 항상 평가 환경에 맞춰 확인해야 합니다.</p>
+<h2 id="12">12. 안정성</h2>
+<p>프로그램은 어떤 상황에서도 Crash하거나 예기치 않게 종료되어서는 안 됩니다. 특히 다음 경우를 시험해야 합니다.</p>
+<ul>
+<li>Client가 Header를 한 Byte씩 천천히 보냄</li>
+<li>Body가 매우 큼</li>
+<li>Client가 연결 중간에 끊김</li>
+<li>잘못된 Method나 Header가 들어옴</li>
+<li>존재하지 않는 파일을 요청함</li>
+<li>CGI가 실패하거나 예상과 다른 Output을 냄</li>
+<li>여러 Client가 동시에 접속함</li>
+<li>Stress Test 중 연결이 반복해서 생성되고 종료됨</li>
+</ul>
+<h2 id="13-readme">13. README 요구사항</h2>
+<p>Repository Root의 <code>README.md</code>는 영어로 작성해야 합니다.</p>
+<p>최소한 다음을 포함해야 합니다.</p>
+<ul>
+<li>첫 줄: 42 과정에서 만들어진 프로젝트임을 나타내는 Italic 문구</li>
+<li>Description</li>
+<li>Instructions</li>
+<li>Resources</li>
+<li>AI를 어떤 작업에 어떻게 사용했는지에 대한 설명</li>
+</ul>
+<p>README는 평가자와 채용 담당자가 프로젝트를 빠르게 이해하는 문서이므로, 단순히 명령어만 나열하지 말고 설계 선택과 테스트 방법도 설명하는 것이 좋습니다.</p>
+<h2 id="14-bonus">14. Bonus</h2>
+<p>Mandatory가 모든 조건에서 안정적으로 동작한 뒤에만 Bonus를 진행합니다.</p>
+<ul>
+<li>Cookie와 Session Management</li>
+<li>여러 종류의 CGI 지원</li>
+</ul>
+<p>Bonus는 필수 기능을 대신하지 않습니다. 필수 기능이 불완전하면 Bonus는 평가되지 않습니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../concepts/" class="btn btn-neutral float-left" title="Basic Concepts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../http-networking/" class="btn btn-neutral float-right" title="HTTP and Networking">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../concepts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../http-networking/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Web History and Backend - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Web History and Backend";
+        var mkdocs_page_input_path = "web/history-and-backend.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Web History and Backend</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-web">1. Web은 무엇인가</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-web">2. 초기 Web: 정적 문서의 전달</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#web">정적 Web의 장점</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#web_1">정적 Web의 한계</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-web">3. 동적 Web의 필요성</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-cgi">4. CGI의 등장</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#cgi">CGI가 해결한 문제</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cgi_1">CGI의 비용</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-web-server-backend">5. Web Server와 Backend의 분리</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#web-server">Web Server의 역할</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#backend">Backend의 역할</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-database">6. Database가 등장한 이유</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-server-side-client-side">7. Server-side와 Client-side</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#server-side">Server-side</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#client-side">Client-side</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-web-20-interactive-web">8. Web 2.0과 Interactive Web</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-api-frontendbackend">9. API와 Frontend/Backend 분리</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#10-web">10. 현대 Web의 확장</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#11-webserv">11. Webserv와 역사 연결하기</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#12">12. 이 페이지를 읽은 뒤 답할 질문</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Web</li>
+      <li class="breadcrumb-item active">Web History and Backend</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="web-backend">Web의 역사와 Backend의 탄생</h1>
+<p>Webserv는 사용자의 요청에 응답하는 HTTP Server를 직접 만드는 과제입니다. 처음에는 단순히 파일을 전달하는 프로그램처럼 보이지만, Web의 발전 과정을 따라가면 정적 파일, CGI, Backend, Database, API가 왜 등장했는지 자연스럽게 이해할 수 있습니다.</p>
+<h2 id="1-web">1. Web은 무엇인가</h2>
+<p>World Wide Web은 Internet이라는 네트워크 위에서 동작하는 정보 시스템입니다.</p>
+<pre><code class="language-text">Internet
+  └── 여러 컴퓨터가 연결된 네트워크
+
+Web
+  └── HTTP로 Resource를 요청하고 전달하는 시스템
+</code></pre>
+<p>Web을 구성하는 핵심 요소는 다음과 같습니다.</p>
+<ul>
+<li>Client: Browser처럼 요청을 보내는 프로그램</li>
+<li>Server: 요청을 받아 Resource를 반환하는 프로그램</li>
+<li>HTTP: Client와 Server가 대화하는 규칙</li>
+<li>URL: 어떤 Resource를 요청할지 표현하는 주소</li>
+<li>HTML: Browser가 화면으로 표현하는 문서 형식</li>
+</ul>
+<pre><code class="language-text">Browser
+   │  HTTP Request
+   ▼
+Web Server
+   │  HTTP Response
+   ▼
+HTML / CSS / Image / Script
+</code></pre>
+<p>Webserv 과제는 이 구조에서 <code>Web Server</code>의 내부를 직접 구현하는 경험입니다.</p>
+<h2 id="2-web">2. 초기 Web: 정적 문서의 전달</h2>
+<p>초기 Web의 기본 모델은 매우 단순했습니다. Server의 디스크에 저장된 HTML 파일을 Client가 요청하면 Server가 파일을 읽어 그대로 전달했습니다.</p>
+<pre><code class="language-text">GET /index.html
+       │
+       ▼
+Server Disk: index.html
+       │
+       ▼
+HTTP Response: HTML 파일 내용
+</code></pre>
+<p>이런 방식을 <strong>Static Web</strong>이라고 합니다. 요청이 여러 번 들어와도 Server가 전달하는 내용은 파일이 바뀌지 않는 한 같습니다.</p>
+<h3 id="web">정적 Web의 장점</h3>
+<ul>
+<li>구조가 단순합니다.</li>
+<li>응답이 빠릅니다.</li>
+<li>Server가 처리할 계산이 적습니다.</li>
+<li>파일과 URL의 관계를 이해하기 쉽습니다.</li>
+</ul>
+<h3 id="web_1">정적 Web의 한계</h3>
+<p>하지만 다음과 같은 기능은 파일만 전달해서 만들기 어렵습니다.</p>
+<ul>
+<li>사용자가 남긴 방명록 저장</li>
+<li>로그인한 사용자별 화면</li>
+<li>검색 결과 생성</li>
+<li>현재 시간이나 날씨 표시</li>
+<li>Form으로 보낸 데이터 처리</li>
+<li>Database에서 글 목록 조회</li>
+</ul>
+<p>문서는 미리 만들어져 있지만, 사용자의 입력에 따라 내용이 바뀌어야 하는 순간 새로운 실행 계층이 필요해졌습니다.</p>
+<h2 id="3-web">3. 동적 Web의 필요성</h2>
+<p>방명록을 예로 들어보겠습니다.</p>
+<pre><code class="language-text">사용자: &quot;안녕하세요&quot;를 입력
+          │
+          ▼
+Server가 입력을 처리하고 저장
+          │
+          ▼
+다음 요청에서 저장된 글을 포함한 페이지 생성
+</code></pre>
+<p>정적 HTML 파일 하나만으로는 사용자가 보낸 글을 저장하거나 다음 요청에 반영할 수 없습니다. Server가 프로그램을 실행하고, 그 결과를 HTML로 만들어야 합니다.</p>
+<p>이때 Web Server와 별도의 프로그램을 연결하는 방식으로 <strong>CGI(Common Gateway Interface)</strong>가 사용되기 시작했습니다.</p>
+<h2 id="4-cgi">4. CGI의 등장</h2>
+<p>CGI는 Web Server가 요청을 외부 프로그램에 전달하고, 외부 프로그램의 출력 결과를 다시 Client에게 전달하는 규칙입니다.</p>
+<pre><code class="language-text">Client
+  │ POST /guestbook
+  │ name=daeunki
+  ▼
+Web Server
+  │ 실행
+  ▼
+CGI Program
+  │ 데이터 처리 및 HTML 출력
+  ▼
+Web Server
+  │ HTTP Response로 포장
+  ▼
+Client Browser
+</code></pre>
+<p>CGI Program은 C, Perl, Python, PHP 등으로 작성할 수 있습니다. Web Server는 Process를 만들고, 환경 변수와 표준 입력으로 Request 정보를 전달합니다. CGI의 표준 출력을 읽어 HTTP Response의 일부로 사용합니다.</p>
+<h3 id="cgi">CGI가 해결한 문제</h3>
+<ul>
+<li>사용자의 입력을 처리할 수 있습니다.</li>
+<li>Request마다 다른 결과를 생성할 수 있습니다.</li>
+<li>Web Server와 Application Logic을 분리할 수 있습니다.</li>
+<li>여러 언어로 동적 페이지를 만들 수 있습니다.</li>
+</ul>
+<h3 id="cgi_1">CGI의 비용</h3>
+<p>전통적인 CGI는 요청마다 새로운 Process를 실행할 수 있습니다.</p>
+<pre><code class="language-text">요청 1 → CGI Process 1 생성 → 종료
+요청 2 → CGI Process 2 생성 → 종료
+요청 3 → CGI Process 3 생성 → 종료
+</code></pre>
+<p>요청이 많아지면 Process 생성과 종료 비용이 커지고, 상태 관리도 어려워집니다. 이 문제를 해결하기 위해 Web Server와 Application을 더 효율적으로 연결하는 여러 방식이 발전했습니다.</p>
+<p>Webserv에서는 CGI를 직접 연결해야 하므로, <code>fork</code>, <code>execve</code>, <code>pipe</code>, 환경 변수, 표준 입출력, Process 종료 처리를 직접 이해하게 됩니다.</p>
+<h2 id="5-web-server-backend">5. Web Server와 Backend의 분리</h2>
+<p>Web이 복잡해지면서 하나의 프로그램이 모든 역할을 맡기보다 역할을 나누기 시작했습니다.</p>
+<pre><code class="language-text">Browser
+   │
+   ▼
+Web Server
+   ├── 정적 파일 전달
+   ├── TLS 종료
+   ├── 요청 전달
+   └── 기본 보안 처리
+         │
+         ▼
+Backend Application
+   ├── 비즈니스 규칙
+   ├── 사용자 인증
+   ├── 입력 검증
+   └── 다른 시스템 호출
+         │
+         ▼
+Database
+</code></pre>
+<h3 id="web-server">Web Server의 역할</h3>
+<p>Web Server는 외부 연결을 받고 HTTP를 처리하는 입구입니다.</p>
+<ul>
+<li>Socket 연결 수락</li>
+<li>HTTP Request 읽기</li>
+<li>정적 파일 제공</li>
+<li>Response Header 작성</li>
+<li>연결과 Timeout 관리</li>
+<li>Backend 또는 CGI로 요청 전달</li>
+</ul>
+<h3 id="backend">Backend의 역할</h3>
+<p>Backend는 Web Server 뒤에서 Application의 규칙과 데이터를 처리합니다.</p>
+<ul>
+<li>사용자의 입력을 검증</li>
+<li>방명록이나 게시글 저장</li>
+<li>로그인과 권한 확인</li>
+<li>Database 조회와 변경</li>
+<li>조건에 따라 Response Data 생성</li>
+<li>다른 서비스나 API 호출</li>
+</ul>
+<p>Webserv 과제는 주로 Web Server의 역할을 구현하지만, CGI를 통해 Backend Application과 연결되는 경계를 경험하게 합니다.</p>
+<h2 id="6-database">6. Database가 등장한 이유</h2>
+<p>동적 페이지가 많아지면 데이터를 파일에 직접 저장하는 것만으로는 부족합니다.</p>
+<pre><code class="language-text">파일만 사용
+  ├── 검색이 어려움
+  ├── 동시 수정 충돌
+  ├── 관계 표현이 어려움
+  └── 권한과 일관성 관리가 어려움
+</code></pre>
+<p>Database는 데이터를 구조화하고 검색·수정·삭제하는 기능을 제공합니다.</p>
+<pre><code class="language-text">Client
+  ▼
+Web Server
+  ▼
+Backend
+  ▼
+Database
+</code></pre>
+<p>방명록을 예로 들면 Backend는 다음과 같은 작업을 담당합니다.</p>
+<ol>
+<li>Client가 보낸 이름과 메시지를 받습니다.</li>
+<li>입력 형식과 길이를 검증합니다.</li>
+<li>Database에 저장합니다.</li>
+<li>저장 결과를 확인합니다.</li>
+<li>최신 방명록 목록을 생성합니다.</li>
+</ol>
+<p>Webserv에서는 Database 자체를 구현하지 않지만, Request가 단순한 파일 읽기를 넘어 Application 처리로 이어지는 이유를 이해하는 데 도움이 됩니다.</p>
+<h2 id="7-server-side-client-side">7. Server-side와 Client-side</h2>
+<p>Web Application은 Server와 Browser 양쪽에서 처리될 수 있습니다.</p>
+<h3 id="server-side">Server-side</h3>
+<pre><code class="language-text">Request
+  ▼
+Server / Backend가 계산
+  ▼
+완성된 HTML 또는 Data Response
+  ▼
+Browser
+</code></pre>
+<p>CGI와 Backend가 대표적입니다. Database 접근이나 비밀 키 사용처럼 Server에서 해야 하는 작업을 처리합니다.</p>
+<h3 id="client-side">Client-side</h3>
+<pre><code class="language-text">HTML / CSS / JavaScript
+          ▼
+Browser가 화면과 상호작용 처리
+</code></pre>
+<p>Browser에서 버튼 동작, 화면 변화, 일부 계산을 처리합니다. 하지만 Database 비밀번호처럼 공개하면 안 되는 정보는 Client-side에 둘 수 없습니다.</p>
+<p>현대 Web은 두 방식을 함께 사용합니다.</p>
+<pre><code class="language-text">Server: 인증과 데이터 처리
+Client: 화면과 사용자 상호작용
+</code></pre>
+<h2 id="8-web-20-interactive-web">8. Web 2.0과 Interactive Web</h2>
+<p>초기의 Web이 문서를 읽는 공간이었다면, Web 2.0에서는 사용자가 직접 내용을 만들고 공유하는 서비스가 중요해졌습니다.</p>
+<pre><code class="language-text">초기 Web
+  Server → 사용자에게 문서 전달
+
+Interactive Web
+  사용자 → Server로 데이터 전송
+  Server → 저장·처리·개인화된 결과 반환
+</code></pre>
+<p>방명록, 게시판, 댓글, 파일 Upload, 로그인은 모두 사용자의 입력을 처리해야 하므로 Backend의 역할이 커졌습니다.</p>
+<p>HTTP Method도 이 흐름과 연결됩니다.</p>
+<ul>
+<li><code>GET</code>: Resource 조회</li>
+<li><code>POST</code>: Data 제출 또는 Resource 생성</li>
+<li><code>DELETE</code>: Resource 삭제</li>
+</ul>
+<p>Webserv에서 이 세 Method를 구현하는 것은 Interactive Web의 가장 기본적인 동작을 직접 만드는 것입니다.</p>
+<h2 id="9-api-frontendbackend">9. API와 Frontend/Backend 분리</h2>
+<p>Backend가 항상 HTML을 직접 만들 필요는 없습니다. Data만 JSON으로 제공하고, Browser의 JavaScript나 별도의 Mobile Application이 이를 화면으로 표현할 수도 있습니다.</p>
+<pre><code class="language-text">Browser Frontend
+       │ JSON Request
+       ▼
+Backend API
+       │
+       ▼
+Database / Other Services
+</code></pre>
+<p>이런 구조에서는 HTTP Status Code와 Header가 더욱 중요합니다. Client는 Response Body만 보는 것이 아니라 Status Code를 보고 성공·실패를 판단합니다.</p>
+<p>Webserv의 Request Parser와 Response Builder는 이 API 구조의 가장 낮은 수준을 이해하는 기반이 됩니다.</p>
+<h2 id="10-web">10. 현대 Web의 확장</h2>
+<p>서비스 규모가 커지면서 Backend도 하나의 프로그램에서 여러 구성요소로 나뉘었습니다.</p>
+<pre><code class="language-text">Reverse Proxy / Load Balancer
+          │
+          ├── Web Frontend
+          ├── User Service
+          ├── Payment Service
+          └── Search Service
+</code></pre>
+<p>이런 구조에서는 다음 문제가 중요해집니다.</p>
+<ul>
+<li>여러 Client를 동시에 처리하는가?</li>
+<li>Connection과 Resource를 효율적으로 사용하는가?</li>
+<li>Service 사이의 오류를 어떻게 전달하는가?</li>
+<li>Timeout과 Retry를 어떻게 관리하는가?</li>
+<li>로그와 상태를 어떻게 관찰하는가?</li>
+</ul>
+<p>Webserv의 Non-blocking I/O, Event Multiplexing, Timeout, 정확한 Error Response는 현대 Backend와 Server의 규모가 커져도 계속 이어지는 기본 원리입니다.</p>
+<h2 id="11-webserv">11. Webserv와 역사 연결하기</h2>
+<p>Webserv의 요구사항을 Web의 발전 흐름과 연결하면 다음과 같습니다.</p>
+<table>
+<thead>
+<tr>
+<th>Web의 발전</th>
+<th>Webserv에서 경험하는 기능</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정적 문서 전달</td>
+<td>Static Website, GET, Content-Type</td>
+</tr>
+<tr>
+<td>사용자 입력 처리</td>
+<td>POST, Request Body</td>
+</tr>
+<tr>
+<td>Resource 관리</td>
+<td>DELETE, Status Code</td>
+</tr>
+<tr>
+<td>동적 페이지</td>
+<td>CGI, Process, Pipe</td>
+</tr>
+<tr>
+<td>여러 Website 운영</td>
+<td>여러 Port, Route Configuration</td>
+</tr>
+<tr>
+<td>대규모 연결 처리</td>
+<td>Non-blocking I/O, Event Loop</td>
+</tr>
+<tr>
+<td>오류와 신뢰성</td>
+<td>Error Page, Timeout, Stress Test</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 Webserv는 단순한 옛날 방식의 Server를 만드는 과제가 아닙니다. HTTP Server가 어떤 문제를 해결해왔고, 그 문제들이 오늘날 Backend Architecture로 어떻게 확장되었는지를 가장 낮은 수준에서 확인하는 과제입니다.</p>
+<h2 id="12">12. 이 페이지를 읽은 뒤 답할 질문</h2>
+<ol>
+<li>정적 Web과 동적 Web의 차이는 무엇인가?</li>
+<li>방명록 같은 기능을 만들 때 왜 Server-side 프로그램이 필요한가?</li>
+<li>CGI는 Web Server와 Application 사이에서 어떤 역할을 하는가?</li>
+<li>Web Server와 Backend를 분리하면 어떤 장점이 있는가?</li>
+<li>Database는 파일 저장만으로 해결하기 어려운 어떤 문제를 해결하는가?</li>
+<li>Webserv에서 구현하는 GET, POST, DELETE는 Interactive Web과 어떻게 연결되는가?</li>
+<li>왜 현대 Web에서도 Socket, HTTP, Status Code, Timeout이 중요한가?</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects/" class="btn btn-neutral float-right" title="Projects">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

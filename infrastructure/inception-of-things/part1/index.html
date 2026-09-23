@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Part 1 — K3s & Vagrant - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Part 1 \u2014 K3s \u0026 Vagrant";
+        var mkdocs_page_input_path = "infrastructure/inception-of-things/part1.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Inception of Things</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Part 1 — K3s & Vagrant</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1">1. 문제를 먼저 이해하기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-vagrant">2. Vagrant는 무엇인가</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-provisioning">3. Provisioning이 필요한 이유</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-k3s-kubernetes">4. K3s와 Kubernetes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-server-agent">5. Server와 Agent</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#server">Server</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#agent">Agent</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-vm-cluster">6. VM들이 Cluster가 되는 과정</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-kubectl">7. kubectl은 무엇을 하는가</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-ssh">8. 네트워크와 SSH를 따로 확인하기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9">9. 구현 전 체크리스트</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10">10. 검증 명령의 의미</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#part-1">Part 1을 끝낸 뒤 답할 질문</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Infrastructure</li>
+          <li class="breadcrumb-item">Inception of Things</li>
+      <li class="breadcrumb-item active">Part 1 — K3s & Vagrant</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="part-1-k3s-and-vagrant">Part 1: K3s and Vagrant</h1>
+<p>Part 1의 목표는 <strong>두 개의 Virtual Machine을 만들고 하나의 K3s Kubernetes Cluster로 연결하는 것</strong>입니다.</p>
+<p>아직 Application을 배포하는 단계가 아닙니다. 먼저 Kubernetes가 실행될 인프라와 Cluster의 기본 구조를 만듭니다.</p>
+<h2 id="1">1. 문제를 먼저 이해하기</h2>
+<p>Kubernetes는 여러 Machine을 하나의 Cluster로 묶어 Container Application을 관리합니다. 그러므로 먼저 다음 환경이 필요합니다.</p>
+<pre><code class="language-text">Host Computer
+    |
+    +-- VM 1: K3s Server
+    |
+    +-- VM 2: K3s Agent
+</code></pre>
+<p>과제에서는 이 VM들을 직접 클릭해서 만드는 대신 Vagrant로 정의하고 생성합니다.</p>
+<h2 id="2-vagrant">2. Vagrant는 무엇인가</h2>
+<p>Vagrant는 Virtual Machine 환경을 코드로 정의하고 반복해서 만들 수 있게 해주는 도구입니다.</p>
+<p>직접 VM을 만들면 다음 작업을 매번 수동으로 해야 합니다.</p>
+<pre><code class="language-text">VM 생성 -&gt; CPU/RAM 설정 -&gt; Network 설정 -&gt; OS 설정 -&gt; 프로그램 설치
+</code></pre>
+<p>Vagrant를 사용하면 <code>Vagrantfile</code>에 이 설정을 기록하고 명령어로 같은 환경을 다시 만들 수 있습니다.</p>
+<pre><code class="language-text">Vagrantfile
+    |
+    v
+  vagrant up
+    |
+    v
+Virtual Machine 생성 및 설정
+</code></pre>
+<p>여기서 중요한 점은 Vagrant 자체가 Kubernetes가 아니라는 것입니다. Vagrant는 Kubernetes를 실행할 <strong>환경을 만드는 도구</strong>입니다.</p>
+<h2 id="3-provisioning">3. Provisioning이 필요한 이유</h2>
+<p>VM만 만든다고 Kubernetes가 실행되는 것은 아닙니다. VM 안에 K3s를 설치하고, Hostname과 Network를 설정하고, 필요한 파일을 배치해야 합니다.</p>
+<p>VM 생성 후 초기 설정을 자동으로 수행하는 과정을 Provisioning이라고 합니다.</p>
+<pre><code class="language-text">VM 생성
+   ↓
+Provisioning Script
+   ├── 패키지 설치
+   ├── Hostname 설정
+   ├── K3s 설치
+   └── Cluster 연결에 필요한 설정
+</code></pre>
+<p>따라서 Part 1의 Script는 단순한 설치 명령 모음이 아니라, VM을 <strong>Kubernetes Node로 바꾸는 절차</strong>입니다.</p>
+<h2 id="4-k3s-kubernetes">4. K3s와 Kubernetes</h2>
+<p>Kubernetes는 Container를 여러 Machine에서 관리하기 위한 플랫폼입니다. K3s는 Kubernetes의 핵심 기능을 유지하면서 작은 환경에서도 실행하기 쉽게 만든 경량 Distribution입니다.</p>
+<p>관계를 다음처럼 이해하면 됩니다.</p>
+<pre><code class="language-text">Kubernetes = 플랫폼과 개념
+K3s        = Kubernetes를 배포하는 한 가지 방식
+</code></pre>
+<p>Part 1에서는 K3s를 각 VM에 설치하여 Kubernetes Cluster를 구성합니다.</p>
+<h2 id="5-server-agent">5. Server와 Agent</h2>
+<p>K3s Cluster에는 역할이 나뉜 Node가 있습니다.</p>
+<h3 id="server">Server</h3>
+<p>Server는 Cluster의 제어를 담당합니다. 어떤 Node가 참여하고 있는지, 어떤 리소스가 원하는 상태인지, 어떤 작업을 수행해야 하는지 관리하는 중심 Node입니다.</p>
+<h3 id="agent">Agent</h3>
+<p>Agent는 Cluster에 참여하여 실제 Workload를 실행하는 Node입니다. Server가 내린 상태에 따라 Pod와 Container가 실행될 수 있습니다.</p>
+<pre><code class="language-text">K3s Cluster
+    |
+    +-- Server: Cluster 제어
+    |
+    +-- Agent: Workload 실행
+</code></pre>
+<p>과제의 두 VM은 다음과 같은 관계를 가집니다.</p>
+<pre><code class="language-text">VM 1: K3s Server
+  - Cluster의 중심 역할
+  - kubectl을 통해 관리
+
+VM 2: K3s Agent
+  - Server가 관리하는 Worker
+  - Cluster에 참여
+</code></pre>
+<h2 id="6-vm-cluster">6. VM들이 Cluster가 되는 과정</h2>
+<p>Agent는 혼자 Kubernetes Cluster가 되지 않습니다. Server의 주소와 인증 정보를 사용해 Server에 등록되어야 합니다.</p>
+<pre><code class="language-text">1. Server VM에서 K3s Server 시작
+2. Server의 주소와 Join Token 확인
+3. Agent VM이 Server 주소에 접속
+4. Agent가 Token으로 자신을 인증
+5. Server가 Agent를 Cluster Node로 등록
+</code></pre>
+<p>결과적으로 Host 입장에서는 VM 두 대가 따로 보이지만, Kubernetes 입장에서는 하나의 Cluster에 속한 두 Node로 보입니다.</p>
+<h2 id="7-kubectl">7. kubectl은 무엇을 하는가</h2>
+<p><code>kubectl</code>은 Kubernetes API Server와 통신하는 CLI입니다. 직접 Agent의 프로세스에 명령을 보내는 도구가 아닙니다.</p>
+<pre><code class="language-text">kubectl
+   |
+   v
+Kubernetes API Server
+   |
+   +-- Cluster 상태 조회
+   +-- 리소스 생성/변경
+   +-- Node와 Pod 상태 확인
+</code></pre>
+<p>예를 들어 <code>kubectl get nodes</code>는 현재 Cluster에 등록된 Node 목록을 API Server에 요청합니다.</p>
+<h2 id="8-ssh">8. 네트워크와 SSH를 따로 확인하기</h2>
+<p>Part 1에서 문제가 생기면 Kubernetes 문제라고 단정하지 말고 계층을 나누어 확인해야 합니다.</p>
+<pre><code class="language-text">SSH 접속 가능?
+    ↓
+VM 간 IP 통신 가능?
+    ↓
+K3s Process 실행 중?
+    ↓
+Agent가 Server에 등록됐나?
+    ↓
+kubectl이 API Server에 연결되나?
+</code></pre>
+<p>SSH가 되지 않으면 K3s보다 먼저 Vagrant Network와 VM 상태를 확인해야 합니다. Agent가 등록되지 않으면 Server 주소, Join Token, 방화벽, K3s 로그를 확인해야 합니다.</p>
+<h2 id="9">9. 구현 전 체크리스트</h2>
+<ul>
+<li>VM 두 대의 이름과 IP가 과제 요구사항과 일치하는가?</li>
+<li>두 VM 모두 SSH Key 기반 접속이 가능한가?</li>
+<li>Server와 Agent의 역할이 뒤바뀌지 않았는가?</li>
+<li>Agent가 접속할 Server의 고정 IP를 알고 있는가?</li>
+<li>Join Token을 안전하게 전달할 수 있는가?</li>
+<li><code>kubectl</code>이 올바른 kubeconfig를 사용하고 있는가?</li>
+<li>재실행했을 때 Provisioning이 실패하지 않거나 상태를 확인할 수 있는가?</li>
+</ul>
+<h2 id="10">10. 검증 명령의 의미</h2>
+<pre><code class="language-bash">vagrant status
+</code></pre>
+<p>Vagrant가 관리하는 VM의 상태를 확인합니다.</p>
+<pre><code class="language-bash">vagrant ssh &lt;server-vm&gt;
+</code></pre>
+<p>Server VM에 SSH로 접속합니다.</p>
+<pre><code class="language-bash">kubectl get nodes -o wide
+</code></pre>
+<p>Cluster에 등록된 Node와 각 Node의 주소, 역할, 상태를 확인합니다.</p>
+<pre><code class="language-bash">kubectl get pods -A
+</code></pre>
+<p>모든 Namespace의 Pod를 확인합니다. Part 1에서는 Application보다 K3s 자체 구성요소가 정상인지 보는 데 사용합니다.</p>
+<h2 id="part-1">Part 1을 끝낸 뒤 답할 질문</h2>
+<ol>
+<li>Vagrant와 K3s는 각각 어떤 문제를 해결하는가?</li>
+<li>VM 두 대는 어떤 과정을 통해 하나의 Cluster가 되는가?</li>
+<li>Server와 Agent의 역할은 어떻게 다른가?</li>
+<li><code>kubectl</code>은 어떤 경로로 Cluster에 명령을 전달하는가?</li>
+<li>SSH가 되지만 Node가 등록되지 않을 때 어느 부분을 확인해야 하는가?</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../subject/" class="btn btn-neutral float-left" title="Project Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../part2/" class="btn btn-neutral float-right" title="Part 2 — K3s & Applications">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../subject/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../part2/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

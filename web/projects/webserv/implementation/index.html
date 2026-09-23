@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../../img/favicon.ico" />
+    <title>Implementation Guide - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Implementation Guide";
+        var mkdocs_page_input_path = "web/projects/webserv/implementation.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../infrastructure/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception of Things</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../infrastructure/inception-of-things/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Projects</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Webserv</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">Implementation Guide</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1">1. 먼저 전체 흐름을 그린다</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-configuration-parser">2. Configuration Parser</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-listen-socket">3. Listen Socket 만들기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-event-loop">4. 하나의 Event Loop</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-connection-state">5. Connection State</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#_1">예시 상태 전이</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-http-parser">6. HTTP Parser</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#parser">Parser 단계</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-body">7. Body 처리</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-route-matching">8. Route Matching</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-response-builder">9. Response Builder</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10-static-file-directory">10. Static File과 Directory</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11-upload-delete">11. Upload와 DELETE</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#12-cgi-process">12. CGI Process</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#13-resource">13. Resource와 종료 처리</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#14">14. 구현 순서 제안</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Web</li>
+          <li class="breadcrumb-item">Webserv</li>
+      <li class="breadcrumb-item active">Implementation Guide</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="implementation-guide">Implementation Guide</h1>
+<p>Webserv는 기능을 하나씩 붙이는 것보다, 처음부터 <strong>이벤트 기반 서버의 구조</strong>를 세우는 것이 중요합니다. 아래 순서는 구현과 학습을 함께 진행하기 위한 제안입니다.</p>
+<h2 id="1">1. 먼저 전체 흐름을 그린다</h2>
+<pre><code class="language-text">Configuration File
+        ↓
+Server Configuration
+        ↓
+Listen Socket
+        ↓
+Event Loop
+        ↓
+Client Connection State
+        ↓
+HTTP Request Parser
+        ↓
+Route Matching
+        ↓
+Response Builder
+        ↓
+File / CGI / Upload
+</code></pre>
+<p>각 계층은 다음 계층에 필요한 정보만 전달해야 합니다. 예를 들어 Socket 계층은 “몇 Byte를 읽었는가”를 알려주고, HTTP Parser는 그 Byte가 Header인지 Body인지 판단합니다.</p>
+<h2 id="2-configuration-parser">2. Configuration Parser</h2>
+<p>처음부터 NGINX 문법 전체를 복사할 필요는 없습니다. 과제가 요구하는 데이터 모델을 먼저 만듭니다.</p>
+<pre><code class="language-text">ServerConfig
+  ├── listen addresses
+  ├── error pages
+  ├── client max body size
+  └── routes
+       ├── path
+       ├── methods
+       ├── redirect
+       ├── root
+       ├── directory listing
+       ├── index file
+       ├── upload path
+       └── CGI rules
+</code></pre>
+<p>Parser는 다음 오류를 구분해야 합니다.</p>
+<ul>
+<li>문법이 잘못됨</li>
+<li>필수 값이 없음</li>
+<li>Port나 Path 값이 유효하지 않음</li>
+<li>같은 정책이 충돌함</li>
+</ul>
+<p>설정 오류는 서버가 시작되기 전에 발견하고 명확한 메시지와 함께 종료하는 편이 안전합니다.</p>
+<h2 id="3-listen-socket">3. Listen Socket 만들기</h2>
+<p>각 <code>interface:port</code>에 대해 Listen Socket을 생성합니다.</p>
+<pre><code class="language-text">getaddrinfo
+    ↓
+socket
+    ↓
+setsockopt
+    ↓
+fcntl(O_NONBLOCK)
+    ↓
+bind
+    ↓
+listen
+    ↓
+Event Loop에 등록
+</code></pre>
+<p>Listen Socket은 Client의 Application Data를 읽는 Socket이 아니라 새로운 연결을 받아들이는 Socket입니다. Event Multiplexing에서 Readable 상태가 되면 <code>accept()</code>를 시도합니다.</p>
+<h2 id="4-event-loop">4. 하나의 Event Loop</h2>
+<p>서버의 중심은 모든 Socket과 Pipe를 관리하는 하나의 Event Loop입니다.</p>
+<pre><code class="language-cpp">while (running)
+{
+    wait_for_events();
+    handle_ready_descriptors();
+    handle_timeouts();
+}
+</code></pre>
+<p>실제 구현에서는 <code>poll()</code>을 사용할 수도 있고, macOS에서는 <code>kqueue()</code>를 사용할 수도 있습니다. 중요한 것은 함수 이름이 아니라 다음 규칙입니다.</p>
+<ol>
+<li>모든 I/O 가능한 Descriptor를 하나의 감시 목록으로 관리합니다.</li>
+<li>Event가 준비됐다는 결과를 받은 뒤에만 Socket을 읽거나 씁니다.</li>
+<li>Read Event와 Write Event를 상황에 맞게 등록합니다.</li>
+<li>한 Client를 처리하는 동안 다른 Client를 기다리며 멈추지 않습니다.</li>
+</ol>
+<h2 id="5-connection-state">5. Connection State</h2>
+<p>Client마다 독립적인 상태 객체가 필요합니다.</p>
+<pre><code class="language-text">ClientConnection
+  ├── socket fd
+  ├── input buffer
+  ├── output buffer
+  ├── parser state
+  ├── request metadata
+  ├── body progress
+  ├── selected route
+  ├── CGI state
+  └── close/keep-alive state
+</code></pre>
+<p>여러 Client가 동시에 Header를 보내면 각 Client의 진행 위치를 섞으면 안 됩니다.</p>
+<h3 id="_1">예시 상태 전이</h3>
+<pre><code class="language-text">NEW
+ ↓ accept
+READING_HEADERS
+ ↓ complete headers
+READING_BODY
+ ↓ complete body
+PROCESSING
+ ↓ response ready
+WRITING_RESPONSE
+ ↓ all bytes sent
+KEEP_ALIVE 또는 CLOSING
+</code></pre>
+<h2 id="6-http-parser">6. HTTP Parser</h2>
+<p>HTTP Parser는 문자열을 한 번에 완성된 Request로 받는다고 가정하면 안 됩니다.</p>
+<pre><code class="language-text">첫 번째 read:  GET /index
+두 번째 read: .html HTTP/1.1\r\nHost: ...
+세 번째 read: \r\n\r\n
+</code></pre>
+<p>따라서 Buffer에 받은 데이터를 누적하고, Header 종료 구분자 <code>\r\n\r\n</code>을 찾은 뒤 Request Line과 Header를 해석해야 합니다.</p>
+<h3 id="parser">Parser 단계</h3>
+<pre><code class="language-text">1. Request Line 대기
+2. Header Line 분리
+3. Header 이름 정규화/검증
+4. Body 길이 결정
+5. Body 수신
+6. 완전한 Request 생성
+</code></pre>
+<p>검증해야 하는 대표 항목은 Method, Target, HTTP Version, Header 형식, Body 크기입니다.</p>
+<h2 id="7-body">7. Body 처리</h2>
+<p><code>Content-Length</code>가 있는 Request는 정해진 Byte 수를 받을 때까지 Body를 누적합니다.</p>
+<p><code>Transfer-Encoding: chunked</code>가 사용되면 Chunk 크기를 해석하고 Chunk Header와 끝의 <code>0</code> Chunk를 제거한 뒤 실제 Body만 만들어야 합니다. CGI는 일반적으로 Un-chunk된 Body와 EOF를 기대합니다.</p>
+<pre><code class="language-text">Chunked Body
+  size\r\n
+  data\r\n
+  0\r\n
+  \r\n
+        ↓
+CGI에 전달할 순수 Body
+</code></pre>
+<p>Client Body가 설정된 최대 크기를 넘으면 전체 Body를 불필요하게 저장하지 말고 적절한 Error Response를 준비해야 합니다.</p>
+<h2 id="8-route-matching">8. Route Matching</h2>
+<p>Request Target과 Configuration Route를 비교해 가장 적합한 규칙을 선택합니다.</p>
+<pre><code class="language-text">Request: /kapouet/pouic/toto
+Route:   /kapouet
+Root:    /tmp/www
+Result:  /tmp/www/pouic/toto
+</code></pre>
+<p>Route 선택 후 다음 순서로 처리합니다.</p>
+<pre><code class="language-text">Method 허용 여부
+    ↓
+Redirect 여부
+    ↓
+파일/디렉토리 경로 계산
+    ↓
+Directory Index 또는 Listing
+    ↓
+GET/POST/DELETE 정책
+    ↓
+CGI 또는 Static File
+</code></pre>
+<p>경로를 계산할 때 URL Decode, <code>..</code>, Root 밖 접근, 디렉토리와 파일의 구분을 신중하게 처리해야 합니다.</p>
+<h2 id="9-response-builder">9. Response Builder</h2>
+<p>응답은 다음 세 부분으로 구성됩니다.</p>
+<pre><code class="language-text">Status Line
+Headers
+빈 줄
+Body
+</code></pre>
+<p>예시:</p>
+<pre><code class="language-http">HTTP/1.1 200 OK\r\n
+Content-Type: text/html\r\n
+Content-Length: 42\r\n
+Connection: close\r\n
+\r\n
+&lt;html&gt;...&lt;/html&gt;
+</code></pre>
+<p>Output Buffer에 모두 저장한 뒤 Socket이 Writable일 때 일부씩 보내야 합니다. <code>send()</code>가 전체 Buffer를 한 번에 처리한다고 가정하면 안 됩니다.</p>
+<pre><code class="language-text">Output Buffer: [전송하지 않은 전체 Response]
+       ↓ send가 일부만 전송
+Output Buffer: [남은 Response]
+       ↓ 반복
+Buffer empty -&gt; keep-alive 또는 close
+</code></pre>
+<h2 id="10-static-file-directory">10. Static File과 Directory</h2>
+<p>GET 요청이 파일을 가리키면 파일을 읽어 Response Body로 보냅니다. 디렉토리를 가리키면 Configuration에 따라 다음 중 하나를 수행합니다.</p>
+<ul>
+<li>Index 파일 제공</li>
+<li>Directory Listing 생성</li>
+<li><code>403 Forbidden</code> 또는 적절한 Error 응답</li>
+</ul>
+<p>Content-Type은 파일 확장자 또는 최소한의 MIME 매핑을 통해 설정합니다.</p>
+<h2 id="11-upload-delete">11. Upload와 DELETE</h2>
+<p>Upload는 Body를 받은 뒤 설정된 Upload 경로에 파일을 저장하는 기능입니다. 파일을 열고 쓰는 디스크 I/O는 Socket Readiness와는 다르지만, 파일 크기·권한·이름 충돌·경로 탈출을 검증해야 합니다.</p>
+<p>DELETE는 Route가 허용하는지 먼저 확인하고, 파일 존재 여부와 삭제 결과를 Response로 표현합니다.</p>
+<h2 id="12-cgi-process">12. CGI Process</h2>
+<p>CGI는 서버 Process와 외부 프로그램 사이에 Pipe를 연결하는 작업입니다.</p>
+<pre><code class="language-text">Webserv Process
+  ├── request body -&gt; stdin Pipe -&gt; CGI stdin
+  └── CGI stdout -&gt; stdout Pipe -&gt; Webserv
+</code></pre>
+<p>일반적인 순서는 다음과 같습니다.</p>
+<pre><code class="language-text">1. Pipe 생성
+2. CGI 실행에 필요한 환경 변수 준비
+3. fork
+4. Child에서 dup2로 stdin/stdout 연결
+5. Child에서 execve
+6. Parent에서 CGI Output을 Event Loop로 읽기
+7. CGI Header와 Body를 해석
+8. Client Response로 변환
+</code></pre>
+<p><code>fork()</code>는 CGI 이외의 용도로 사용하지 않습니다. CGI가 끝나지 않거나 Pipe가 닫히지 않는 경우를 대비해 Timeout과 종료 처리가 필요합니다.</p>
+<h2 id="13-resource">13. Resource와 종료 처리</h2>
+<p>각 단계가 실패하면 이미 생성한 File Descriptor와 Process를 정리해야 합니다.</p>
+<pre><code class="language-text">Client close
+  ↓
+Event 목록에서 제거
+  ↓
+Socket shutdown/close
+  ↓
+Buffer와 CGI 상태 해제
+  ↓
+Child Process wait 처리
+</code></pre>
+<p>서버가 한 번의 잘못된 Request 때문에 전체 Process를 종료하지 않도록 예외와 오류 반환 경계를 설계해야 합니다.</p>
+<h2 id="14">14. 구현 순서 제안</h2>
+<pre><code class="language-text">1. Makefile과 빈 Server 실행
+2. Listen Socket 하나 만들기
+3. Client accept와 연결 종료
+4. Event Loop로 여러 Client 관리
+5. 고정 HTTP Response 보내기
+6. Request Line과 Header Parser
+7. GET 정적 파일
+8. Error Page와 상태 코드
+9. Configuration Parser
+10. Route와 여러 Port
+11. POST, Upload, DELETE
+12. Directory Listing과 Redirect
+13. CGI
+14. Browser/Stress/비정상 입력 검증
+</code></pre>
+<p>각 단계에서 작동하는 작은 상태를 유지해야 합니다. 여러 기능을 한 번에 추가하면 Parser, Routing, I/O 문제를 구분하기 어렵습니다.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../http-networking/" class="btn btn-neutral float-left" title="HTTP and Networking"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../testing/" class="btn btn-neutral float-right" title="Testing and Evaluation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../http-networking/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../testing/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../../..";</script>
+    <script src="../../../../js/theme_extra.js"></script>
+    <script src="../../../../js/theme.js"></script>
+      <script src="../../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
