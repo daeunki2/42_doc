@@ -7,35 +7,50 @@ theme:
 nav:
   - Home: index.md
 
-  - Inception of Things:
-      - Preview:
-          - Born2beroot: preview/born2beroot.md
-          - Inception: preview/inception.md
-      - Overview: iot/index.md
-      - Project Guide: iot/subject.md
-      - Part 1 — K3s & Vagrant: iot/part1.md
-      - Part 2 — K3s & Applications: iot/part2.md
-      - Part 3 — K3d & Argo CD: iot/part3.md
-      - Bonus — GitLab: iot/bonus.md
-      - Review: review/index.md
+  - Infrastructure:
+    - Overview: infrastructure/index.md
+    - Born2beroot:
+      - Overview: infrastructure/born2beroot/index.md
+    - Inception:
+      - Overview: infrastructure/inception/index.md
+    - Inception of Things:
+      - Overview: infrastructure/inception-of-things/index.md
+      - Project Guide: infrastructure/inception-of-things/subject.md
+      - Part 1 — K3s & Vagrant: infrastructure/inception-of-things/part1.md
+      - Part 2 — K3s & Applications: infrastructure/inception-of-things/part2.md
+      - Part 3 — K3d & Argo CD: infrastructure/inception-of-things/part3.md
+      - Bonus — GitLab: infrastructure/inception-of-things/bonus.md
+      - Review: infrastructure/inception-of-things/review.md
 
-  - N-puzzle:
-    - Overview: npuzzle/index.md
-    - Project Guide: npuzzle/subject.md
-    - Puzzle Representation: npuzzle/puzzle.md
-    - Search Algorithms: npuzzle/search.md
-    - Heuristics: npuzzle/heuristics.md
+  - Web:
+    - Overview: web/index.md
+    - Projects: web/projects/index.md
 
-    - Implementation:
-        - Overview: npuzzle/implementation/index.md
-        - Parsing & Validation: npuzzle/implementation/parser.md
-        - Snail Goal: npuzzle/implementation/goal.md
-        - Movement: npuzzle/implementation/movement.md
-        - Solvability: npuzzle/implementation/solvability.md
-        - A* Solver: npuzzle/implementation/astar.md
-        - GUI: npuzzle/implementation/gui.md
+  - Data:
+    - Overview: data/index.md
+    - Projects: data/projects/index.md
 
-    - Review: npuzzle/review.md
+  - AI / Algorithms:
+    - Overview: ai/index.md
+    - Projects: ai/projects/index.md
+    - N-puzzle:
+      - Overview: ai/npuzzle/index.md
+      - Project Guide: ai/npuzzle/subject.md
+      - Puzzle Representation: ai/npuzzle/puzzle.md
+      - Search Algorithms: ai/npuzzle/search.md
+      - Heuristics: ai/npuzzle/heuristics.md
+      - Implementation:
+        - Overview: ai/npuzzle/implementation/index.md
+        - Parsing & Validation: ai/npuzzle/implementation/parser.md
+        - Snail Goal: ai/npuzzle/implementation/goal.md
+        - Movement: ai/npuzzle/implementation/movement.md
+        - Solvability: ai/npuzzle/implementation/solvability.md
+        - A* Solver: ai/npuzzle/implementation/astar.md
+        - GUI: ai/npuzzle/implementation/gui.md
+      - Review: ai/npuzzle/review.md
+
+  - Common:
+    - Overview: common/index.md
     
 markdown_extensions:
   - tables

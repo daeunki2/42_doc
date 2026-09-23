@@ -1,1 +1,14 @@
 site/
+
+# Local Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local and generated files
+.DS_Store
+*.log
+
+# Assignment source files
+*.pdf

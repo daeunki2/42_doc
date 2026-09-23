@@ -1,156 +1,45 @@
-# 42 Infrastructure Notes
+# 42 Study Notes
 
-> From a single Linux server to containers, Kubernetes, and GitOps.
+42 과제를 진행하며 학습한 개념과 구현 과정을 기록하는 문서입니다.
 
-이 문서는 42의 인프라 관련 프로젝트를 진행하며 배우고 이해한 내용을 기록하기 위한 학습 노트입니다.
+과제를 단순히 완성하는 것보다, 다음 질문에 답할 수 있는 이해를 목표로 합니다.
 
-프로젝트를 단순히 **완성하는 것**에 목적을 두기보다,
+- 무엇을 만들고 있는가?
+- 왜 이 기술이 필요한가?
+- 내부적으로 어떻게 동작하는가?
+- 다른 개념과 어떻게 연결되는가?
 
-- 이 기술은 무엇인가?
-- 왜 필요한가?
-- 어떤 문제를 해결하는가?
-- 이전에 배운 기술과 어떻게 연결되는가?
-- 실제 시스템에서는 어떤 역할을 하는가?
+## Categories
 
-를 이해하는 것을 목표로 합니다.
+| Category | Topics |
+|---|---|
+| Infrastructure | Linux, Docker, Kubernetes, GitOps |
+| Web | HTTP, Server, Backend, Frontend |
+| Data | Data Processing, Analysis, Visualization |
+| AI / Algorithms | Search, A*, Heuristics, Machine Learning |
+| Common | Git, Networking, Mathematics |
 
-42의 인프라 프로젝트들은 서로 독립되어 보이지만, 실제로는 하나의 자연스러운 흐름으로 연결됩니다.
-
----
-
-## Learning Path
-
-### Born2beroot
-
-**Virtual Machine → Linux → System Administration**
-
-가상 머신 위에 Linux 서버를 직접 구성하며  
-하나의 서버가 어떻게 만들어지고 관리되는지를 배웁니다.
-
-사용자와 권한, SSH, 방화벽, 서비스, 디스크, 시스템 모니터링 등을 다루면서  
-이후 인프라 학습의 기반이 되는 **Linux와 Server Administration**을 이해합니다.
-
----
-
-### Inception
-
-**Container → Docker → Docker Compose**
-
-하나의 서버 안에서 여러 애플리케이션을  
-어떻게 독립적인 환경으로 나누어 실행할 수 있는지 배웁니다.
-
-Docker Image와 Container를 시작으로 Network, Volume, Dockerfile을 이해하고,  
-Docker Compose를 이용해 여러 서비스를 하나의 시스템으로 구성합니다.
-
-이 단계에서 관심의 대상은 하나의 서버에서  
-**여러 Container와 Service를 어떻게 구성할 것인가**로 확장됩니다.
-
----
-
-### Inception of Things
-
-**Kubernetes → Container Orchestration → GitOps**
-
-Container를 만드는 것에서 한 단계 더 나아가  
-여러 Container를 **어떻게 배포하고, 연결하고, 원하는 상태로 유지할 것인지**를 배웁니다.
-
-Vagrant와 K3s를 이용해 Kubernetes Cluster를 구성하고,  
-Pod, Deployment, Service, Ingress를 이용해 Application을 배포합니다.
-
-마지막으로 K3d와 Argo CD를 통해  
-Git Repository의 상태를 기준으로 Application을 자동으로 배포하고 관리하는 **GitOps**까지 이어집니다.
-
----
-
-## The Big Picture
-
-전체 학습 흐름은 다음과 같습니다.
+## Learning Flow
 
 ```text
-Born2beroot
-    │
-    │  How do we manage a server?
-    ▼
-Linux / Virtual Machine
-    │
-    ▼
-Inception
-    │
-    │  How do we isolate and run applications?
-    ▼
-Docker / Container
-    │
-    ▼
-Inception of Things
-    │
-    │  How do we manage containers?
-    ▼
-Kubernetes
-    │
-    │  How do we automate deployment state?
-    ▼
-GitOps / Argo CD
-```
-
-각 프로젝트에서 새로운 도구가 등장하지만, 중요한 것은 도구 자체를 외우는 것이 아닙니다.
-
-```text
-Linux
+Subject
   ↓
-Server
-  ↓
-Container
-  ↓
-Orchestration
-  ↓
-Deployment Automation
-```
-
-**문제가 어떻게 변하고, 그 문제를 해결하기 위해 다음 기술이 왜 등장하는지 이해하는 것.**
-
-이것이 이 문서의 가장 중요한 학습 방향입니다.
-
----
-
-## How This Documentation Is Organized
-
-각 프로젝트의 문서는 가능한 한 다음 순서로 정리합니다.
-
-```text
-What?
-  ↓
-Why?
-  ↓
-How does it work?
-  ↓
-How do the components connect?
+Concepts
   ↓
 Implementation
   ↓
 Verification
+  ↓
+Review
 ```
 
-명령어나 설정 파일을 바로 작성하기 전에  
-먼저 **무엇을 만들고 있는지와 왜 그렇게 구성하는지** 이해합니다.
+각 분야와 과제는 이 흐름에 따라 정리합니다. 명령어나 코드를 기록하는 데 그치지 않고, 실제 시스템과 구현에서 각 요소가 어떤 역할을 하는지 설명하는 것을 중요하게 생각합니다.
 
-구현 후에는 실제 명령어와 동작 결과를 통해  
-배운 개념이 시스템에서 어떻게 나타나는지 다시 확인합니다.
+## Current Projects
 
----
+현재 문서에는 다음 과제와 학습 주제가 정리되어 있습니다.
 
-## Current Progress
+- Infrastructure: Born2beroot, Inception, Inception of Things
+- AI / Algorithms: N-puzzle, A* Search, Heuristics
 
-```text
-Born2beroot          ✓
-      ↓
-Inception            ✓
-      ↓
-Inception of Things  ← Current
-      ↓
-Kubernetes
-      ↓
-GitOps
-```
-
-현재는 **Inception of Things**를 통해  
-Docker 이후의 Container Orchestration과 GitOps를 학습하고 있습니다.
+새로운 과제를 시작하거나 기존 과제를 다시 공부할 때 관련 분야 아래에 문서를 추가합니다.
