@@ -24,7 +24,15 @@ nav:
 
   - Web:
     - Overview: web/index.md
+    - Web History and Backend: web/history-and-backend.md
     - Projects: web/projects/index.md
+    - Webserv:
+      - Overview: web/projects/webserv/index.md
+      - Basic Concepts: web/projects/webserv/concepts.md
+      - Requirements: web/projects/webserv/requirements.md
+      - HTTP and Networking: web/projects/webserv/http-networking.md
+      - Implementation Guide: web/projects/webserv/implementation.md
+      - Testing and Evaluation: web/projects/webserv/testing.md
 
   - Data:
     - Overview: data/index.md
