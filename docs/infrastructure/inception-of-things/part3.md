@@ -1,219 +1,262 @@
-# Part 3: K3d, Argo CD and GitOps
+# Part 3: Git이 배포의 기준이 되는 과정
 
-Part 2까지는 `kubectl`이나 Kubernetes 설정 파일을 사용해 Cluster에 Application을 배포했습니다. Part 3에서는 배포의 기준을 개발자의 명령어에서 **Git Repository**로 옮깁니다.
+이번 Part의 질문은 **“누군가 직접 명령하지 않아도 Git에 적힌 상태로 앱을 유지할 수 있을까?”**입니다. Part 2의 Pod, Deployment, Service를 그대로 사용하면서 배포 설정을 관리하는 방법을 바꿉니다.
 
-핵심 질문은 다음과 같습니다.
+## 이 과제의 요구사항으로 무엇을 배울까?
 
-> Application의 원하는 상태를 Git에 기록하고, Cluster가 그 상태를 자동으로 따라가게 만들 수 있는가?
-
-## 1. Part 2와 무엇이 다른가
-
-Part 2의 흐름은 사람이 Cluster에 직접 명령하는 방식입니다.
+과제는 **Vagrant 없이 Docker와 K3d로 Cluster를 만들고, 공개 GitHub 저장소의 변경을 Argo CD가 자동 배포하도록 구성하라**고 요구합니다. 앱은 v1과 v2를 구분할 수 있어야 합니다.
 
 ```text
-Developer
-		|
-		+-- kubectl apply
-		v
-Kubernetes Cluster
+내 PC
+└── 실습 VM
+    └── Docker
+        └── K3d가 만든 Node Container들
+            └── K3s Cluster
+                ├── argocd Namespace -> Argo CD 구성요소
+                └── dev Namespace -> Pod -> Container -> 앱
+
+외부 GitHub 저장소 -> Argo CD가 설정 확인 -> 앱 배포 상태 변경
 ```
 
-Part 3에서는 Git에 설정을 Push하고 Argo CD가 Cluster에 반영합니다.
+이 그림은 Node들이 Cluster를 이루고 그 Cluster가 앱을 관리하는 관계입니다. 모든 앱이 별도의 “Cluster Container” 하나 안에 들어간다는 뜻은 아닙니다.
+
+| 요구사항 | 이 요구를 통해 배우는 것 |
+|---|---|
+| K3d와 Docker 사용 | Node를 실행하는 환경과 Node가 관리하는 앱의 실행 환경을 구분한다 |
+| Namespace 분리 | 같은 Cluster 안에서도 관리 범위와 이름 공간을 나눌 수 있다 |
+| 공개 GitHub에 설정 보관 | 실행할 상태의 기준과 변경 이력을 Cluster 밖에 남길 수 있다 |
+| Argo CD 자동 배포 | Git에 선언한 상태와 실제 리소스 상태를 자동으로 맞출 수 있다 |
+| v1에서 v2로 변경 후 응답 확인 | 파일 수정, 배포 반영, 앱 실행, 사용자 응답은 각각 다른 단계다 |
+
+이 Part를 읽고 나면 **“Git의 한 줄이 바뀐 뒤 누가 어떤 일을 해서 PC 안의 앱 응답이 달라지는지”** 설명할 수 있는 것이 목표입니다.
+
+## 1. 수동으로 잘 배포했는데 왜 바꿔야 할까?
+
+사람이 직접 Cluster 설정을 바꾸면 지금 돌아가는 버전이 무엇인지, 누가 어떤 이유로 바꿨는지, 다른 환경에서 무엇을 재현해야 하는지 추적하기 어려워질 수 있습니다.
+
+원하는 배포 상태를 파일로 적고 Git에 저장하면 변경 이력이 남습니다. 그런데 Git 파일만 바뀌었다고 실행 중인 앱이 저절로 바뀌지는 않습니다.
 
 ```text
-Developer
-		|
-		+-- git push
-		v
-Git Repository
-		|
-		v
-Argo CD
-		|
-		v
-Kubernetes Cluster
+Git: v2를 실행하고 싶다
+Cluster: 아직 v1이 실행 중이다
 ```
 
-이 차이를 이해하는 것이 Part 3의 중심입니다. Argo CD는 단순히 YAML을 실행하는 도구가 아니라, Git의 원하는 상태와 Cluster의 실제 상태를 계속 비교하는 시스템입니다.
+두 상태를 비교하고 연결해 주는 역할이 필요합니다. 이 과제에서는 Argo CD가 그 역할을 맡습니다.
 
-## 2. K3s와 K3d 비교
+## 2. K3d는 K3s와 무엇이 다른가?
 
-Part 1과 Part 2에서는 K3s를 사용했고, Part 3에서는 K3d를 사용합니다.
+Part 1·2에서는 Vagrant로 만든 VM에 K3s를 설치했습니다. Part 3에서는 Docker Container를 Kubernetes Node의 실행 환경으로 사용합니다.
 
-| 항목 | K3s | K3d |
+```text
+Part 1·2: VM -> K3s Node -> 앱 Pod
+Part 3:   Docker Container -> K3s Node -> 앱 Pod
+               ▲
+       K3d가 생성과 연결을 관리
+```
+
+**K3s**는 Kubernetes 배포판입니다. **K3d**는 K3s Node를 Docker Container로 쉽게 만들고 연결하는 도구입니다. 여기서 Docker는 앱 하나만 실행하기 위해 쓰는 것이 아니라, Node가 실행될 환경을 만드는 데 사용됩니다.
+
+따라서 Docker가 보는 Node Container와 Kubernetes가 보는 앱 Pod는 서로 다른 층의 대상입니다. Container 안에서 Kubernetes가 또 Container를 관리한다는 말이 이상하게 들린다면 “Node를 실행하는 환경”과 “Node가 관리하는 앱”을 구분해 보세요.
+
+## 3. Namespace는 왜 나눌까?
+
+같은 Cluster에는 배포를 관리하는 Argo CD도 있고, 실제 사용자 앱도 있습니다. 이들을 이름과 관리 범위로 구분하기 위해 **Namespace**를 사용합니다.
+
+```text
+같은 Cluster
+├── argocd Namespace: 배포를 관리하는 구성요소
+└── dev Namespace:    우리가 배포할 앱
+```
+
+Namespace는 VM을 추가하는 것도, Node를 따로 만드는 것도 아닙니다. 같은 Node에 서로 다른 Namespace의 Pod가 함께 실행될 수 있습니다.
+
+또한 Namespace를 나누기만 했다고 네트워크 통신이 자동 차단되지는 않습니다. 이름의 범위, 접근 권한 정책, 네트워크 격리는 서로 연결되지만 별도로 생각해야 하는 문제입니다.
+
+## 4. Git Repository와 Image Registry
+
+두 저장소를 먼저 구분해야 합니다.
+
+| 위치 | 들어가는 것 | 가져가는 쪽 |
 |---|---|---|
-| 정체 | 경량 Kubernetes Distribution | Docker 안에서 K3s Cluster를 실행하는 도구 |
-| 실행 환경 | VM이나 일반 Linux Host | Docker Container 기반 |
-| 주요 역할 | Kubernetes Server/Agent 제공 | 개발·실습용 K3s Cluster 생성 및 관리 |
-| 과제에서의 위치 | Part 1, Part 2 | Part 3 |
-
-K3d는 Kubernetes 그 자체가 아닙니다. K3s를 Docker Container 안에서 쉽게 실행하고 관리하기 위한 Wrapper에 가깝습니다.
+| GitHub Repository | 어떤 Image를 어떻게 실행할지 적은 설정 파일 | Argo CD |
+| Docker Hub Registry | 실행할 앱의 Image | Node의 Container Runtime |
 
 ```text
-Docker
-	|
-	v
-K3d
-	|
-	v
-K3s Server/Agent Container
-	|
-	v
-Kubernetes Cluster
+GitHub의 YAML: wil42/playground:v2를 실행하라
+                         │
+                         ▼
+Cluster의 배포 설정 변경
+                         │
+                         ▼
+Node가 Registry에서 v2 Image를 가져와 실행
 ```
 
-따라서 Part 3에서 Docker가 필요한 이유는 K3d가 K3s Node를 Container로 실행하기 때문입니다.
+**Manifest**는 Kubernetes 리소스의 원하는 상태를 적은 문서입니다. 보통 YAML 형식으로 작성합니다. YAML은 들여쓰기로 데이터의 관계를 표현하는 파일 형식이며, 그것 자체가 앱 프로그램은 아닙니다.
 
-## 3. Namespace
+Argo CD가 Git에 있는 앱 소스 코드를 자동으로 Image로 만드는 것은 아닙니다. 직접 만든 앱이라면 Image 빌드와 Registry 등록이 먼저 필요합니다.
 
-하나의 Kubernetes Cluster 안에서 리소스를 논리적으로 분리하려면 Namespace를 사용합니다.
+## 5. v1과 v2는 무엇을 바꾸는가?
 
-과제에서는 적어도 다음 두 영역을 구분합니다.
+`wil42/playground:v1`에서 `v1`은 Image의 Tag입니다. `v2`는 다른 버전을 가리키도록 준비한 Tag입니다.
 
 ```text
-Kubernetes Cluster
-		|
-		+-- argocd Namespace
-		|     +-- Argo CD Components
-		|
-		+-- dev Namespace
-					+-- Application
+v1 Image -> v1이라고 응답하는 앱
+v2 Image -> v2라고 응답하는 앱
 ```
 
-`argocd`는 배포를 관리하는 Argo CD가 위치하는 공간이고, `dev`는 Argo CD가 배포할 Application의 공간입니다.
+버전 변경은 실행 중인 Container 안에 들어가 파일을 손으로 고치는 방식이 아닙니다. 새 Image를 사용하는 Pod로 배포 상태를 전환합니다.
 
-Namespace를 사용한다고 Cluster가 두 개로 나뉘는 것은 아닙니다. 같은 Cluster 안의 리소스를 이름과 권한 관점에서 구분하는 것입니다.
+Tag 이름만 다르고 Image 내용이 같다면 사용자가 차이를 확인하기 어렵습니다. 과제에서는 두 버전을 구분할 수 있어야 합니다. 또한 Tag는 변경 가능한 이름표이므로 실제 어떤 Image를 가리키는지도 관리해야 합니다.
 
-## 4. Argo CD가 관리하는 두 상태
+## 6. GitOps와 Source of Truth
 
-Argo CD는 다음 두 상태를 비교합니다.
+**GitOps**는 Git에 선언한 상태를 기준으로 실행 환경을 관리하는 방식입니다. **Source of Truth**는 “어떤 상태가 맞는지 판단하는 기준”을 뜻합니다.
 
 ```text
-Desired State
-Git Repository에 기록된 Kubernetes 설정
-
-Actual State
-현재 Kubernetes Cluster에서 실행 중인 리소스
+사람이 원하는 변경을 Git에 기록
+    -> 변경 이력이 남음
+    -> 배포 관리 도구가 차이를 감지
+    -> Cluster 상태를 Git에 맞춤
 ```
 
-두 상태가 같으면 `Synced`, 다르면 `OutOfSync` 상태가 됩니다.
+Cluster의 상태가 Git과 다르면 어느 쪽을 기준으로 맞출지 정해야 합니다. 이 흐름에서는 Git에 적힌 상태를 기준으로 삼습니다. 실제 앱 상태를 관찰하지 않아도 된다는 뜻은 아닙니다.
+
+## 7. Argo CD는 무엇과 무엇을 비교할까?
+
+**Desired State**는 Git Manifest에 선언한 원하는 상태입니다. **Actual State**는 Cluster API를 통해 확인하는 실제 리소스 상태입니다.
 
 ```text
-Git:     image v1
-Cluster: image v1
-				 ↓
-			 Synced
+Desired: Deployment Image = v2
+Actual:  Deployment Image = v1
+                    │
+                    ▼
+                차이 발견
+                    │
+                    ▼
+        동기화: Deployment를 v2로 변경
 ```
 
-Git의 Image Tag를 `v1`에서 `v2`로 바꾸면 상태가 달라집니다.
+동기화를 **Sync**라고 부릅니다. 수동 Sync는 사람이 반영을 시작하고, 자동 Sync는 정책에 따라 감지한 차이를 자동으로 반영합니다. 과제는 자동 배포를 요구하므로 자동 Sync가 필요합니다.
+
+이 과정은 push 순간에 항상 즉시 끝나는 것이 아닙니다. Git 변경을 확인하는 주기, 다운로드, Pod 시작 시간이 있습니다. GitHub가 실행 중인 Container에 직접 파일을 밀어 넣는 방식도 아닙니다.
+
+## 8. Application: 어떤 Git을 어디에 배포할까?
+
+Argo CD에서 **Application**은 “어디의 설정을 어느 Cluster에 반영할지” 연결하는 관리 리소스입니다. 일반적인 말인 웹 Application과 구분해서 읽어야 합니다.
+
+| 질문 | Application에 기록할 정보 |
+|---|---|
+| 어디의 파일을 읽을까? | Git Repository URL |
+| 어느 버전을 따라갈까? | Branch, Tag 또는 commit |
+| 어떤 디렉터리가 앱 설정일까? | 저장소 내부 Path |
+| 어디에 배포할까? | 대상 Cluster와 Namespace |
+| 언제 반영할까? | Sync 정책 |
 
 ```text
-Git:     image v2
-Cluster: image v1
-				 ↓
-			 OutOfSync
-				 ↓
-Argo CD가 변경을 감지하고 Sync
-				 ↓
-Cluster: image v2
+Source: GitHub / main / apps/playground
+    -> Argo CD Application
+    -> Destination: 현재 Cluster / dev
 ```
 
-## 5. GitOps란 무엇인가
+Git에 파일이 있어도 Path가 틀리면 원하는 Manifest를 읽지 못합니다. 다른 브랜치를 추적하면 main의 변경이 반영되지 않을 수 있습니다. “설정이 존재한다”와 “올바른 설정을 따라간다”를 구분해야 합니다.
 
-GitOps는 Git을 시스템의 원하는 상태를 기록하는 **Source of Truth**로 사용하는 운영 방식입니다.
+## 9. Argo CD와 Kubernetes의 역할 분담
 
-일반적인 수동 배포에서는 Cluster가 실제 상태의 기준이 되기 쉽습니다.
+두 시스템 모두 상태를 맞추지만 비교하는 대상이 다릅니다.
 
 ```text
-사람 -> kubectl -> Cluster
+Argo CD:
+Git의 Manifest <-> Cluster 리소스 설정
+
+Kubernetes:
+리소스의 원하는 상태 <-> 실제 Pod 실행 상태
 ```
 
-GitOps에서는 다음 흐름이 기준이 됩니다.
+Argo CD가 Deployment의 Image를 v2로 바꾸면, Kubernetes의 Deployment 관련 관리 기능이 새 ReplicaSet과 Pod를 관리합니다. Node의 Runtime이 Image를 가져와 실행하고, 준비된 Pod가 Service 대상에 들어갑니다.
+
+Argo CD가 직접 각 Container 프로세스에 접속해서 버전 파일을 고치는 것이 아닙니다. 각 단계의 책임을 나누었기 때문에 어디서 멈췄는지도 구분할 수 있습니다.
+
+## 10. v1에서 v2까지 머릿속으로 따라가기
+
+**먼저 예상해 보기:** Git도 v2이고 Argo CD가 Synced라면 사용자도 반드시 v2 응답을 받고 있을까요?
+
+<figure class="learning-diagram" markdown="1">
+<div class="diagram-scroll" tabindex="0" role="region" aria-label="가로로 스크롤할 수 있는 학습 그림" markdown="1">
+
+[![Git의 v2 설정을 Argo CD가 Deployment에 반영하고 Kubernetes가 새 Pod를 준비합니다. Node Runtime은 별도 Registry에서 Image를 가져와 실행하고 실제 v2 응답을 확인합니다.](../../assets/diagrams/part3-gitops.svg)](../../assets/diagrams/part3-gitops.svg)
+
+</div>
+<figcaption>Argo CD는 설정을 동기화하고, Kubernetes와 Runtime은 앱 실행을 관리합니다. 그림을 누르면 원본을 크게 볼 수 있습니다.</figcaption>
+</figure>
+
+<details class="learning-check">
+<summary>생각한 뒤 해설 보기</summary>
+<p>그렇다고 단정할 수 없습니다. 설정은 반영됐어도 Image 다운로드나 앱 시작이 실패할 수 있습니다. Pod의 준비 상태와 실제 응답까지 확인해야 합니다. Git의 설정, Cluster의 설정, 실행 결과는 각각 확인할 대상입니다.</p>
+</details>
+
+이 과정에서 “Git에는 v2가 보인다”는 첫 부분만 확인한 것입니다. 실제 앱 응답까지 확인해야 변경의 결과를 알 수 있습니다.
+
+## 11. Synced와 Healthy는 다른 질문이다
+
+| 상태 | 의미 |
+|---|---|
+| Synced | 추적하는 Git 설정과 Cluster 설정이 일치하는가? |
+| OutOfSync | 두 설정 사이에 차이가 있는가? |
+| Healthy | 리소스가 기대하는 실행 상태에 도달했는가? |
+
+Git도 v2이고 Deployment도 v2이면 설정은 맞을 수 있습니다. 하지만 Image를 내려받지 못하면 Pod는 실행되지 못합니다. 따라서 Synced라는 표시만으로 앱이 정상이라는 결론을 내릴 수 없습니다.
+
+Healthy도 모든 업무 기능의 정확성을 증명하는 것은 아닙니다. 과제에서는 마지막으로 실제 응답이 v1인지 v2인지 확인해야 합니다.
+
+## 12. 수동 변경과 삭제는 어떻게 처리할까?
+
+자동 Sync와 함께 자주 보이는 정책이 두 가지 있습니다.
+
+**Self-heal**은 누군가 Cluster를 수동으로 바꿔 Git과 달라졌을 때 Git 상태로 되돌리는 정책입니다. **Prune**은 Git에서 제거한 관리 리소스를 Cluster에서도 삭제하는 정책입니다.
 
 ```text
-사람 -> Git 변경 -> Argo CD 감지 -> Cluster 동기화
+Git v2 / Cluster를 사람이 v1로 변경 -> Self-heal의 대상
+Git에서 Service 삭제 / Cluster에는 남음 -> Prune의 대상
 ```
 
-따라서 변경 이력이 Git commit으로 남고, 누가 언제 어떤 배포 상태를 요청했는지 확인할 수 있습니다.
+자동 Sync를 켠다는 것과 이 두 정책을 켠다는 것은 별도 선택입니다. 무엇을 자동화하는지 이해해야 예상치 못한 복구나 삭제를 해석할 수 있습니다. [Argo CD 자동 동기화 정책](https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/)
 
-## 6. Application 정의
+## 13. 관리 UI 접속과 앱 접속은 다르다
 
-Argo CD에서 관리할 Application은 보통 다음 정보를 가집니다.
+Argo CD 화면이 열린다는 것은 관리 프로그램에 접속했다는 뜻입니다. 사용자 앱까지 연결된다는 뜻은 아닙니다.
 
 ```text
-Source
-	- 어떤 Git Repository인가?
-	- 어떤 경로의 Manifest를 읽는가?
-
-Destination
-	- 어느 Kubernetes Cluster인가?
-	- 어느 Namespace에 배포하는가?
-
-Sync Policy
-	- 자동으로 동기화할 것인가?
-	- 수동으로 동기화할 것인가?
+관리 경로: Browser -> Argo CD UI
+사용 경로: Client  -> playground 앱
 ```
 
-이 정보가 연결되어야 Argo CD가 “어디의 설정을 어디에 반영할지” 알 수 있습니다.
+**port-forward**는 개발·확인 목적으로 로컬 포트를 Pod까지 임시 연결해 주는 방법입니다. 실행한 프로그램이 종료되거나 연결한 Pod가 교체되면 접속도 끊길 수 있습니다.
 
-## 7. Image Tag 변경을 배포로 연결하기
+이때 localhost는 port-forward를 실행한 환경입니다. 실습 VM에서 연결을 열었는데 물리 Mac의 localhost를 찾아가면 다른 곳을 보고 있는 것입니다. Docker의 포트 공개, Ingress를 통한 접근, kubectl의 port-forward는 비슷하게 보여도 구성되는 경로가 다릅니다.
 
-과제에서 중요한 검증은 Git의 변경이 실제 Application 업데이트로 이어지는지 확인하는 것입니다.
+## 14. 과제 요구사항을 개념에 연결하기
 
-```text
-1. Git Repository의 Manifest 확인
-2. Image Tag를 v1에서 v2로 변경
-3. Commit과 Push
-4. Argo CD가 Repository 변경을 확인
-5. Application이 OutOfSync가 됨
-6. Sync가 수행됨
-7. Deployment가 새 Image를 사용
-8. 새로운 Pod가 생성됨
-9. 실제 응답이 v2로 바뀜
-```
+기준: `inception_of_things.pdf` v4.0, 본문 12–15쪽.
 
-여기서 Git 파일만 바뀌고 Cluster의 Pod가 바뀌지 않는다면, Repository 연결·Sync Policy·Image 존재 여부·Pod 상태를 각각 확인해야 합니다.
+| 요구사항 | 이해할 개념 |
+|---|---|
+| VM에서 Docker와 K3d 사용, Vagrant 없이 구성 | Node 실행 환경의 변경 |
+| 필요한 도구를 설치할 Script | 재현 가능한 준비 과정 |
+| Argo CD용 Namespace와 `dev` Namespace | 관리 프로그램과 앱의 범위 구분 |
+| 팀원 login이 이름에 포함된 공개 GitHub 저장소 | 배포 설정의 공개된 기준 |
+| v1·v2 앱, GitHub 변경으로 자동 업데이트 | GitOps와 실제 결과 검증 |
 
-## 8. 자동 동기화와 수동 동기화
+원문이 제공하는 `wil42/playground`는 8888 포트를 사용합니다. 직접 만든 앱을 쓴다면 공개 Docker Hub 저장소에 구분 가능한 v1·v2 Image를 준비해야 합니다.
 
-Argo CD는 변경을 감지한 뒤 자동으로 Sync할 수도 있고, 사용자가 승인한 뒤 수동으로 Sync할 수도 있습니다.
+원문은 continuous integration이라는 표현도 사용하지만, 여기서 Argo CD로 배우는 중심은 배포와 동기화(CD)입니다. 소스 코드 빌드·테스트 자동화(CI)는 별도 단계입니다. 설정과 실행 명령은 [구현 참고](implementation-reference.md)에 있습니다.
 
-```text
-자동 Sync
-Git 변경 -> 감지 -> 즉시 Cluster 반영
+## 15. 이해를 확인하기
 
-수동 Sync
-Git 변경 -> OutOfSync 표시 -> 사람이 Sync 실행 -> 반영
-```
+1. K3s와 K3d는 각각 어떤 역할인가?
+2. Git Repository와 Image Registry에는 무엇이 저장되는가?
+3. Argo CD와 Kubernetes는 각각 어떤 상태 차이를 줄이는가?
+4. Git에 v2를 push했는데도 앱이 v1이라면 어느 단계를 확인할까?
+5. Synced인데 Pod가 실행되지 않을 수 있는 이유는 무엇인가?
+6. Argo CD UI가 열리는데 앱 접속이 실패하면 두 경로를 어떻게 나누어 볼까?
 
-과제에서 요구하는 방식이 무엇인지 확인해야 하며, 중요한 것은 “Argo CD가 Git 변경을 인식하고 Application 상태를 바꿀 수 있는가”를 검증하는 것입니다.
-
-## 9. 문제를 계층별로 좁히기
-
-```text
-Git Repository에 Manifest가 존재하는가?
-				↓
-Argo CD Application이 Repository를 바라보는가?
-				↓
-Application의 Source Path가 맞는가?
-				↓
-Destination Namespace가 맞는가?
-				↓
-Application이 Synced 상태인가?
-				↓
-Deployment가 새 Image를 사용했는가?
-				↓
-새 Pod가 Ready 상태인가?
-```
-
-Argo CD 화면에 Application이 보인다는 것만으로 배포가 끝난 것은 아닙니다. Sync 상태, Health 상태, 실제 Pod와 Application 응답까지 확인해야 합니다.
-
-## 10. 검증 질문
-
-1. K3d는 K3s와 어떤 관계인가?
-2. K3d가 실행되기 위해 Docker가 필요한 이유는 무엇인가?
-3. `argocd`와 `dev` Namespace를 분리하는 이유는 무엇인가?
-4. Argo CD의 Desired State와 Actual State는 각각 어디에 존재하는가?
-5. Git이 Source of Truth라는 것은 실제 운영 흐름에서 무엇을 의미하는가?
-6. Image Tag를 바꾼 뒤 Application이 업데이트되기까지 어떤 단계가 필요한가?
-7. Argo CD가 Synced인데 Application이 동작하지 않는다면 무엇을 추가로 확인해야 하는가?
+다음: [Bonus — Local GitLab](bonus.md)

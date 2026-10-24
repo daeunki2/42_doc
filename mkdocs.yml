@@ -15,10 +15,13 @@ nav:
       - Overview: infrastructure/inception/index.md
     - Inception of Things:
       - Overview: infrastructure/inception-of-things/index.md
-      - Project Guide: infrastructure/inception-of-things/subject.md
+      - 네트워크 입문 — 웹 접속의 여정: infrastructure/inception-of-things/network-journey.md
+      - VM·Docker로 이어지는 네트워크: infrastructure/inception-of-things/foundations.md
+      - 학습 목표와 지도: infrastructure/inception-of-things/subject.md
       - Part 1 — K3s & Vagrant: infrastructure/inception-of-things/part1.md
       - Part 2 — K3s & Applications: infrastructure/inception-of-things/part2.md
       - Part 3 — K3d & Argo CD: infrastructure/inception-of-things/part3.md
+      - Implementation Reference: infrastructure/inception-of-things/implementation-reference.md
       - Bonus — GitLab: infrastructure/inception-of-things/bonus.md
       - Review: infrastructure/inception-of-things/review.md
 
@@ -63,3 +66,8 @@ nav:
 markdown_extensions:
   - tables
   - fenced_code
+  - md_in_html
+
+
+extra_css:
+  - stylesheets/learning-diagrams.css

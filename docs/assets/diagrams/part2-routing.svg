@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="970" viewBox="0 0 720 970" role="img" aria-labelledby="title desc">
+<title id="title">Part 2 · 요청 전달과 실행 관리</title><desc id="desc">사용자 요청은 Ingress Controller에서 Host 규칙으로 app2 Service의 backend를 선택해 Ready Pod로 전달됩니다. Deployment와 ReplicaSet은 별도로 Pod 수를 관리하며 웹 요청을 중계하지 않습니다.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;fill:#172b4d}.title{font-size:26px;font-weight:700}.label{font-size:21px;font-weight:700}.body{font-size:18px}.note{font-size:17px;fill:#475569}</style>
+<rect width="720" height="970" rx="20" fill="#f8fafc"/>
+<text x="32" y="46" class="title" text-anchor="start">Part 2 · 요청 전달과 실행 관리</text>
+<rect x="36" y="80" width="648" height="85" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="112" class="label" text-anchor="start">Client</text>
+<text x="54" y="140" class="body" text-anchor="start">목적지 192.168.56.110:80 / Host: app2.com</text>
+<path d="M360 165 V195" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="201" width="648" height="88" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="233" class="label" text-anchor="start">Ingress Controller</text>
+<text x="54" y="261" class="body" text-anchor="start">Ingress 규칙을 읽고 app2 backend를 선택</text>
+<path d="M360 289 V319" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="325" width="648" height="88" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="357" class="label" text-anchor="start">app2 Service</text>
+<text x="54" y="385" class="body" text-anchor="start">Label로 Pod 그룹 선택 / 안정적인 접점</text>
+<path d="M360 413 V445" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="360" y="474" class="note" text-anchor="middle">논리적인 요청 경로 · 준비된 Pod 중 하나로 전달</text>
+<rect x="36" y="500" width="192" height="90" rx="12" fill="#e9f7ef" stroke="#83bda0" stroke-width="1.5"/>
+<text x="54" y="532" class="label" text-anchor="start">Pod A</text>
+<text x="54" y="560" class="body" text-anchor="start">app2 실행</text>
+<path d="M360 482 H132 V494" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="264" y="500" width="192" height="90" rx="12" fill="#e9f7ef" stroke="#83bda0" stroke-width="1.5"/>
+<text x="282" y="532" class="label" text-anchor="start">Pod B</text>
+<text x="282" y="560" class="body" text-anchor="start">app2 실행</text>
+<path d="M360 482 H360 V494" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="492" y="500" width="192" height="90" rx="12" fill="#e9f7ef" stroke="#83bda0" stroke-width="1.5"/>
+<text x="510" y="532" class="label" text-anchor="start">Pod C</text>
+<text x="510" y="560" class="body" text-anchor="start">app2 실행</text>
+<path d="M360 482 H588 V494" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="36" y="628" class="label" text-anchor="start">위: 사용자의 요청이 이동하는 흐름</text>
+<rect x="36" y="674" width="648" height="88" rx="12" fill="#fff5e6" stroke="#d7b47a" stroke-width="1.5"/>
+<text x="54" y="706" class="label" text-anchor="start">Deployment → ReplicaSet</text>
+<text x="54" y="734" class="body" text-anchor="start">아래 관리자가 원하는 Pod 개수 3개를 유지</text>
+<path d="M660 674 V459 H615 V494" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<text x="36" y="800" class="label" text-anchor="start">점선: 실행 상태를 관리하는 관계</text>
+<text x="36" y="832" class="body" text-anchor="start">Deployment는 사용자 요청을 중계하는 Proxy가 아닙니다.</text>
+<text x="36" y="880" class="note" text-anchor="start">Service 연결은 논리적 표현입니다. Controller 구현에 따라</text>
+<text x="36" y="908" class="note" text-anchor="start">Service의 대상 Pod 주소로 직접 연결할 수도 있습니다.</text>
+<text x="36" y="940" class="note" text-anchor="start">app1·app3의 경로는 생략하고 app2 요청 하나를 보여 줍니다.</text>
+</svg>

@@ -1,1373 +1,317 @@
-# 과제 파악하기
+# 학습 목표와 지도: 네트워크에서 Kubernetes로
 
-## 1. 이 과제는 무엇을 배우는 과제인가?
+앞에서 우리는 웹 요청이 네트워크를 지나 앱에 도착하는 원리를 배웠습니다. 이제 질문을 바꾸어 봅시다. **그 요청을 받을 앱을 어디에서 실행하고, 계속 정상적인 상태로 유지하고, 새 버전으로 바꾸는 일은 누가 할까요?**
 
-Inception of Things는 **Kubernetes를 처음 경험하기 위한 System Administration 프로젝트**입니다.
+Inception of Things는 이 질문을 작은 환경에서 직접 풀어 보는 과제입니다. 이 페이지는 무엇을 만들고, 각 요구사항으로 무엇을 배우며, 어떤 이해를 갖추고 다음 단계로 넘어갈지 안내합니다. 개념의 상세 설명은 각 Part에, 설정과 명령어는 [구현 참고](implementation-reference.md)에 있습니다.
 
-과제는 Vagrant를 이용한 Virtual Machine 구성에서 시작하여 K3s를 이용한 Kubernetes Cluster 구성, Application 배포, 그리고 K3d와 Argo CD를 이용한 자동 배포까지 단계적으로 진행됩니다.
+**원문 기준:** 로컬 `inception_of_things.pdf` v4.0. 아래의 요구사항은 원문을 요약한 것이고, 학습 목표와 읽는 순서는 이 문서가 제안하는 학습 지도입니다. 최신 평가 기준을 대신하는 문서는 아닙니다.
 
-원본 과제는 이 프로젝트를 **Kubernetes에 대한 최소한의 입문(minimal introduction)**이라고 설명합니다.
+## 1. 어디에서 출발하는가?
 
-따라서 이 과제의 목표는 Kubernetes의 모든 기능을 배우는 것이 아닙니다.
+처음부터 모든 도구를 알 필요는 없습니다. 다음 두 페이지의 내용을 자신의 말로 설명할 수 있으면 출발할 수 있습니다.
 
-전체적인 학습 흐름을 먼저 이해하는 것이 중요합니다.
+| 선수지식 | 알고 시작할 내용 | 아직 어렵다면 |
+|---|---|---|
+| 네트워크 | 인터페이스, IP, Port, 경로, DNS와 HTTP Host의 차이 | [웹 접속의 여정](network-journey.md) |
+| 실행 환경 | VM과 Container, Image, localhost, 포트 전달 | [VM·Docker의 네트워크](foundations.md) |
 
-```text
-Virtual Machine
-      │
-      ▼
-   Vagrant
-      │
-      ▼
-     K3s
-      │
-      ▼
- Kubernetes
-      │
-      ▼
-Application Deployment
-      │
-      ▼
-     K3d
-      │
-      ▼
-   Argo CD
-      │
-      ▼
-    GitOps
-```
+확인할 질문은 두 가지입니다.
 
-과제는 크게 세 단계로 구성됩니다.
+- 내 브라우저가 다른 환경의 웹 서버에 요청할 때 어떤 주소와 연결이 필요한가?
+- 같은 PC 안에서도 VM이나 Container의 localhost가 서로 다른 곳일 수 있는 이유는 무엇인가?
+
+Kubernetes 용어는 아래에서 배우면 됩니다. 처음부터 YAML을 작성하거나 설치 명령을 외울 필요는 없습니다.
+
+## 2. Container를 실행할 수 있는데 왜 Kubernetes를 배울까?
+
+웹 앱 하나를 Container로 실행했고 요청도 잘 도착한다고 생각해 봅시다. 이제 앱을 계속 운영하려면 새로운 질문이 생깁니다.
 
 ```text
-Part 1
-K3s + Vagrant
-→ Kubernetes Cluster 만들기
-
-Part 2
-K3s + Applications
-→ Kubernetes에 Application 배포하기
-
-Part 3
-K3d + Argo CD
-→ Git을 기준으로 Application 배포 자동화하기
-
-Bonus
-GitLab
-→ Git 저장소까지 Local Infrastructure에 포함하기
+앱이 종료되면 누가 다시 실행할까?
+같은 앱을 세 개 유지하려면 누가 개수를 확인할까?
+머신이 여러 대라면 어느 머신에서 실행할까?
+앱이 교체되어 주소가 달라지면 요청은 어디로 보낼까?
+새 버전을 배포할 때 실행 상태를 누가 관리할까?
 ```
 
----
+Container 실행 도구의 재시작 정책이나 별도 Script로 일부 문제를 해결할 수도 있습니다. 하지만 머신과 앱이 늘어나면 여러 상태를 함께 관리하는 일이 중요해집니다.
 
-# 2. 먼저 알아야 할 것
+**Kubernetes는 Container 기반 앱을 배포하고, 배치하고, 원하는 실행 상태로 관리하는 플랫폼입니다.** 여러 실행 단위가 협력하도록 관리하는 일을 Orchestration이라고 부릅니다. [Kubernetes 공식 개요](https://kubernetes.io/docs/concepts/overview/)
 
-이 프로젝트를 시작하기 전에 모든 개념을 완벽하게 공부할 필요는 없습니다.
+모든 작은 앱에 Kubernetes가 필수인 것은 아닙니다. 그 자체의 운영 복잡성도 있습니다. 이 과제에서는 작은 환경을 이용해 이런 관리 문제가 어떻게 해결되는지 배웁니다.
 
-다만 다음 흐름은 알고 시작하는 것이 좋습니다.
+## 3. Kubernetes의 중심 생각: 원하는 상태를 적는다
 
-## 우리가 이미 배운 것
-
-Born2beroot와 Inception에서 배운 개념들이 그대로 이어집니다.
+앱을 유지하는 두 가지 생각을 비교해 봅시다.
 
 ```text
-Born2beroot
-
-Virtual Machine
-Linux
-IP / Port
-SSH
-Service
-Network
-      │
-      ▼
-Inception
-
-Docker
-Image
-Container
-Network
-Volume
-Docker Compose
-      │
-      ▼
-Inception of Things
-
-Vagrant
-Kubernetes
-K3s / K3d
-Pod
-Deployment
-Service
-Ingress
-Namespace
-Argo CD
-GitOps
+동작을 지시: 앱 하나를 지금 실행해라
+상태를 선언: 이 앱이 세 개 실행되는 상태를 유지해라
 ```
 
-즉 완전히 새로운 내용을 처음부터 배우는 것이 아니라,
-
-> **VM과 Container에 대한 지식을 바탕으로 여러 Container를 관리하는 방법을 배우는 과정**
-
-이라고 생각할 수 있습니다.
-
----
-
-# 3. Kubernetes는 왜 필요한가?
-
-Inception에서는 Docker Compose를 이용하여 여러 Container를 구성했습니다.
-
-예를 들어:
+두 번째가 **선언적 관리**입니다. 원하는 상태를 Desired State, 실제로 관찰한 상태를 Actual State라고 합니다.
 
 ```text
-Docker Compose
-
-├── NGINX
-├── WordPress
-└── MariaDB
+원하는 상태: 앱 복제본 3개
+실제 상태:   앱 복제본 2개
+                 ↓ 차이 확인
+           부족한 실행 단위 생성
+                 ↓
+           원하는 상태에 가까워짐
 ```
 
-작은 환경에서는 이런 방식으로도 충분합니다.
+차이를 관찰하고 줄이는 과정을 Reconciliation이라고 하며, 이를 반복하는 관리 구성요소를 Controller라고 부릅니다. [Kubernetes Controllers](https://kubernetes.io/docs/concepts/architecture/controller/)
 
-하지만 Container와 Server가 많아지면 새로운 문제가 발생합니다.
+선언했다고 즉시 반드시 성공하는 것은 아닙니다. Image를 가져올 수 없거나 머신 자원이 부족하면 원하는 상태에 도달하지 못합니다. 따라서 **원하는 상태, 실제 상태, 차이가 생긴 이유**를 함께 읽는 것이 학습의 핵심입니다.
+
+## 4. 처음 만나는 이름들을 역할로 묶기
+
+이름을 한꺼번에 외우기보다 질문에 연결해 두세요. 각 Part에서 다시 만납니다.
+
+| 질문 | 개념과 도구 |
+|---|---|
+| 어디에서 실행할까? | **Node**: 참여한 머신, **Cluster**: 함께 관리하는 Node들의 집합 |
+| Kubernetes를 어떻게 준비할까? | **K3s**: 가벼운 Kubernetes 배포판 |
+| VM 환경을 반복해서 만들려면? | **Vagrant**: VM 생성과 설정 과정 관리 |
+| 앱을 어떤 단위로 실행할까? | **Pod**: Container를 묶어 실행하는 단위 |
+| 어떤 앱을 몇 개 유지할까? | **Deployment**: 앱의 배포 상태를 선언하고 관리 |
+| 바뀌는 Pod에 어떻게 연결할까? | **Service**: 선택한 Pod 그룹의 안정적인 접점 |
+| HTTP 요청을 어느 앱에 보낼까? | **Ingress**와 **Controller**: 라우팅 규칙과 이를 수행하는 프로그램 |
+| Node를 Docker Container로 만들려면? | **K3d**: Docker에서 K3s Cluster 생성·관리 |
+| Git에 적힌 설정을 누가 반영할까? | **Argo CD**: Git과 Cluster 리소스 상태를 비교하고 동기화 |
+
+Kubernetes는 VM처럼 별도 운영체제를 담는 상자가 아닙니다. Node 위에서 실행되는 관리 구성요소와 실행 구성요소가 협력하는 시스템입니다. “Kubernetes 안에 앱이 있다”는 그림은 앱이 그 관리 아래 실행된다는 뜻으로 읽습니다.
+
+## 5. 이 과제를 끝낸 뒤 할 수 있어야 하는 것
+
+도구를 설치했다는 사실보다, 다음 일을 직접 설명하고 확인할 수 있는지를 목표로 삼습니다.
+
+1. **실행 위치를 그릴 수 있다.** PC, VM, Node, Pod, Container가 어떤 관계인지 구분한다.
+2. **Cluster 참여를 설명할 수 있다.** Server와 Agent가 어떤 주소와 인증 정보로 연결되는지 설명한다.
+3. **앱의 관리와 요청 전달을 구분할 수 있다.** Deployment와 Service·Ingress가 각각 무엇을 하는지 설명한다.
+4. **원하는 상태와 실제 상태를 비교할 수 있다.** Pod가 부족하거나 준비되지 않았을 때 어느 상태를 확인할지 말한다.
+5. **Git 변경부터 앱 응답까지 추적할 수 있다.** v1을 v2로 바꾼 뒤 각 구성요소가 하는 일을 설명한다.
+6. **문제의 범위를 좁힐 수 있다.** 네트워크 연결, 앱 실행, HTTP 라우팅, Git 동기화 중 무엇부터 확인할지 근거를 댄다.
+
+## 6. 전체 학습 지도
 
 ```text
-Container가 죽으면?
-
-Container를 3개 실행하고 싶다면?
-
-3개 중 하나가 죽으면?
-
-여러 Server가 있다면
-어느 Server에 Container를 실행해야 할까?
-
-Application을 업데이트하려면?
-
-Container의 IP가 계속 바뀐다면
-다른 Application은 어떻게 찾을까?
+선수지식: 네트워크 + VM·Container
+    ↓
+Part 1: 앱을 운영할 머신들을 연결한다
+    배울 것: Node, Cluster, Server/Agent, API와 인증
+    ↓
+Part 2: 앱을 유지하고 사용자 요청을 연결한다
+    배울 것: Pod, Deployment, Service, Ingress
+    ↓
+Part 3: 실행할 상태의 기준을 Git에 둔다
+    배울 것: K3d, Namespace, Argo CD, GitOps
+    ↓
+Bonus: 배포 기준이 되는 Git 서비스도 직접 운영한다
 ```
 
-이러한 문제를 관리하는 시스템을 **Container Orchestrator**라고 합니다.
+이 화살표는 학습 순서입니다. Part 1의 두 VM 위에 Part 2와 Part 3를 계속 추가하라는 뜻은 아닙니다. 각 Part는 다른 환경을 구성하며 앞에서 배운 개념을 다시 사용합니다.
 
-Kubernetes가 대표적인 Container Orchestrator입니다.
+원문은 전체 작업을 VM에서 진행하도록 요구합니다. 아래 구조도에서는 물리 PC 안의 작업용 VM을 **실습 VM**, Vagrant가 만드는 VM을 **Guest VM**이라고 구분합니다. 중첩 가상화의 실제 지원 여부는 환경 선택 시 확인합니다.
 
-이 과제에서는 Kubernetes가 이러한 문제를 어떻게 해결하는지 아주 작은 환경에서 직접 경험하게 됩니다.
+## 7. Part 1: 독립된 머신을 하나의 Cluster로
 
----
-
-# 4. 이 과제에서 가장 중요한 생각
-
-Kubernetes를 공부할 때 가장 먼저 이해해야 할 개념 중 하나는 **Desired State**입니다.
-
-Docker를 직접 사용할 때는 보통 명령을 내립니다.
+### 무엇을 만드는가?
 
 ```text
-이 Container를 실행해.
+물리 PC
+└── 실습 VM: Vagrant를 실행하는 환경
+    ├── Guest VM: <login>S
+    │   └── 192.168.56.110 / K3s Server
+    └── Guest VM: <login>SW
+        └── 192.168.56.111 / K3s Agent
+
+두 Guest가 네트워크와 인증을 통해 같은 Cluster에 참여
 ```
 
-Kubernetes에서는 조금 다르게 생각합니다.
+목표는 **독립된 머신 두 대를 하나의 관리 시스템으로 연결하는 것**입니다. 아직 사용자 웹 앱을 배포하는 것이 중심은 아닙니다.
+
+### 각 요구사항으로 무엇을 배우는가?
+
+기준: 원문 본문 6–8쪽.
+
+| 과제 요구사항 | 배울 수 있는 것 |
+|---|---|
+| Vagrant로 VM 두 대 실행 | 환경의 구성을 파일로 남기고 반복 생성하는 방법 |
+| 선택한 배포판의 최신 안정 버전 사용 | Guest OS와 그 위에서 실행할 도구를 구분하는 방법 |
+| 팀원 login에 `S`, `SW`를 붙인 머신 이름 | 머신의 식별과 역할 구분 |
+| primary network interface에 `.110`, `.111` 지정 | 실제 인터페이스, IP 설정, 머신 간 경로의 관계 |
+| 두 머신에 비밀번호 없는 SSH 접속 | 네트워크 접속과 키 기반 사용자 인증 |
+| K3s Server와 Agent 구성 | 관리 역할과 실행 역할, Cluster 참여 |
+| kubectl 사용 | Linux 로그인과 Kubernetes API 관리의 차이 |
+
+원문은 1 CPU와 RAM 512MB 또는 1024MB의 최소 구성을 강하게 권장합니다. 이는 학습용 자원 절약 의도와 연결되지만, 사용할 K3s 버전의 실행 조건과는 별도로 확인해야 합니다. 구체적인 조건은 [Part 1 구현 참고](implementation-reference.md)에 있습니다.
+
+### 무엇을 설명하고 확인하면 다음으로 갈 수 있을까?
+
+**설명 목표:** Server 주소, Join Token, SSH Key, kubeconfig가 각각 어떤 질문에 답하는지 구분한다. Agent의 localhost가 Server를 뜻하지 않는 이유를 설명한다.
+
+**동작 확인:** 이름과 주소가 요구사항에 맞고, 두 VM에 키로 SSH 접속할 수 있으며, 같은 Cluster에서 Node 두 개가 Ready로 확인된다.
+
+“SSH가 된다”와 “Agent가 Cluster에 정상 참여했다”는 서로 다른 확인입니다.
+
+학습 페이지: [Part 1 — 여러 머신을 하나의 Cluster로 이해하기](part1.md)
+
+## 8. Part 2: 앱을 유지하는 일과 요청을 보내는 일
+
+### 무엇을 만드는가?
 
 ```text
-이 Application의 Pod가
-항상 3개 존재해야 한다.
+물리 PC
+└── 실습 VM
+    └── Guest VM 1대: <login>S / 192.168.56.110
+        └── K3s Server가 관리하는 앱
+            ├── app1
+            ├── app2 복제본 3개
+            └── app3
+
+Client -> 같은 VM IP:80 -> HTTP Host에 따라 앱 선택
 ```
 
-우리는 원하는 상태를 선언하고 Kubernetes는 실제 상태를 그 상태에 맞추려고 합니다.
+Part 1에서는 머신끼리 연결했습니다. 이제 **그 환경에서 앱을 계속 실행하고, 외부 요청을 올바른 앱까지 전달하는 방법**을 배웁니다. Part 1과 같은 IP를 사용하므로 두 환경을 동시에 실행할 때 주소 충돌에 주의합니다.
+
+### 각 요구사항으로 무엇을 배우는가?
+
+기준: 원문 본문 9–11쪽.
+
+| 과제 요구사항 | 배울 수 있는 것 |
+|---|---|
+| 최신 안정 배포판의 VM 한 대에서 K3s Server 실행 | 한 Node도 Cluster를 구성하고 앱을 실행할 수 있다 |
+| 이름은 login + `S`, IP는 `.110` | 머신 식별과 외부 진입점 |
+| 웹 앱 세 개 배포 | 머신 하나와 앱 실행 하나가 같은 개념이 아니다 |
+| app2 복제본 세 개 | 원하는 개수와 실제 Pod 상태를 맞추는 관리 |
+| Host가 `app1.com`이면 app1 | IP 연결 이후 HTTP 정보로 요청 대상을 구분 |
+| Host가 `app2.com`이면 app2 | 같은 IP·Port로 여러 앱을 제공하는 라우팅 |
+| 그 외 요청은 app3 | 기본 규칙까지 포함해 동작을 정의하는 방법 |
+| 평가에서 Ingress 제시 | 선언한 규칙과 실제 요청 결과를 연결해 설명하는 방법 |
+
+Pod, Deployment, Service는 이 문서에서 위 요구사항을 이해하고 구성하는 데 사용하는 개념입니다. 특히 app1·app3를 각각 Pod 하나로 두는 것은 문서의 예시이며, 원문에서 복제본 수를 명시한 앱은 app2입니다.
+
+### 무엇을 설명하고 확인하면 다음으로 갈 수 있을까?
+
+**설명 목표:** 다음 두 흐름을 각각 그릴 수 있다.
 
 ```text
-Desired State
-
-Pod = 3
-      │
-      ▼
-Kubernetes
-      │
-      ▼
-Actual State
-
-Pod
-Pod
-Pod
+관리: Deployment -> ReplicaSet -> Pod의 개수와 배포 상태
+요청: Client -> Ingress Controller -> Service backend -> Pod의 앱
 ```
 
-만약 하나가 죽으면:
+**동작 확인:** Host별로 app1·app2·app3가 구분되어 응답하고, app2 복제본 세 개가 준비되어 있다. 학습용으로 app2 Pod 하나를 삭제했을 때 새 Pod가 만들어지는 이유도 설명한다. 이 삭제 실험은 이해 확인 방법이며 별도의 원문 요구사항으로 추가한 것은 아니다.
+
+Pod 세 개가 VM 한 대에서 실행되면 VM 전체 장애에 대한 대비가 된 것은 아닙니다. 복제본을 무엇으로부터 보호하려는지 함께 생각합니다.
+
+학습 페이지: [Part 2 — 앱의 실행과 요청 전달](part2.md)
+
+## 9. Part 3: Git에서 앱 응답까지 이어지는 배포
+
+### 무엇을 만드는가?
 
 ```text
-Desired: 3
+물리 PC
+└── 실습 VM
+    └── Docker
+        └── K3d가 만든 Node Container들
+            └── K3s Cluster
+                ├── Argo CD용 Namespace: 배포 관리
+                └── dev Namespace: 사용자 앱
 
-Actual: 2
-
-      ↓
-
-Kubernetes
-
-      ↓
-
-새로운 Pod 생성
-
-      ↓
-
-Actual: 3
+공개 GitHub의 설정 -> Argo CD -> Cluster의 배포 상태
+Docker Hub의 Image -> Node의 Runtime -> 실제 앱 실행
 ```
 
-이 **"원하는 상태를 선언하고 시스템이 그 상태를 유지한다"**는 생각은 이후 Argo CD와 GitOps를 이해하는 데도 중요합니다.
+K3d가 Node 실행 환경을 만들고, K3s가 앱 실행을 관리합니다. Argo CD는 Git과 Cluster 설정을 연결합니다. **어떤 환경에서 실행하는가**와 **실행할 상태의 기준을 어디에 두는가**를 함께 배웁니다.
 
----
+### 각 요구사항으로 무엇을 배우는가?
 
-# 5. Part 1 — K3s and Vagrant
+기준: 원문 본문 12–15쪽.
 
-## 목표
+| 과제 요구사항 | 배울 수 있는 것 |
+|---|---|
+| Vagrant 없이 VM에서 Docker와 K3d 사용 | VM 기반 Node와 Container 기반 Node의 차이 |
+| 필요한 패키지·도구 설치 Script 준비 | 다른 시점에도 같은 환경을 준비하는 재현성 |
+| Argo CD용 Namespace와 앱용 `dev` 생성 | 같은 Cluster 안의 이름 공간과 관리 범위 |
+| 이름에 팀원 login이 포함된 공개 GitHub 저장소 | 배포 설정의 기준과 변경 이력을 외부에 기록 |
+| GitHub 설정으로 Argo CD가 앱을 자동 배포 | 원하는 설정과 실제 리소스 상태의 동기화 |
+| 구분 가능한 v1·v2 앱 준비 | 실행 파일 묶음인 Image와 배포 버전의 관계 |
+| GitHub에서 버전 변경 후 업데이트 확인 | commit부터 실제 사용자 응답까지 결과를 추적 |
 
-Part 1에서는 **두 개의 Virtual Machine을 만들고 K3s Cluster를 구성합니다.**
+원문 제공 앱은 `wil42/playground`이며 8888 포트를 사용합니다. 직접 만든 앱을 선택한다면 공개 Docker Hub 저장소에 구분 가능한 `v1`, `v2` Image를 준비해야 합니다. Git에 넣는 Manifest는 실행 설정이고 Registry에 넣는 Image는 실행할 앱이라는 차이를 기억하세요.
+
+문서는 Argo CD Namespace를 `argocd`로 선택합니다. 원문에서 명시적으로 이름을 고정한 앱 Namespace는 `dev`입니다. Node 수, 포트 공개 방식, Self-heal·Prune 정책 등의 예시 선택은 원문의 필수 조건과 구분해 읽습니다.
+
+### 무엇을 설명하고 확인하면 완료했다고 볼 수 있을까?
+
+**설명 목표:** 다음 과정을 자신의 말로 연결한다.
 
 ```text
-              Kubernetes Cluster
-
-        ┌────────────────────┐
-        │                    │
-        ▼                    ▼
-
-   VM 1                    VM 2
-192.168.56.110          192.168.56.111
-
- K3s Server              K3s Agent
- Controller               Worker
+Git의 v1을 v2로 변경하고 push
+    -> Argo CD가 새 설정 확인
+    -> Deployment 변경
+    -> Kubernetes가 새 Pod 준비
+    -> 실제 앱이 v2로 응답
 ```
 
-VM은 직접 하나씩 만드는 것이 아니라 **Vagrant**를 이용하여 생성합니다.
+**동작 확인:** Git에 새 버전이 있고, Argo CD가 해당 변경을 반영하며, 앱이 정상 실행되어 실제 응답이 v2임을 확인한다. `Synced`와 앱의 정상 실행 상태, 사용자가 받는 응답을 각각 구분한다.
 
----
+학습 페이지: [Part 3 — Git이 배포의 기준이 되는 과정](part3.md)
 
-## 과제가 요구하는 것
+## 10. Bonus는 어떤 질문을 더하는가?
 
-VM 두 대가 필요합니다.
+필수 Part가 완전히 동작한 뒤, GitHub 대신 Local GitLab을 사용해 같은 배포 흐름을 만듭니다. 원문은 최신 GitLab, 전용 `gitlab` Namespace, Cluster와의 연동, Part 3의 동작 유지와 `bonus` 디렉터리 제출을 요구합니다.
 
-첫 번째:
+여기서는 **배포 설정을 가져오는 서비스도 내가 운영한다면 무엇을 더 책임져야 할까?**를 배웁니다. Git 서비스의 실행, 주소와 접근 경로, Argo CD의 저장소 연결을 다시 생각하게 됩니다. 원문에서 Helm은 사용할 수 있는 도구의 예이며 필수 도구는 아닙니다.
+
+학습 페이지: [Bonus — Local GitLab](bonus.md)
+
+## 11. 공부할 때는 이 순서를 반복하기
+
+각 Part를 한 번에 구현하려고 하기보다 다음 과정을 반복합니다.
 
 ```text
-hostname
-→ <login>S
-
-IP
-→ 192.168.56.110
-
-K3s
-→ Server / Controller
+1. 요구사항을 한 문장으로 말한다
+2. 실행 위치와 요청·관리 흐름을 그린다
+3. 각 구성요소가 필요한 이유를 설명한다
+4. 문서의 예시를 읽고 결과를 예상한다
+5. 실제 상태를 확인하여 예상과 비교한다
+6. 다르면 어느 단계에서 차이가 생겼는지 찾는다
 ```
 
-두 번째:
+처음 읽을 때는 1–3에 집중해도 됩니다. 그림에는 아직 설명할 수 없는 용어를 표시해 두고 해당 Part로 돌아갑니다. 구현 후에는 같은 그림에 실제 이름, IP, Port, Namespace를 넣어 봅니다.
+
+## 12. 막혔을 때 돌아갈 위치
+
+| 막히는 질문 | 돌아갈 페이지 |
+|---|---|
+| IP와 Host가 무엇이 다른가? | [네트워크 입문](network-journey.md) |
+| localhost가 누구이며 VM까지 어떻게 연결되는가? | [VM·Docker의 네트워크](foundations.md) |
+| SSH는 되는데 왜 Cluster에 참여하지 못할까? | [Part 1](part1.md) |
+| Pod는 있는데 왜 앱 응답이 없을까? | [Part 2](part2.md) |
+| Git은 v2인데 왜 실행 중인 앱은 다를까? | [Part 3](part3.md) |
+| 이해한 내용을 어떤 설정과 명령으로 표현할까? | [구현 참고](implementation-reference.md) |
+
+## 13. 학습 완료와 제출 준비 구분하기
+
+이해한 내용을 설명할 수 있는 것과 제출 요구사항을 빠짐없이 만족하는 것은 함께 확인해야 합니다. 아래 제출 구조는 원문 본문 17쪽 기준이며, 현재 학습 문서 저장소의 `docs` 구조와는 별개입니다.
 
 ```text
-hostname
-→ <login>SW
-
-IP
-→ 192.168.56.111
-
-K3s
-→ Agent / Worker
+과제 제출 저장소/
+├── p1/     VM 두 대와 K3s Cluster 구성
+├── p2/     VM 한 대와 세 웹 앱 구성
+├── p3/     K3d와 Argo CD 배포 구성
+└── bonus/  선택 과제
 ```
 
-두 머신 모두 password 없이 SSH 접속할 수 있어야 합니다.
+필요한 Script는 각 Part의 `scripts`, 설정 파일은 `confs`에 정리합니다. 원문은 제출 저장소 안의 작업을 평가하고 평가 대상 그룹의 컴퓨터에서 확인한다고 명시합니다.
 
-또한 `kubectl`을 사용할 수 있어야 합니다.
+마지막으로 세 문장을 완성해 보세요.
 
----
+- **Part 1:** “두 VM을 하나의 Cluster로 연결하려면 …이 필요하다.”
+- **Part 2:** “사용자 요청은 …을 거쳐 앱에 도착하고, 앱의 개수는 …이 관리한다.”
+- **Part 3:** “Git의 버전을 바꾸면 …이 설정을 반영하고 …이 앱을 실행한다.”
 
-## 여기서 배워야 할 개념
-
-### Vagrant
-
-Virtual Machine 환경을 **코드로 정의하고 자동으로 생성하기 위한 도구**입니다.
-
-Born2beroot에서는 VM을 직접 만들었다면:
-
-```text
-Born2beroot
-
-VM 설정
-→ OS 설치
-→ Network 설정
-→ 직접 관리
-```
-
-Vagrant에서는:
-
-```text
-Vagrantfile
-      │
-      ▼
-vagrant up
-      │
-      ▼
-VM 생성
-      │
-      ├── CPU
-      ├── RAM
-      ├── Network
-      ├── Hostname
-      └── Provisioning
-```
-
-이라는 방식으로 VM 환경을 재현할 수 있습니다.
-
-### Provisioning
-
-VM을 만든 뒤 필요한 프로그램 설치와 설정까지 자동으로 수행하는 과정입니다.
-
-```text
-VM 생성
-   │
-   ▼
-Provisioning Script
-   │
-   ├── K3s 설치
-   ├── 설정
-   └── Cluster 연결
-```
-
-### Kubernetes Cluster
-
-여러 머신을 하나의 Kubernetes 환경으로 묶은 것입니다.
-
-### Node
-
-Kubernetes Cluster에 참여하는 하나의 Machine입니다.
-
-이 과제에서는:
-
-```text
-Cluster
-│
-├── Server Node
-│
-└── Agent Node
-```
-
-형태가 됩니다.
-
-### K3s
-
-K3s는 Kubernetes를 가볍게 구성할 수 있도록 만든 Kubernetes Distribution입니다.
-
-Part 1에서는 K3s를 이용하여 작은 Kubernetes Cluster를 직접 구성합니다.
-
-### kubectl
-
-Kubernetes Cluster에 명령을 보내고 상태를 확인하기 위한 CLI입니다.
-
-예:
-
-```bash
-kubectl get nodes
-```
-
-```bash
-kubectl get pods
-```
-
----
-
-## Part 1에서 스스로 답할 수 있어야 하는 질문
-
-Part 1이 끝났다면 최소한 다음 질문에 답할 수 있어야 합니다.
-
-```text
-Vagrant는 왜 사용하는가?
-
-Vagrantfile은 무엇인가?
-
-Provisioning은 무엇인가?
-
-Kubernetes Cluster란 무엇인가?
-
-Node란 무엇인가?
-
-Server와 Agent의 차이는 무엇인가?
-
-K3s는 Kubernetes와 어떤 관계인가?
-
-두 VM은 어떻게 하나의 Cluster가 되는가?
-
-kubectl은 누구에게 명령을 보내는가?
-```
-
----
-
-# 6. Part 2 — K3s and Applications
-
-Part 1에서는 Kubernetes가 실행될 **환경**을 만들었습니다.
-
-Part 2에서는 처음으로 그 Kubernetes 위에 **Application을 배포합니다.**
-
-## 목표
-
-이번에는 VM 하나만 사용합니다.
-
-```text
-VM
-│
-│ K3s Server
-│
-└── Kubernetes
-      │
-      ├── App 1
-      ├── App 2 × 3
-      └── App 3
-```
-
-세 개의 Web Application을 실행해야 합니다.
-
-요청의 `HOST`에 따라 서로 다른 Application이 보여야 합니다.
-
-```text
-                  192.168.56.110
-                         │
-                      Ingress
-                         │
-          ┌──────────────┼──────────────┐
-          │              │              │
-       app1.com        app2.com       default
-          │              │              │
-          ▼              ▼              ▼
-        App 1           App 2          App 3
-                        × 3
-```
-
-특히 **App 2는 3개의 Replica**를 가져야 합니다.
-
----
-
-# 7. 여기서 Kubernetes의 핵심 개념을 배운다
-
-Part 2가 이 과제에서 Kubernetes 자체를 이해하는 가장 중요한 부분입니다.
-
-## Pod
-
-Container가 Kubernetes에서 실행되는 기본 단위입니다.
-
-처음에는 다음 정도로 이해하면 충분합니다.
-
-```text
-Docker
-
-Container
-
-    ↓ Kubernetes
-
-Pod
-└── Container
-```
-
-Pod 안에는 하나 이상의 Container가 들어갈 수 있습니다.
-
----
-
-## Deployment
-
-Application의 Pod를 어떻게 실행하고 유지할지 선언합니다.
-
-예를 들어:
-
-```text
-App2
-
-replicas: 3
-```
-
-라고 선언하면:
-
-```text
-Deployment
-    │
-    ├── Pod
-    ├── Pod
-    └── Pod
-```
-
-형태로 유지됩니다.
-
----
-
-## Replica
-
-같은 Application의 Pod를 여러 개 실행하는 것입니다.
-
-Part 2의 App2가 바로 이를 경험하기 위한 요구사항입니다.
-
-```text
-App2
-
-├── Pod
-├── Pod
-└── Pod
-```
-
----
-
-## Service
-
-Pod는 생성되고 삭제될 수 있습니다.
-
-따라서 다른 시스템이 특정 Pod 하나의 IP에 직접 의존하면 관리하기 어렵습니다.
-
-Service는 여러 Pod 앞에 **안정적인 접근 지점**을 제공합니다.
-
-```text
-Service
-   │
-   ├── Pod
-   ├── Pod
-   └── Pod
-```
-
----
-
-## Ingress
-
-외부에서 들어온 HTTP 요청을 규칙에 따라 적절한 Service로 전달합니다.
-
-이 과제에서는 `HOST`를 이용합니다.
-
-```text
-app1.com
-    │
-    ▼
-Ingress
-    │
-    ▼
-App1 Service
-```
-
-```text
-app2.com
-    │
-    ▼
-Ingress
-    │
-    ▼
-App2 Service
-```
-
-그 외 요청은 App3로 보내야 합니다.
-
----
-
-## Kubernetes YAML
-
-Kubernetes에서는 원하는 리소스 상태를 YAML 파일로 선언하는 방식을 많이 사용합니다.
-
-개념적으로:
-
-```yaml
-kind: Deployment
-
-spec:
-  replicas: 3
-```
-
-처럼:
-
-> "Pod를 세 개 만들어라"
-
-라고 명령을 반복해서 내리는 것이 아니라,
-
-> "이 Application은 Pod가 세 개 존재하는 상태여야 한다"
-
-라고 원하는 상태를 선언합니다.
-
----
-
-## Part 2에서 반드시 연결해야 하는 구조
-
-각 개념을 따로 외우기보다 다음 흐름을 이해하는 것이 중요합니다.
-
-```text
-External Request
-       │
-       ▼
-    Ingress
-       │
-       ▼
-    Service
-       │
-       ▼
-  Deployment
-       │
-       ▼
-      Pod
-       │
-       ▼
-   Container
-```
-
----
-
-## Part 2가 끝났을 때 답할 수 있어야 하는 질문
-
-```text
-Pod와 Container의 관계는?
-
-Deployment는 왜 필요한가?
-
-Replica는 왜 만드는가?
-
-Pod 하나가 죽으면 어떻게 되는가?
-
-Service는 왜 필요한가?
-
-Ingress와 Service는 무엇이 다른가?
-
-HOST에 따라 다른 Application을
-어떻게 보여주는가?
-
-왜 App2를 3개 실행하도록 했을까?
-```
-
----
-
-# 8. Part 3 — K3d and Argo CD
-
-Part 2까지는 우리가 직접 Kubernetes에 Application을 배포했습니다.
-
-Part 3에서는 여기서 한 단계 더 나아갑니다.
-
-## 목표
-
-이번에는 Vagrant를 사용하지 않습니다.
-
-VM 안에 Docker와 K3d 등을 설치하고 Kubernetes 환경을 구성합니다.
-
-그리고 Argo CD를 이용합니다.
-
-전체 구조는 다음과 같습니다.
-
-```text
-Developer
-    │
-    │ git push
-    ▼
-Public GitHub Repository
-    │
-    │ Desired State
-    ▼
-  Argo CD
-    │
-    │ Sync
-    ▼
- Kubernetes
-    │
-    ▼
-Application
-```
-
----
-
-# 9. K3s와 K3d
-
-과제에서는 **K3s와 K3d의 차이를 이해해야 한다고 명시적으로 요구합니다.**
-
-Part 1과 Part 2에서는 K3s를 사용했습니다.
-
-Part 3에서는 K3d를 사용합니다.
-
-학습할 때 다음 질문을 중심으로 비교해야 합니다.
-
-```text
-K3s란 무엇인가?
-
-K3d란 무엇인가?
-
-왜 K3d를 사용하려면 Docker가 필요한가?
-
-Part 1에서는 왜 VM 안에 K3s를 설치했는가?
-
-Part 3에서는 Cluster가 어디에서 실행되는가?
-```
-
----
-
-# 10. Namespace
-
-Part 3에서는 두 개의 Namespace를 만들어야 합니다.
-
-```text
-Kubernetes Cluster
-│
-├── namespace: argocd
-│      │
-│      └── Argo CD
-│
-└── namespace: dev
-       │
-       └── Application
-```
-
-Namespace는 하나의 Kubernetes Cluster 안에서 리소스를 논리적으로 구분하는 방법입니다.
-
----
-
-# 11. Argo CD
-
-Argo CD는 Git Repository에 선언된 Kubernetes 설정을 기준으로 Cluster의 상태를 관리합니다.
-
-예를 들어 GitHub에:
-
-```text
-deployment.yaml
-
-image: playground:v1
-```
-
-이 있다고 가정합니다.
-
-Cluster도:
-
-```text
-playground:v1
-```
-
-을 실행하고 있습니다.
-
-이 상태는 서로 일치합니다.
-
-```text
-Git        Cluster
-
-v1    ==    v1
-
-      Synced
-```
-
-Git을:
-
-```text
-v1 → v2
-```
-
-로 변경하면:
-
-```text
-Git        Cluster
-
-v2    !=    v1
-```
-
-차이가 발생합니다.
-
-Argo CD가 이를 동기화하면:
-
-```text
-Git        Cluster
-
-v2    ==    v2
-
-      Synced
-```
-
-가 됩니다.
-
-과제에서는 실제로 Git Repository에서 Application 버전을 변경하고 Application이 업데이트되는 것을 확인해야 합니다.
-
----
-
-# 12. GitOps
-
-Part 3에서 배우게 되는 중요한 운영 방식입니다.
-
-GitOps에서는 Git Repository를 시스템의 원하는 상태를 기록하는 **Source of Truth**로 사용합니다.
-
-기존 방식:
-
-```text
-Developer
-    │
-kubectl 명령
-    │
-    ▼
-Kubernetes
-```
-
-GitOps:
-
-```text
-Developer
-    │
- git push
-    ▼
-   Git
-    │
-    ▼
- Argo CD
-    │
-    ▼
-Kubernetes
-```
-
-따라서:
-
-```text
-Git에 기록된 상태
-        =
-우리가 원하는 상태
-```
-
-가 됩니다.
-
-이 개념은 앞에서 배운 Kubernetes의 **Desired State**와 연결됩니다.
-
----
-
-# 13. Part 3에서 배워야 할 개념
-
-```text
-K3d
-│
-├── K3s와의 차이
-├── Docker와의 관계
-└── Cluster 생성
-
-Namespace
-│
-└── Resource 분리
-
-Argo CD
-│
-├── Git Repository 감시
-├── Desired State 비교
-└── Synchronization
-
-GitOps
-│
-├── Git = Source of Truth
-└── Declarative Deployment
-
-Image Tag
-│
-├── v1
-└── v2
-```
-
----
-
-# 14. Part 3이 끝났을 때 답할 수 있어야 하는 질문
-
-```text
-K3s와 K3d의 차이는?
-
-왜 K3d에 Docker가 필요한가?
-
-Namespace는 왜 사용하는가?
-
-Argo CD는 무엇을 하는가?
-
-Argo CD는 무엇과 무엇을 비교하는가?
-
-Git이 Source of Truth라는 것은 무슨 뜻인가?
-
-Git에서 v1 → v2로 변경하면
-어떤 과정을 거쳐 Application이 바뀌는가?
-
-GitOps와 직접 kubectl을 사용하는 방식은
-무엇이 다른가?
-```
-
----
-
-# 15. Bonus — GitLab
-
-Bonus에서는 Part 3에서 사용했던 GitHub를 **Local GitLab**으로 대체합니다.
-
-Part 3:
-
-```text
-GitHub
-   │
-   ▼
-Argo CD
-   │
-   ▼
-Kubernetes
-```
-
-Bonus:
-
-```text
-Local GitLab
-      │
-      ▼
-   Argo CD
-      │
-      ▼
- Kubernetes
-```
-
-GitLab 자체도 Local에서 실행되어야 하며:
-
-```text
-namespace: gitlab
-```
-
-이라는 전용 Namespace를 만들어야 합니다.
-
-Part 3에서 구현했던 모든 기능이 Local GitLab을 이용해서도 동작해야 합니다.
-
-Bonus에서는 필요하다면 Helm 등의 도구를 사용할 수 있습니다.
-
-> Bonus는 Mandatory가 완벽하게 동작하는 경우에만 평가됩니다.
-
----
-
-# 16. 과제 전체에서 배워야 할 개념 지도
-
-처음부터 모든 것을 공부하려고 하면 Kubernetes 용어가 한꺼번에 등장하기 때문에 혼란스러울 수 있습니다.
-
-다음 순서로 공부하는 것이 좋습니다.
-
-```text
-[이미 알고 있어야 할 것]
-
-Linux
- │
- ├── Process
- ├── Service
- ├── IP / Port
- ├── SSH
- └── Network
-       │
-       ▼
-Docker
- │
- ├── Image
- ├── Container
- └── Network
-
-────────────────────────────
-
-[Part 1]
-
-Virtual Machine
-       │
-       ▼
-    Vagrant
-       │
-       ▼
-  Provisioning
-       │
-       ▼
-      K3s
-       │
-       ▼
-Kubernetes Cluster
-       │
-       ├── Server
-       └── Agent
-       │
-       ▼
-     kubectl
-
-────────────────────────────
-
-[Part 2]
-
-    Container
-        │
-        ▼
-       Pod
-        │
-        ▼
-   Deployment
-        │
-        ▼
-     Replica
-        │
-        ▼
-     Service
-        │
-        ▼
-     Ingress
-
-────────────────────────────
-
-[Part 3]
-
-      Docker
-        │
-        ▼
-       K3d
-        │
-        ▼
- Kubernetes Cluster
-        │
-        ├── Namespace
-        │
-        ▼
-     Argo CD
-        │
-        ▼
-       Git
-        │
-        ▼
-      GitOps
-
-────────────────────────────
-
-[Bonus]
-
-     GitLab
-        │
-        ▼
-Local Git Repository
-        │
-        ▼
-     Argo CD
-        │
-        ▼
-    Kubernetes
-```
-
----
-
-# 17. 과제의 진짜 학습 흐름
-
-이 프로젝트를 단순히:
-
-```text
-Vagrant 설치
-K3s 설치
-YAML 작성
-Argo CD 설치
-```
-
-라는 설치 과제로 접근하면 각각의 기술이 왜 필요한지 이해하기 어렵습니다.
-
-대신 각 Part가 **하나의 질문에 답하는 과정**이라고 생각하는 것이 좋습니다.
-
-### Part 1
-
-> Kubernetes가 동작할 환경은 어떻게 만드는가?
-
-```text
-Vagrant
-→ VM
-→ K3s
-→ Cluster
-```
-
-### Part 2
-
-> Kubernetes는 Application을 어떻게 실행하고 외부에 제공하는가?
-
-```text
-Deployment
-→ Pod
-→ Service
-→ Ingress
-```
-
-### Part 3
-
-> Application의 배포 상태를 Git을 기준으로 자동 관리할 수 있는가?
-
-```text
-Git
-→ Argo CD
-→ Kubernetes
-```
-
-### Bonus
-
-> Git Repository까지 직접 운영한다면?
-
-```text
-GitLab
-→ Argo CD
-→ Kubernetes
-```
-
----
-
-# 18. 구현 전에 세울 학습 목표
-
-이 프로젝트를 완료했을 때 다음 문장을 자신의 말로 설명할 수 있다면 과제의 핵심을 이해했다고 볼 수 있습니다.
-
-### Infrastructure
-
-> Virtual Machine과 Container의 차이를 설명할 수 있다.
-
-> Vagrant가 VM 환경을 어떻게 재현하는지 설명할 수 있다.
-
-### Kubernetes
-
-> Kubernetes가 왜 필요한지 설명할 수 있다.
-
-> Cluster와 Node의 관계를 설명할 수 있다.
-
-> Pod, Deployment, Service, Ingress의 역할과 연결 관계를 설명할 수 있다.
-
-### Deployment
-
-> Kubernetes의 Desired State 개념을 설명할 수 있다.
-
-> Replica를 선언했을 때 Kubernetes가 무엇을 하는지 설명할 수 있다.
-
-### GitOps
-
-> K3s와 K3d의 차이를 설명할 수 있다.
-
-> Argo CD가 무엇을 비교하고 동기화하는지 설명할 수 있다.
-
-> Git을 Source of Truth로 사용한다는 의미를 설명할 수 있다.
-
-> Git에서 Application의 Image Tag를 변경했을 때 실제 Application이 업데이트되는 흐름을 설명할 수 있다.
-
----
-
-# 19. 추천 학습 순서
-
-처음부터 Kubernetes 전체를 공부할 필요는 없습니다.
-
-과제의 진행 순서에 맞춰 필요한 만큼 공부합니다.
-
-```text
-1. 과제 전체 구조 파악
-
-        ↓
-
-2. Vagrant 이해
-
-        ↓
-
-3. Part 1 구현
-   VM → K3s Cluster
-
-        ↓
-
-4. Kubernetes 기본 구조 이해
-   Cluster / Node / Pod
-
-        ↓
-
-5. Part 2 개념
-   Deployment / Service / Ingress
-
-        ↓
-
-6. Part 2 구현
-
-        ↓
-
-7. K3s vs K3d
-
-        ↓
-
-8. Argo CD / GitOps 이해
-
-        ↓
-
-9. Part 3 구현
-
-        ↓
-
-10. 전체 구조 다시 연결
-
-        ↓
-
-11. Mandatory 완성
-
-        ↓
-
-12. Bonus GitLab
-```
-
-즉,
-
-> **필요한 개념을 먼저 이해하고 → 바로 구현하고 → 실제 동작을 확인하고 → 다시 개념과 연결한다.**
-
-이 과정을 반복합니다.
-
----
-
-# 20. 최종적으로 만들어지는 것
-
-Mandatory를 모두 완료하면 전체적으로 다음과 같은 경험을 하게 됩니다.
-
-```text
-Part 1
-
-Vagrant
-   │
-   ├── VM : Server
-   └── VM : Worker
-          │
-          ▼
-     K3s Cluster
-
-
-Part 2
-
-Client
-   │
-   ▼
-Ingress
-   │
-   ▼
-Service
-   │
-   ▼
-Deployment
-   │
-   ▼
-Pods
-
-
-Part 3
-
-Developer
-   │
-git push
-   ▼
-GitHub
-   │
-   ▼
-Argo CD
-   │
-   ▼
-K3d / Kubernetes
-   │
-   ▼
-Application
-
-
-Bonus
-
-Developer
-   │
-git push
-   ▼
-Local GitLab
-   │
-   ▼
-Argo CD
-   │
-   ▼
-Kubernetes
-   │
-   ▼
-Application
-```
-
----
-
-# 21. 제출 구조
-
-Mandatory는 Repository Root에 다음 세 폴더로 제출합니다.
-
-```text
-.
-├── p1/
-├── p2/
-└── p3/
-```
-
-Bonus를 진행한다면:
-
-```text
-.
-├── p1/
-├── p2/
-├── p3/
-└── bonus/
-```
-
-형태가 됩니다.
-
-필요한 Script는 `scripts` 폴더에, Configuration File은 `confs` 폴더에 위치해야 합니다.
-
-예를 들어:
-
-```text
-p1/
-├── Vagrantfile
-├── scripts/
-└── confs/
-
-p2/
-├── Vagrantfile
-├── scripts/
-└── confs/
-
-p3/
-├── scripts/
-└── confs/
-
-bonus/
-├── ...
-├── scripts/
-└── confs/
-```
-
-평가는 **평가받는 팀의 컴퓨터에서 진행**되며, Repository 안에 제출된 내용만 평가 대상이 됩니다.
-
----
-
-# 정리
-
-Inception of Things의 핵심은 단순히 Kubernetes 명령어를 배우는 것이 아닙니다.
-
-이 프로젝트는 지금까지 배운 인프라 개념을 다음 단계로 연결합니다.
-
-```text
-Born2beroot
-│
-│ "Server를 어떻게 관리하는가?"
-│
-▼
-Linux / VM
-
-        ↓
-
-Inception
-│
-│ "Application을 어떻게 격리하는가?"
-│
-▼
-Docker / Container
-
-        ↓
-
-Inception of Things — Part 1
-│
-│ "Container를 운영할 Cluster를 어떻게 만드는가?"
-│
-▼
-Vagrant / K3s / Kubernetes
-
-        ↓
-
-Part 2
-│
-│ "Kubernetes가 Application을 어떻게 관리하는가?"
-│
-▼
-Pod / Deployment / Service / Ingress
-
-        ↓
-
-Part 3
-│
-│ "배포 상태를 어떻게 자동으로 관리하는가?"
-│
-▼
-K3d / Argo CD / GitOps
-
-        ↓
-
-Bonus
-│
-│ "Git Infrastructure까지 직접 운영한다면?"
-│
-▼
-GitLab
-```
-
-따라서 이 과제의 학습 방향은 **VM → Container → Orchestration → GitOps**라는 인프라 기술의 발전 흐름을 이해하는 것입니다.
+다음: [Part 1 — 여러 머신을 하나의 Cluster로 이해하기](part1.md)
