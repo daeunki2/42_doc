@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="740" viewBox="0 0 720 740" role="img" aria-labelledby="title desc">
+<title id="title">Part 1 · 두 머신이 하나의 Cluster로</title><desc id="desc">물리 PC 안의 실습 VM에 Server Guest와 Agent Guest가 있습니다. Agent가 Server의 고정 IP와 Join Token을 사용해 Cluster에 등록합니다. 두 Guest는 서로 다른 localhost를 가집니다.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;fill:#172b4d}.title{font-size:26px;font-weight:700}.label{font-size:21px;font-weight:700}.body{font-size:18px}.note{font-size:17px;fill:#475569}</style>
+<rect width="720" height="740" rx="20" fill="#f8fafc"/>
+<text x="32" y="46" class="title" text-anchor="start">Part 1 · 두 머신이 하나의 Cluster로</text>
+<rect x="28" y="76" width="664" height="620" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="46" y="108" class="label" text-anchor="start">물리 PC</text>
+<rect x="48" y="130" width="624" height="542" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="66" y="162" class="label" text-anchor="start">실습 VM · Vagrant 실행</text>
+<rect x="72" y="192" width="576" height="132" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="90" y="224" class="label" text-anchor="start">Guest VM 1 · K3s Server</text>
+<text x="90" y="252" class="body" text-anchor="start">주소: 192.168.56.110</text>
+<text x="90" y="277" class="body" text-anchor="start">Cluster 상태를 관리 / Pod 실행도 가능</text>
+<rect x="72" y="438" width="576" height="132" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="90" y="470" class="label" text-anchor="start">Guest VM 2 · K3s Agent</text>
+<text x="90" y="498" class="body" text-anchor="start">주소: 192.168.56.111</text>
+<text x="90" y="523" class="body" text-anchor="start">같은 Cluster에 참여 / Pod 실행 역할</text>
+<path d="M144 438 V329" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="176" y="366" class="label" text-anchor="start">Server 주소 :6443 + Join Token</text>
+<text x="176" y="397" class="body" text-anchor="start">Agent가 Server에 연결하여 등록</text>
+<text x="76" y="610" class="note" text-anchor="start">두 Guest의 네트워크 환경과 localhost는 서로 다릅니다.</text>
+<text x="76" y="642" class="note" text-anchor="start">Cluster는 두 Node의 관계이며, 별도의 VM이 아닙니다.</text>
+</svg>

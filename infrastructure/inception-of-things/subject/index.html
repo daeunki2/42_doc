@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>학습 목표와 지도 - 42 Infrastructure Notes</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../../stylesheets/learning-diagrams.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\ud559\uc2b5 \ubaa9\ud45c\uc640 \uc9c0\ub3c4";
+        var mkdocs_page_input_path = "infrastructure/inception-of-things/subject.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> 42 Infrastructure Notes
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Infrastructure</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../../">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Born2beroot</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../born2beroot/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Inception</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../inception/">Overview</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" >Inception of Things</a>
+    <ul class="current">
+                <li class="toctree-l2"><a class="reference internal" href="../">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../network-journey/">네트워크 입문 — 웹 접속의 여정</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../foundations/">VM·Docker로 이어지는 네트워크</a>
+                </li>
+                <li class="toctree-l2 current"><a class="reference internal current" href="#">학습 목표와 지도</a>
+    <ul class="current">
+    <li class="toctree-l3"><a class="reference internal" href="#1">1. 어디에서 출발하는가?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-container-kubernetes">2. Container를 실행할 수 있는데 왜 Kubernetes를 배울까?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-kubernetes">3. Kubernetes의 중심 생각: 원하는 상태를 적는다</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4">4. 처음 만나는 이름들을 역할로 묶기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5">5. 이 과제를 끝낸 뒤 할 수 있어야 하는 것</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6">6. 전체 학습 지도</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-part-1-cluster">7. Part 1: 독립된 머신을 하나의 Cluster로</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#_1">무엇을 만드는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_2">각 요구사항으로 무엇을 배우는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_3">무엇을 설명하고 확인하면 다음으로 갈 수 있을까?</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#8-part-2">8. Part 2: 앱을 유지하는 일과 요청을 보내는 일</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#_4">무엇을 만드는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_5">각 요구사항으로 무엇을 배우는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_6">무엇을 설명하고 확인하면 다음으로 갈 수 있을까?</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-part-3-git">9. Part 3: Git에서 앱 응답까지 이어지는 배포</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#_7">무엇을 만드는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_8">각 요구사항으로 무엇을 배우는가?</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#_9">무엇을 설명하고 확인하면 완료했다고 볼 수 있을까?</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#10-bonus">10. Bonus는 어떤 질문을 더하는가?</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11">11. 공부할 때는 이 순서를 반복하기</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#12">12. 막혔을 때 돌아갈 위치</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#13">13. 학습 완료와 제출 준비 구분하기</a>
+    </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part1/">Part 1 — K3s & Vagrant</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part2/">Part 2 — K3s & Applications</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../part3/">Part 3 — K3d & Argo CD</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../implementation-reference/">Implementation Reference</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../bonus/">Bonus — GitLab</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Web</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/history-and-backend/">Web History and Backend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../web/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Webserv</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/concepts/">Basic Concepts</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/requirements/">Requirements</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/http-networking/">HTTP and Networking</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/implementation/">Implementation Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../web/projects/webserv/testing/">Testing and Evaluation</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../data/projects/">Projects</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI / Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../ai/projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >N-puzzle</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/">Overview</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/subject/">Project Guide</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/puzzle/">Puzzle Representation</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/search/">Search Algorithms</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/heuristics/">Heuristics</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" >Implementation</a>
+    <ul>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/">Overview</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/parser/">Parsing & Validation</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/goal/">Snail Goal</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/movement/">Movement</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/solvability/">Solvability</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/astar/">A* Solver</a>
+                </li>
+                <li class="toctree-l3"><a class="reference internal" href="../../../ai/npuzzle/implementation/gui/">GUI</a>
+                </li>
+    </ul>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../../ai/npuzzle/review/">Review</a>
+                </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Common</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../common/">Overview</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">42 Infrastructure Notes</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Infrastructure</li>
+          <li class="breadcrumb-item">Inception of Things</li>
+      <li class="breadcrumb-item active">학습 목표와 지도</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="kubernetes">학습 목표와 지도: 네트워크에서 Kubernetes로</h1>
+<p>앞에서 우리는 웹 요청이 네트워크를 지나 앱에 도착하는 원리를 배웠습니다. 이제 질문을 바꾸어 봅시다. <strong>그 요청을 받을 앱을 어디에서 실행하고, 계속 정상적인 상태로 유지하고, 새 버전으로 바꾸는 일은 누가 할까요?</strong></p>
+<p>Inception of Things는 이 질문을 작은 환경에서 직접 풀어 보는 과제입니다. 이 페이지는 무엇을 만들고, 각 요구사항으로 무엇을 배우며, 어떤 이해를 갖추고 다음 단계로 넘어갈지 안내합니다. 개념의 상세 설명은 각 Part에, 설정과 명령어는 <a href="../implementation-reference/">구현 참고</a>에 있습니다.</p>
+<p><strong>원문 기준:</strong> 로컬 <code>inception_of_things.pdf</code> v4.0. 아래의 요구사항은 원문을 요약한 것이고, 학습 목표와 읽는 순서는 이 문서가 제안하는 학습 지도입니다. 최신 평가 기준을 대신하는 문서는 아닙니다.</p>
+<h2 id="1">1. 어디에서 출발하는가?</h2>
+<p>처음부터 모든 도구를 알 필요는 없습니다. 다음 두 페이지의 내용을 자신의 말로 설명할 수 있으면 출발할 수 있습니다.</p>
+<table>
+<thead>
+<tr>
+<th>선수지식</th>
+<th>알고 시작할 내용</th>
+<th>아직 어렵다면</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>네트워크</td>
+<td>인터페이스, IP, Port, 경로, DNS와 HTTP Host의 차이</td>
+<td><a href="../network-journey/">웹 접속의 여정</a></td>
+</tr>
+<tr>
+<td>실행 환경</td>
+<td>VM과 Container, Image, localhost, 포트 전달</td>
+<td><a href="../foundations/">VM·Docker의 네트워크</a></td>
+</tr>
+</tbody>
+</table>
+<p>확인할 질문은 두 가지입니다.</p>
+<ul>
+<li>내 브라우저가 다른 환경의 웹 서버에 요청할 때 어떤 주소와 연결이 필요한가?</li>
+<li>같은 PC 안에서도 VM이나 Container의 localhost가 서로 다른 곳일 수 있는 이유는 무엇인가?</li>
+</ul>
+<p>Kubernetes 용어는 아래에서 배우면 됩니다. 처음부터 YAML을 작성하거나 설치 명령을 외울 필요는 없습니다.</p>
+<h2 id="2-container-kubernetes">2. Container를 실행할 수 있는데 왜 Kubernetes를 배울까?</h2>
+<p>웹 앱 하나를 Container로 실행했고 요청도 잘 도착한다고 생각해 봅시다. 이제 앱을 계속 운영하려면 새로운 질문이 생깁니다.</p>
+<pre><code class="language-text">앱이 종료되면 누가 다시 실행할까?
+같은 앱을 세 개 유지하려면 누가 개수를 확인할까?
+머신이 여러 대라면 어느 머신에서 실행할까?
+앱이 교체되어 주소가 달라지면 요청은 어디로 보낼까?
+새 버전을 배포할 때 실행 상태를 누가 관리할까?
+</code></pre>
+<p>Container 실행 도구의 재시작 정책이나 별도 Script로 일부 문제를 해결할 수도 있습니다. 하지만 머신과 앱이 늘어나면 여러 상태를 함께 관리하는 일이 중요해집니다.</p>
+<p><strong>Kubernetes는 Container 기반 앱을 배포하고, 배치하고, 원하는 실행 상태로 관리하는 플랫폼입니다.</strong> 여러 실행 단위가 협력하도록 관리하는 일을 Orchestration이라고 부릅니다. <a href="https://kubernetes.io/docs/concepts/overview/">Kubernetes 공식 개요</a></p>
+<p>모든 작은 앱에 Kubernetes가 필수인 것은 아닙니다. 그 자체의 운영 복잡성도 있습니다. 이 과제에서는 작은 환경을 이용해 이런 관리 문제가 어떻게 해결되는지 배웁니다.</p>
+<h2 id="3-kubernetes">3. Kubernetes의 중심 생각: 원하는 상태를 적는다</h2>
+<p>앱을 유지하는 두 가지 생각을 비교해 봅시다.</p>
+<pre><code class="language-text">동작을 지시: 앱 하나를 지금 실행해라
+상태를 선언: 이 앱이 세 개 실행되는 상태를 유지해라
+</code></pre>
+<p>두 번째가 <strong>선언적 관리</strong>입니다. 원하는 상태를 Desired State, 실제로 관찰한 상태를 Actual State라고 합니다.</p>
+<pre><code class="language-text">원하는 상태: 앱 복제본 3개
+실제 상태:   앱 복제본 2개
+                 ↓ 차이 확인
+           부족한 실행 단위 생성
+                 ↓
+           원하는 상태에 가까워짐
+</code></pre>
+<p>차이를 관찰하고 줄이는 과정을 Reconciliation이라고 하며, 이를 반복하는 관리 구성요소를 Controller라고 부릅니다. <a href="https://kubernetes.io/docs/concepts/architecture/controller/">Kubernetes Controllers</a></p>
+<p>선언했다고 즉시 반드시 성공하는 것은 아닙니다. Image를 가져올 수 없거나 머신 자원이 부족하면 원하는 상태에 도달하지 못합니다. 따라서 <strong>원하는 상태, 실제 상태, 차이가 생긴 이유</strong>를 함께 읽는 것이 학습의 핵심입니다.</p>
+<h2 id="4">4. 처음 만나는 이름들을 역할로 묶기</h2>
+<p>이름을 한꺼번에 외우기보다 질문에 연결해 두세요. 각 Part에서 다시 만납니다.</p>
+<table>
+<thead>
+<tr>
+<th>질문</th>
+<th>개념과 도구</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>어디에서 실행할까?</td>
+<td><strong>Node</strong>: 참여한 머신, <strong>Cluster</strong>: 함께 관리하는 Node들의 집합</td>
+</tr>
+<tr>
+<td>Kubernetes를 어떻게 준비할까?</td>
+<td><strong>K3s</strong>: 가벼운 Kubernetes 배포판</td>
+</tr>
+<tr>
+<td>VM 환경을 반복해서 만들려면?</td>
+<td><strong>Vagrant</strong>: VM 생성과 설정 과정 관리</td>
+</tr>
+<tr>
+<td>앱을 어떤 단위로 실행할까?</td>
+<td><strong>Pod</strong>: Container를 묶어 실행하는 단위</td>
+</tr>
+<tr>
+<td>어떤 앱을 몇 개 유지할까?</td>
+<td><strong>Deployment</strong>: 앱의 배포 상태를 선언하고 관리</td>
+</tr>
+<tr>
+<td>바뀌는 Pod에 어떻게 연결할까?</td>
+<td><strong>Service</strong>: 선택한 Pod 그룹의 안정적인 접점</td>
+</tr>
+<tr>
+<td>HTTP 요청을 어느 앱에 보낼까?</td>
+<td><strong>Ingress</strong>와 <strong>Controller</strong>: 라우팅 규칙과 이를 수행하는 프로그램</td>
+</tr>
+<tr>
+<td>Node를 Docker Container로 만들려면?</td>
+<td><strong>K3d</strong>: Docker에서 K3s Cluster 생성·관리</td>
+</tr>
+<tr>
+<td>Git에 적힌 설정을 누가 반영할까?</td>
+<td><strong>Argo CD</strong>: Git과 Cluster 리소스 상태를 비교하고 동기화</td>
+</tr>
+</tbody>
+</table>
+<p>Kubernetes는 VM처럼 별도 운영체제를 담는 상자가 아닙니다. Node 위에서 실행되는 관리 구성요소와 실행 구성요소가 협력하는 시스템입니다. “Kubernetes 안에 앱이 있다”는 그림은 앱이 그 관리 아래 실행된다는 뜻으로 읽습니다.</p>
+<h2 id="5">5. 이 과제를 끝낸 뒤 할 수 있어야 하는 것</h2>
+<p>도구를 설치했다는 사실보다, 다음 일을 직접 설명하고 확인할 수 있는지를 목표로 삼습니다.</p>
+<ol>
+<li><strong>실행 위치를 그릴 수 있다.</strong> PC, VM, Node, Pod, Container가 어떤 관계인지 구분한다.</li>
+<li><strong>Cluster 참여를 설명할 수 있다.</strong> Server와 Agent가 어떤 주소와 인증 정보로 연결되는지 설명한다.</li>
+<li><strong>앱의 관리와 요청 전달을 구분할 수 있다.</strong> Deployment와 Service·Ingress가 각각 무엇을 하는지 설명한다.</li>
+<li><strong>원하는 상태와 실제 상태를 비교할 수 있다.</strong> Pod가 부족하거나 준비되지 않았을 때 어느 상태를 확인할지 말한다.</li>
+<li><strong>Git 변경부터 앱 응답까지 추적할 수 있다.</strong> v1을 v2로 바꾼 뒤 각 구성요소가 하는 일을 설명한다.</li>
+<li><strong>문제의 범위를 좁힐 수 있다.</strong> 네트워크 연결, 앱 실행, HTTP 라우팅, Git 동기화 중 무엇부터 확인할지 근거를 댄다.</li>
+</ol>
+<h2 id="6">6. 전체 학습 지도</h2>
+<pre><code class="language-text">선수지식: 네트워크 + VM·Container
+    ↓
+Part 1: 앱을 운영할 머신들을 연결한다
+    배울 것: Node, Cluster, Server/Agent, API와 인증
+    ↓
+Part 2: 앱을 유지하고 사용자 요청을 연결한다
+    배울 것: Pod, Deployment, Service, Ingress
+    ↓
+Part 3: 실행할 상태의 기준을 Git에 둔다
+    배울 것: K3d, Namespace, Argo CD, GitOps
+    ↓
+Bonus: 배포 기준이 되는 Git 서비스도 직접 운영한다
+</code></pre>
+<p>이 화살표는 학습 순서입니다. Part 1의 두 VM 위에 Part 2와 Part 3를 계속 추가하라는 뜻은 아닙니다. 각 Part는 다른 환경을 구성하며 앞에서 배운 개념을 다시 사용합니다.</p>
+<p>원문은 전체 작업을 VM에서 진행하도록 요구합니다. 아래 구조도에서는 물리 PC 안의 작업용 VM을 <strong>실습 VM</strong>, Vagrant가 만드는 VM을 <strong>Guest VM</strong>이라고 구분합니다. 중첩 가상화의 실제 지원 여부는 환경 선택 시 확인합니다.</p>
+<h2 id="7-part-1-cluster">7. Part 1: 독립된 머신을 하나의 Cluster로</h2>
+<h3 id="_1">무엇을 만드는가?</h3>
+<pre><code class="language-text">물리 PC
+└── 실습 VM: Vagrant를 실행하는 환경
+    ├── Guest VM: &lt;login&gt;S
+    │   └── 192.168.56.110 / K3s Server
+    └── Guest VM: &lt;login&gt;SW
+        └── 192.168.56.111 / K3s Agent
+
+두 Guest가 네트워크와 인증을 통해 같은 Cluster에 참여
+</code></pre>
+<p>목표는 <strong>독립된 머신 두 대를 하나의 관리 시스템으로 연결하는 것</strong>입니다. 아직 사용자 웹 앱을 배포하는 것이 중심은 아닙니다.</p>
+<h3 id="_2">각 요구사항으로 무엇을 배우는가?</h3>
+<p>기준: 원문 본문 6–8쪽.</p>
+<table>
+<thead>
+<tr>
+<th>과제 요구사항</th>
+<th>배울 수 있는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vagrant로 VM 두 대 실행</td>
+<td>환경의 구성을 파일로 남기고 반복 생성하는 방법</td>
+</tr>
+<tr>
+<td>선택한 배포판의 최신 안정 버전 사용</td>
+<td>Guest OS와 그 위에서 실행할 도구를 구분하는 방법</td>
+</tr>
+<tr>
+<td>팀원 login에 <code>S</code>, <code>SW</code>를 붙인 머신 이름</td>
+<td>머신의 식별과 역할 구분</td>
+</tr>
+<tr>
+<td>primary network interface에 <code>.110</code>, <code>.111</code> 지정</td>
+<td>실제 인터페이스, IP 설정, 머신 간 경로의 관계</td>
+</tr>
+<tr>
+<td>두 머신에 비밀번호 없는 SSH 접속</td>
+<td>네트워크 접속과 키 기반 사용자 인증</td>
+</tr>
+<tr>
+<td>K3s Server와 Agent 구성</td>
+<td>관리 역할과 실행 역할, Cluster 참여</td>
+</tr>
+<tr>
+<td>kubectl 사용</td>
+<td>Linux 로그인과 Kubernetes API 관리의 차이</td>
+</tr>
+</tbody>
+</table>
+<p>원문은 1 CPU와 RAM 512MB 또는 1024MB의 최소 구성을 강하게 권장합니다. 이는 학습용 자원 절약 의도와 연결되지만, 사용할 K3s 버전의 실행 조건과는 별도로 확인해야 합니다. 구체적인 조건은 <a href="../implementation-reference/">Part 1 구현 참고</a>에 있습니다.</p>
+<h3 id="_3">무엇을 설명하고 확인하면 다음으로 갈 수 있을까?</h3>
+<p><strong>설명 목표:</strong> Server 주소, Join Token, SSH Key, kubeconfig가 각각 어떤 질문에 답하는지 구분한다. Agent의 localhost가 Server를 뜻하지 않는 이유를 설명한다.</p>
+<p><strong>동작 확인:</strong> 이름과 주소가 요구사항에 맞고, 두 VM에 키로 SSH 접속할 수 있으며, 같은 Cluster에서 Node 두 개가 Ready로 확인된다.</p>
+<p>“SSH가 된다”와 “Agent가 Cluster에 정상 참여했다”는 서로 다른 확인입니다.</p>
+<p>학습 페이지: <a href="../part1/">Part 1 — 여러 머신을 하나의 Cluster로 이해하기</a></p>
+<h2 id="8-part-2">8. Part 2: 앱을 유지하는 일과 요청을 보내는 일</h2>
+<h3 id="_4">무엇을 만드는가?</h3>
+<pre><code class="language-text">물리 PC
+└── 실습 VM
+    └── Guest VM 1대: &lt;login&gt;S / 192.168.56.110
+        └── K3s Server가 관리하는 앱
+            ├── app1
+            ├── app2 복제본 3개
+            └── app3
+
+Client -&gt; 같은 VM IP:80 -&gt; HTTP Host에 따라 앱 선택
+</code></pre>
+<p>Part 1에서는 머신끼리 연결했습니다. 이제 <strong>그 환경에서 앱을 계속 실행하고, 외부 요청을 올바른 앱까지 전달하는 방법</strong>을 배웁니다. Part 1과 같은 IP를 사용하므로 두 환경을 동시에 실행할 때 주소 충돌에 주의합니다.</p>
+<h3 id="_5">각 요구사항으로 무엇을 배우는가?</h3>
+<p>기준: 원문 본문 9–11쪽.</p>
+<table>
+<thead>
+<tr>
+<th>과제 요구사항</th>
+<th>배울 수 있는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>최신 안정 배포판의 VM 한 대에서 K3s Server 실행</td>
+<td>한 Node도 Cluster를 구성하고 앱을 실행할 수 있다</td>
+</tr>
+<tr>
+<td>이름은 login + <code>S</code>, IP는 <code>.110</code></td>
+<td>머신 식별과 외부 진입점</td>
+</tr>
+<tr>
+<td>웹 앱 세 개 배포</td>
+<td>머신 하나와 앱 실행 하나가 같은 개념이 아니다</td>
+</tr>
+<tr>
+<td>app2 복제본 세 개</td>
+<td>원하는 개수와 실제 Pod 상태를 맞추는 관리</td>
+</tr>
+<tr>
+<td>Host가 <code>app1.com</code>이면 app1</td>
+<td>IP 연결 이후 HTTP 정보로 요청 대상을 구분</td>
+</tr>
+<tr>
+<td>Host가 <code>app2.com</code>이면 app2</td>
+<td>같은 IP·Port로 여러 앱을 제공하는 라우팅</td>
+</tr>
+<tr>
+<td>그 외 요청은 app3</td>
+<td>기본 규칙까지 포함해 동작을 정의하는 방법</td>
+</tr>
+<tr>
+<td>평가에서 Ingress 제시</td>
+<td>선언한 규칙과 실제 요청 결과를 연결해 설명하는 방법</td>
+</tr>
+</tbody>
+</table>
+<p>Pod, Deployment, Service는 이 문서에서 위 요구사항을 이해하고 구성하는 데 사용하는 개념입니다. 특히 app1·app3를 각각 Pod 하나로 두는 것은 문서의 예시이며, 원문에서 복제본 수를 명시한 앱은 app2입니다.</p>
+<h3 id="_6">무엇을 설명하고 확인하면 다음으로 갈 수 있을까?</h3>
+<p><strong>설명 목표:</strong> 다음 두 흐름을 각각 그릴 수 있다.</p>
+<pre><code class="language-text">관리: Deployment -&gt; ReplicaSet -&gt; Pod의 개수와 배포 상태
+요청: Client -&gt; Ingress Controller -&gt; Service backend -&gt; Pod의 앱
+</code></pre>
+<p><strong>동작 확인:</strong> Host별로 app1·app2·app3가 구분되어 응답하고, app2 복제본 세 개가 준비되어 있다. 학습용으로 app2 Pod 하나를 삭제했을 때 새 Pod가 만들어지는 이유도 설명한다. 이 삭제 실험은 이해 확인 방법이며 별도의 원문 요구사항으로 추가한 것은 아니다.</p>
+<p>Pod 세 개가 VM 한 대에서 실행되면 VM 전체 장애에 대한 대비가 된 것은 아닙니다. 복제본을 무엇으로부터 보호하려는지 함께 생각합니다.</p>
+<p>학습 페이지: <a href="../part2/">Part 2 — 앱의 실행과 요청 전달</a></p>
+<h2 id="9-part-3-git">9. Part 3: Git에서 앱 응답까지 이어지는 배포</h2>
+<h3 id="_7">무엇을 만드는가?</h3>
+<pre><code class="language-text">물리 PC
+└── 실습 VM
+    └── Docker
+        └── K3d가 만든 Node Container들
+            └── K3s Cluster
+                ├── Argo CD용 Namespace: 배포 관리
+                └── dev Namespace: 사용자 앱
+
+공개 GitHub의 설정 -&gt; Argo CD -&gt; Cluster의 배포 상태
+Docker Hub의 Image -&gt; Node의 Runtime -&gt; 실제 앱 실행
+</code></pre>
+<p>K3d가 Node 실행 환경을 만들고, K3s가 앱 실행을 관리합니다. Argo CD는 Git과 Cluster 설정을 연결합니다. <strong>어떤 환경에서 실행하는가</strong>와 <strong>실행할 상태의 기준을 어디에 두는가</strong>를 함께 배웁니다.</p>
+<h3 id="_8">각 요구사항으로 무엇을 배우는가?</h3>
+<p>기준: 원문 본문 12–15쪽.</p>
+<table>
+<thead>
+<tr>
+<th>과제 요구사항</th>
+<th>배울 수 있는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vagrant 없이 VM에서 Docker와 K3d 사용</td>
+<td>VM 기반 Node와 Container 기반 Node의 차이</td>
+</tr>
+<tr>
+<td>필요한 패키지·도구 설치 Script 준비</td>
+<td>다른 시점에도 같은 환경을 준비하는 재현성</td>
+</tr>
+<tr>
+<td>Argo CD용 Namespace와 앱용 <code>dev</code> 생성</td>
+<td>같은 Cluster 안의 이름 공간과 관리 범위</td>
+</tr>
+<tr>
+<td>이름에 팀원 login이 포함된 공개 GitHub 저장소</td>
+<td>배포 설정의 기준과 변경 이력을 외부에 기록</td>
+</tr>
+<tr>
+<td>GitHub 설정으로 Argo CD가 앱을 자동 배포</td>
+<td>원하는 설정과 실제 리소스 상태의 동기화</td>
+</tr>
+<tr>
+<td>구분 가능한 v1·v2 앱 준비</td>
+<td>실행 파일 묶음인 Image와 배포 버전의 관계</td>
+</tr>
+<tr>
+<td>GitHub에서 버전 변경 후 업데이트 확인</td>
+<td>commit부터 실제 사용자 응답까지 결과를 추적</td>
+</tr>
+</tbody>
+</table>
+<p>원문 제공 앱은 <code>wil42/playground</code>이며 8888 포트를 사용합니다. 직접 만든 앱을 선택한다면 공개 Docker Hub 저장소에 구분 가능한 <code>v1</code>, <code>v2</code> Image를 준비해야 합니다. Git에 넣는 Manifest는 실행 설정이고 Registry에 넣는 Image는 실행할 앱이라는 차이를 기억하세요.</p>
+<p>문서는 Argo CD Namespace를 <code>argocd</code>로 선택합니다. 원문에서 명시적으로 이름을 고정한 앱 Namespace는 <code>dev</code>입니다. Node 수, 포트 공개 방식, Self-heal·Prune 정책 등의 예시 선택은 원문의 필수 조건과 구분해 읽습니다.</p>
+<h3 id="_9">무엇을 설명하고 확인하면 완료했다고 볼 수 있을까?</h3>
+<p><strong>설명 목표:</strong> 다음 과정을 자신의 말로 연결한다.</p>
+<pre><code class="language-text">Git의 v1을 v2로 변경하고 push
+    -&gt; Argo CD가 새 설정 확인
+    -&gt; Deployment 변경
+    -&gt; Kubernetes가 새 Pod 준비
+    -&gt; 실제 앱이 v2로 응답
+</code></pre>
+<p><strong>동작 확인:</strong> Git에 새 버전이 있고, Argo CD가 해당 변경을 반영하며, 앱이 정상 실행되어 실제 응답이 v2임을 확인한다. <code>Synced</code>와 앱의 정상 실행 상태, 사용자가 받는 응답을 각각 구분한다.</p>
+<p>학습 페이지: <a href="../part3/">Part 3 — Git이 배포의 기준이 되는 과정</a></p>
+<h2 id="10-bonus">10. Bonus는 어떤 질문을 더하는가?</h2>
+<p>필수 Part가 완전히 동작한 뒤, GitHub 대신 Local GitLab을 사용해 같은 배포 흐름을 만듭니다. 원문은 최신 GitLab, 전용 <code>gitlab</code> Namespace, Cluster와의 연동, Part 3의 동작 유지와 <code>bonus</code> 디렉터리 제출을 요구합니다.</p>
+<p>여기서는 <strong>배포 설정을 가져오는 서비스도 내가 운영한다면 무엇을 더 책임져야 할까?</strong>를 배웁니다. Git 서비스의 실행, 주소와 접근 경로, Argo CD의 저장소 연결을 다시 생각하게 됩니다. 원문에서 Helm은 사용할 수 있는 도구의 예이며 필수 도구는 아닙니다.</p>
+<p>학습 페이지: <a href="../bonus/">Bonus — Local GitLab</a></p>
+<h2 id="11">11. 공부할 때는 이 순서를 반복하기</h2>
+<p>각 Part를 한 번에 구현하려고 하기보다 다음 과정을 반복합니다.</p>
+<pre><code class="language-text">1. 요구사항을 한 문장으로 말한다
+2. 실행 위치와 요청·관리 흐름을 그린다
+3. 각 구성요소가 필요한 이유를 설명한다
+4. 문서의 예시를 읽고 결과를 예상한다
+5. 실제 상태를 확인하여 예상과 비교한다
+6. 다르면 어느 단계에서 차이가 생겼는지 찾는다
+</code></pre>
+<p>처음 읽을 때는 1–3에 집중해도 됩니다. 그림에는 아직 설명할 수 없는 용어를 표시해 두고 해당 Part로 돌아갑니다. 구현 후에는 같은 그림에 실제 이름, IP, Port, Namespace를 넣어 봅니다.</p>
+<h2 id="12">12. 막혔을 때 돌아갈 위치</h2>
+<table>
+<thead>
+<tr>
+<th>막히는 질문</th>
+<th>돌아갈 페이지</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP와 Host가 무엇이 다른가?</td>
+<td><a href="../network-journey/">네트워크 입문</a></td>
+</tr>
+<tr>
+<td>localhost가 누구이며 VM까지 어떻게 연결되는가?</td>
+<td><a href="../foundations/">VM·Docker의 네트워크</a></td>
+</tr>
+<tr>
+<td>SSH는 되는데 왜 Cluster에 참여하지 못할까?</td>
+<td><a href="../part1/">Part 1</a></td>
+</tr>
+<tr>
+<td>Pod는 있는데 왜 앱 응답이 없을까?</td>
+<td><a href="../part2/">Part 2</a></td>
+</tr>
+<tr>
+<td>Git은 v2인데 왜 실행 중인 앱은 다를까?</td>
+<td><a href="../part3/">Part 3</a></td>
+</tr>
+<tr>
+<td>이해한 내용을 어떤 설정과 명령으로 표현할까?</td>
+<td><a href="../implementation-reference/">구현 참고</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="13">13. 학습 완료와 제출 준비 구분하기</h2>
+<p>이해한 내용을 설명할 수 있는 것과 제출 요구사항을 빠짐없이 만족하는 것은 함께 확인해야 합니다. 아래 제출 구조는 원문 본문 17쪽 기준이며, 현재 학습 문서 저장소의 <code>docs</code> 구조와는 별개입니다.</p>
+<pre><code class="language-text">과제 제출 저장소/
+├── p1/     VM 두 대와 K3s Cluster 구성
+├── p2/     VM 한 대와 세 웹 앱 구성
+├── p3/     K3d와 Argo CD 배포 구성
+└── bonus/  선택 과제
+</code></pre>
+<p>필요한 Script는 각 Part의 <code>scripts</code>, 설정 파일은 <code>confs</code>에 정리합니다. 원문은 제출 저장소 안의 작업을 평가하고 평가 대상 그룹의 컴퓨터에서 확인한다고 명시합니다.</p>
+<p>마지막으로 세 문장을 완성해 보세요.</p>
+<ul>
+<li><strong>Part 1:</strong> “두 VM을 하나의 Cluster로 연결하려면 …이 필요하다.”</li>
+<li><strong>Part 2:</strong> “사용자 요청은 …을 거쳐 앱에 도착하고, 앱의 개수는 …이 관리한다.”</li>
+<li><strong>Part 3:</strong> “Git의 버전을 바꾸면 …이 설정을 반영하고 …이 앱을 실행한다.”</li>
+</ul>
+<p>다음: <a href="../part1/">Part 1 — 여러 머신을 하나의 Cluster로 이해하기</a></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../foundations/" class="btn btn-neutral float-left" title="VM·Docker로 이어지는 네트워크"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../part1/" class="btn btn-neutral float-right" title="Part 1 — K3s & Vagrant">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../foundations/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../part1/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

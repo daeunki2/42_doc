@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="820" viewBox="0 0 720 820" role="img" aria-labelledby="title desc">
+<title id="title">주소 입력에서 화면 표시까지</title><desc id="desc">브라우저는 DNS로 주소를 알아낸 뒤 서버와 연결하고 HTTP 요청과 응답을 주고받습니다. 응답으로 받은 HTML에서 추가 자원을 요청하여 화면을 구성합니다.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;fill:#172b4d}.title{font-size:26px;font-weight:700}.label{font-size:21px;font-weight:700}.body{font-size:18px}.note{font-size:17px;fill:#475569}</style>
+<rect width="720" height="820" rx="20" fill="#f8fafc"/>
+<text x="32" y="46" class="title" text-anchor="start">주소 입력에서 화면 표시까지</text>
+<rect x="36" y="80" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="112" class="label" text-anchor="start">① 주소를 읽는다</text>
+<text x="54" y="140" class="body" text-anchor="start">https://www.naver.com/ → 대상 이름과 접근 방식</text>
+<path d="M360 170 V202" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="208" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="240" class="label" text-anchor="start">② DNS로 주소를 알아낸다</text>
+<text x="54" y="268" class="body" text-anchor="start">유효한 캐시가 없으면 Resolver에 질의한다.</text>
+<path d="M360 298 V330" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="336" width="648" height="115" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="368" class="label" text-anchor="start">③ 네트워크를 통해 서버와 연결한다</text>
+<text x="54" y="396" class="body" text-anchor="start">인터페이스 → 공유기·Router → 목적지</text>
+<text x="54" y="421" class="body" text-anchor="start">대표적인 TCP 기반 HTTPS: TCP 연결 + TLS 보호</text>
+<path d="M360 451 V483" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="489" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="521" class="label" text-anchor="start">④ HTTP 요청과 응답을 주고받는다</text>
+<text x="54" y="549" class="body" text-anchor="start">브라우저 → 요청 / 서버 → 상태 코드·Header·Body</text>
+<path d="M360 579 V611" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="617" width="648" height="115" rx="12" fill="#e9f7ef" stroke="#83bda0" stroke-width="1.5"/>
+<text x="54" y="649" class="label" text-anchor="start">⑤ 받은 내용을 화면으로 만든다</text>
+<text x="54" y="677" class="body" text-anchor="start">HTML 해석 → CSS·JS·이미지 등 추가 요청</text>
+<text x="54" y="702" class="body" text-anchor="start">배치·그리기 → 화면 표시와 갱신</text>
+<text x="36" y="767" class="note" text-anchor="start">DNS 조회와 연결 준비도 같은 네트워크를 사용합니다.</text>
+<text x="36" y="794" class="note" text-anchor="start">개념 순서이며, 실제 네이버 내부 구조를 나타내지 않습니다.</text>
+</svg>

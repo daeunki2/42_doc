@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1010" viewBox="0 0 720 1010" role="img" aria-labelledby="title desc">
+<title id="title">Part 3 · Git 변경이 앱 응답으로</title><desc id="desc">GitHub의 Image 설정을 v2로 변경하면 Argo CD가 읽고 Deployment를 동기화합니다. Kubernetes가 새 Pod를 준비하고 Node Runtime이 Registry의 Image를 실행합니다. 사용자 응답을 별도로 확인해야 합니다.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;fill:#172b4d}.title{font-size:26px;font-weight:700}.label{font-size:21px;font-weight:700}.body{font-size:18px}.note{font-size:17px;fill:#475569}</style>
+<rect width="720" height="1010" rx="20" fill="#f8fafc"/>
+<text x="32" y="46" class="title" text-anchor="start">Part 3 · Git 변경이 앱 응답으로</text>
+<rect x="36" y="80" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="112" class="label" text-anchor="start">① 공개 GitHub 저장소</text>
+<text x="54" y="140" class="body" text-anchor="start">Manifest: 실행할 Image를 v1 → v2로 변경</text>
+<path d="M360 170 V200" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="206" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="238" class="label" text-anchor="start">② Argo CD · argocd Namespace</text>
+<text x="54" y="266" class="body" text-anchor="start">Git을 읽고 Cluster 설정과 비교 → 자동 Sync</text>
+<path d="M360 296 V326" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="332" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="364" class="label" text-anchor="start">③ Deployment 설정 변경</text>
+<text x="54" y="392" class="body" text-anchor="start">Argo CD가 v2 설정 반영 / Kubernetes가 배포 관리</text>
+<path d="M360 422 V452" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="458" width="648" height="115" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="490" class="label" text-anchor="start">④ Node Runtime이 Image 확보·실행</text>
+<text x="54" y="518" class="body" text-anchor="start">별도 출처: Docker Hub 등 Image Registry</text>
+<text x="54" y="543" class="body" text-anchor="start">Git은 실행 설정을, Registry는 실행할 Image를 제공</text>
+<path d="M360 573 V603" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="609" width="648" height="90" rx="12" fill="#eaf2ff" stroke="#93b4e8" stroke-width="1.5"/>
+<text x="54" y="641" class="label" text-anchor="start">⑤ 새 Pod 준비 · dev Namespace</text>
+<text x="54" y="669" class="body" text-anchor="start">앱 시작 → Ready 확인 → 요청 대상에 포함</text>
+<path d="M360 699 V729" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="36" y="735" width="648" height="90" rx="12" fill="#e9f7ef" stroke="#83bda0" stroke-width="1.5"/>
+<text x="54" y="767" class="label" text-anchor="start">⑥ 실제 응답 확인</text>
+<text x="54" y="795" class="body" text-anchor="start">Client 요청 → 앱이 v2로 응답</text>
+<text x="36" y="866" class="label" text-anchor="start">Synced: Git과 Cluster 설정이 일치하는가?</text>
+<text x="36" y="900" class="body" text-anchor="start">Healthy: 리소스가 기대한 실행 상태에 도달했는가?</text>
+<text x="36" y="934" class="body" text-anchor="start">실제 응답: 사용자가 기대한 버전을 받고 있는가?</text>
+<text x="36" y="978" class="note" text-anchor="start">GitHub가 Container에 직접 파일을 밀어 넣는 흐름이 아닙니다.</text>
+</svg>
